@@ -306,6 +306,7 @@ class AgendaScreen extends Component {
 
   getData() {
     console.tron.log("getData");
+    return []
     const today = moment();
     const dayFormat = "YYYY-MM-DD";
     const currentDay = moment().format(dayFormat);

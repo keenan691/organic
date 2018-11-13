@@ -26,6 +26,7 @@
                     (my/defprojectshortcut ?r "src/redux/index.js")
                     (my/defprojectshortcut ?s "src/themes/ApplicationStyles.js")
                     (my/defprojectshortcut ?t "src/themes")
+                    (my/defprojectshortcut ?p "package.json")
                     (my/defshortcut ?k skeleton/templates-dir)
                     (my/defshortcut ?x "index.js")
                     ;; (my/defprojectshortcut ?e "ignite/plugins/projectcomponents/templates")

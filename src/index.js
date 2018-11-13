@@ -12,7 +12,7 @@ import createSagaMiddleware from "redux-saga";
 import sagaPlugin from "reactotron-redux-saga";
 import storage from "redux-persist/lib/storage";
 
-import OrgApi from "org-mode-connection";
+import { OrgApi } from "org-mode-connection";
 
 import {
   configureNavigation,

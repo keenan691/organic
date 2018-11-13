@@ -20,7 +20,7 @@ import DialogAndroid from "react-native-dialogs";
 import R from "ramda";
 import moment from "moment";
 
-import OrgApi from "org-mode-connection";
+import { OrgApi } from "org-mode-connection";
 
 import { Colors } from "./themes";
 import {
@@ -272,13 +272,13 @@ export function* startup(action) {
 
   /* ------------- Load readme if is first run ------------- */
 
-  const firstRun = yield select(StartupSelectors.isFirstRun);
-  if (firstRun) {
-    const res = yield call(RNFS.readFileAssets, "org/readme.org", "utf8");
-    yield call(OrgApi.createFileFromString, "readme.org", res.split("\n"));
-  }
-  yield put(OrgDataRedux.getOrgDataRequest());
-  yield put(StartupRedux.startupFinished());
+  // const firstRun = yield select(StartupSelectors.isFirstRun);
+  // if (firstRun) {
+  //   const res = yield call(RNFS.readFileAssets, "org/readme.org", "utf8");
+  //   yield call(OrgApi.createFileFromString, "readme.org", res.split("\n"));
+  // }
+  // yield put(OrgDataRedux.getOrgDataRequest());
+  // yield put(StartupRedux.startupFinished());
 }
 
 // * Nodes interactions sagas
