@@ -1,0 +1,8 @@
+syntax: glob
+.emacs.desktop
+.emacs.desktop.lock
+.idea
+.git
+coverage
+ignite
+android

@@ -1,0 +1,293 @@
+#+TITLE: =Organic= 0.8 manual
+
+* Notebooks
+
+=Notebook= is organized in a hierarchical structure which is the best representation of notes and thoughts. An overview of this structure is achieved by folding (hiding) large parts of the document to show only the general document structure and the parts currently being worked on.
+
+=Notebooks= can be imported from org format file or created in =Organic=.
+
+** Add/Sync
+Press =red button= when visiting Notebooks screen and then
+
+- =green button= to add local notebook
+- =blue button= to connect to org mode file
+- =purple button= to trigger manual sync
+
+** Manage Notebooks
+
+=Press Long= on notebook to show menu with the possible actions:
+
+*** Rename
+Renames metadata title in org file.
+
+*** Delete
+Deletes file from database.
+
+** Synchronizing beetweet devices
+Due to the fact that =Organic= is only responsible for synchronisation between the =org= file and the =internal database= to take advantage of the synchronisation  between devices possibility you need to use the external tool eg:
+
+- [[https://en.wikipedia.org/wiki/Resilio_Sync][Resilio Sync]]
+- Dropbox
+- Google Drive
+
+At the moment only manual sync is possible.
+
+New chages are sygnalized by =sync= text indicator at the bottom of the menu.
+
+Sync can be triggered manually by pressing the =main button= on notes screen and then the =blue one=.
+
+Merging and resolving changes is not yet supported so when you make changes on =Organic= and after that you receive remote changes from =org file= you will have conflict and there are two ways to resolve it.
+
+Press long on conflicted file on the notes screen and then select option:
+
+*** Force load
+Overwrites =Organic= changes with imported file changes.
+
+*** Force save
+Overwrites imported file with =Organic's= version.
+
+* Notes
+** Properties
+*** This is =headline's= title
+Press it to edit
+
+*** Click here to see headline's =content=
+Here is some content.
+You can make words *bold*, /italic/, _underlined_, =verbatim= and ~code~, and +strike-through+.
+
+*** Can have tags                                   :sampleTag1:sampleTag2:
+Press on tag to change it.
+
+You can select from existing tags or enter new tags.
+
+When entering tags they should be =separated by space=.
+
+=Press long= tag to search for the other occurances of the tag in all of the files.
+
+*** TODO Can have todo state
+Press on =todo state different than done= to mark it as done.
+
+Press on =done task= to select new state.
+
+*** [#A] Can have priority
+=Press= priority to edit it.
+
+*** TODO Headline can be scheduled
+DEADLINE: <2018-10-25 czw> SCHEDULED: <2018-10-21 nie>
+Date links to the agenda
+
+** Visibility
+*** Use slider on the top of the screen to fold  the  whole levels of headlines
+**** Child note
+The content of this note is not seen in the main view
+
+***** Child note
+
+** Interactions
+*** To edit this headline press it with =two fingers=.
+*** Press long to trigger batch edit mode
+If there is only one object selected, by pressing it again, you can switch modes beetween =batch edit= and =outline=
+
+**** Batch edit mode
+In this mode you can select many headlines and change their properties or delete them:
+
+The available options are:
+- to delete
+- to change/clear tags
+- to change/clear todo
+- to change/clear priority
+- agenda
+  - schedule for today .
+  - schedule by +1day
+  - schedule by +2day
+  - schedule by +3day
+  - schedule
+    - date
+    - time
+    - repeater
+  - deadline
+    - warning period
+
+**** Outline edit mode
+It is used to move headline in the tree structure
+In this mode only one object can be selected
+
+It can work in two submodes:
+- freely move single
+- move the whole subtree
+
+*** TODO Flinge from the left side on the headline and quickly press it  to mark todo as done
+*** Flinge finger to the left and quickly press to edit todo
+*** Flinge finger to the right and quickly press to edit tags
+
+** Adding
+*** Press red plus button when one headline is selected
+It adds new headline as a child of the =selected headline=
+
+*** Press red plus button when no headlines are selected
+It adds new headline as a child of the =current root headline=
+
+** Marking
+Note can be marked/unmarked for quick access by pressing the =mark= button
+Marked notes can be accessed in the sidebar
+
+* Sinks/Capture Templates
+They are used to quickly insert headline to the specified file in the specific place of its headlines structure with the specified properties.
+
+** Creating
+1. Narrow to selected node by clicking on it
+2. Press =sink button= on the right top
+3. Enter name of a new capture template
+
+At this moment created capture template has no properties.
+
+** Using
+You can use capture templates from inside app by pressing =plus= icon on the bottom menu and then selecting desired capture template from the list
+
+Capture can be also trigerred from android notification outside app.
+
+** Modifing
+When capture template is initially selected it has no properties.
+You can add it when editing node in the capture form.
+Modified capture template can be saved, by pressing icon on top left edit screen. It has two possiblities:
+- =Save=
+- =Save as=
+
+** Managing
+Capture templates can be saved, renamed and deleted
+
+* Deadlines,  scheduling and repeated tasks
+These are compatibile with org-mode. You can read more in the org-mode manual.
+- [[https://orgmode.org/manual/Deadlines-and-scheduling.html][The Org Manual: Deadlines and scheduling]]
+- [[https://orgmode.org/manual/Repeated-tasks.html#Repeated-tasks][The Org Manual: Repeated tasks]]
+
+* Search
+** Search query
+You can search using this fields
+- phrase
+- todo states
+- tags
+- priority
+- is sheduled
+- deadline
+
+Press an unmarked search agrument to mark it green
+Press the marked green search agrument to mark it red
+Press the marked red search agrument to unmark it
+
+Red color works as a negation
+
+** Manage
+Searches can be saved, renamed and deleted
+
+* Changelogs
+
+** 0.8
+First release
+
+* Future plans and ideas
+** Small Enhacements
+- can fold/unfold independent headlines
+- use inactive timestamp to create the last added
+
+** Themes
+- a few dark and white themes.
+- automatically change theme beetween dark and white based on sunrise/sunset times
+
+** Automatic sync and a changes merging system
+- Run sync periodically when phone is in the sleep mode
+- Intelligently merge changes if we have them remote and local
+- If it cannot auto merge show manual merge dialog with the possibility to merge individual notes
+
+** Better GTD support
+- stucked projects
+- gps based context tags
+- reports tools
+
+** Better Org mode support
+- categories
+- headline and files properties
+- inherited tags
+- sparse trees
+- file tags
+- configurable todo flows
+- tables
+- src blocks
+- date ranges
+- effort
+- clocking
+
+** Refile module
+Move headlines quickly between files, other notes
+
+** Dashboard of your life
+** Capture templates saved in headline metedata
+If you share file, capture templates are also shared
+
+** Lists and checkboxes
+- can outline lists and checkboxes
+- check/uncheck checkboxes
+- convert headline tree => checkboxes/lists tree and vice versa
+** Better outline mode
+- optimise performance
+- powerful touchable interface
+
+** Content edit module
+- manipulates lists and checkboxes
+- extracts region of the note
+
+** Generate lisp snippet with the current capture templates
+- Generated snippet can be saved in the selected org file
+- Snippet can be pasted directly to the org-mode config
+
+** Spaced Repetition module
+[[https://en.wikipedia.org/wiki/Spaced_repetition][Spaced repetition - Wikipedia]]
+Compatibile with [[https://orgmode.org/worg/org-contrib/org-drill.html][org-drill.el]]
+
+** Alarms and notifications
+- can schedule items as phone alarms
+- notification
+** Clocking module
+- pomodoro mode
+- can clock-in and clock-out tasks
+- current clocked in task synhronized with org-mode
+- daily, weekly and monthly reports
+- set/view effort
+
+** New capture types
+- place using gps
+- capture with the timestamp
+- capture to date tree
+- sheduled/deadline for tommorow, today itd
+
+** Customisable agenda
+** Concept maps
+- visualise headlines in different graphical forms
+- add the way of adding a hierarchy independent two-way relationship between two entries
+
+Inspired by [[https://github.com/Kungsgeten/org-brain][GitHub - Kungsgeten/org-brain: Org-mode wiki + concept-mapping]]
+
+** Notes sharing and collaboration module
+** Web browsers capture plugins
+- coverts html selection to  the org mode format
+- triggers capture templates
+** Phone contacts integration
+
+** Google calendar integration
+
+** Youtube playlists integration
+
+** Mercurial and Git support
+** WebDav support
+** Blackberry's phisicall  keyboard support
+** Voice note capture features
+When using google voice keybord
+- tag the headline using the dictated content
+- automatically divide the dictated content on headline and content
+- brainstorm mode
+  - dim screen instead of going to sleep
+  - auto switch off brainstorm mode after some time of inactivity
+  - trigger capture by shaking the phone
+
+* Contact
+[[mailto:bartlomiej.nankiewicz@gmail.com][bartlomiej.nankiewicz@gmail.com]]

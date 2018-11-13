@@ -1,0 +1,11 @@
+{
+  "plugins": {
+    "modules": {},
+    "es_modules": {},
+    "node": {},
+    "resolve": {}
+  },
+  "libs": ["browser", "ecmascript", "jest"],
+  "loadEagerly": [
+  ]
+}
