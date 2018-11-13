@@ -1,7 +1,10 @@
+# Personal
+.dir-locals.el
+TODOs.org
+
 # OSX
 #
 .DS_Store
-
 # Xcode
 #
 build/

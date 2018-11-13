@@ -1,36 +1,43 @@
-screenshoot:
-	@read -p "Enter filename:" screen_name; \
-	screen_path=/sdcard/Download/Sync/share/$$screen_name.png; \
-	~/Android/Sdk/platform-tools/adb shell screencap $$screen_path
+fix-imports:
+	find ./src -name "**.ts*" -exec importjs rewrite --overwrite {} \;
 
-# android/app/build/outputs/apk/app-release.apk
-pub: clean build install_build
+prettier:
+	cd src
+	yarn prettier --write "**/*.ts*"
+
+eslint-fix:
+	yarn eslint --fix
+
+tsc:
+	yarn tsc -p ./ --noEmit
+
+tsc-watch:
+	yarn tsc -p ./ --noEmit -w
+
+install-clean-version: clean build install_build
 
 build:
 	cd android; ./gradlew assembleRelease
 
-install_build:
+install-build:
 	react-native run-android --variant=release
 
-test:
-	./node_modules/.bin/jest --bail --color --watch --notify
+# test:
+# 	yarn jest --bail --color --watch --notify
 
-testCurrent:
-	./node_modules/.bin/jest --bail --color --watch --notify -t move
+# test-current:
+# 	yarn test --bail --color --watch --notify -t Content
 
 install:
 	react-native run-android
 
 log:
-	react-native log-android
-
-log1:
 	adb logcat | grep 'ReactNative'
 
 kill:
 	fuser -k -n tcp 8081
 
-clean:
+clean-react:
 	rm -rf /tmp/metro-cache; \
 	watchman watch-del-all; \
 	rm -rf $TMPDIR/react-native-packager-cache-*; \
@@ -38,18 +45,18 @@ clean:
 
 clean1:
 	yarn install; \
-	yarn link org-mode-connection
-	rm -rf node_modules; \
 	rm -rf android/build; \
 
-cleanYarn:
+clean-yarn:
 	yarn cache clean; \
+	rm -rf node_modules; \
 	yarn install; \
-	yarn link org-mode-connection
 
-run:
-	~/Android/Sdk/platform-tools/adb reverse tcp:8081 tcp:8081
+run: bridge
 	yarn start
+
+add-types:
+	inv add-types
 
 bridge:
 	~/Android/Sdk/platform-tools/adb reverse tcp:8081 tcp:8081

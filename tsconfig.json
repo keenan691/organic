@@ -9,9 +9,10 @@
     "esModuleInterop": true,
     "allowSyntheticDefaultImports": true,
     "jsx": "react",
-    "lib": ["esnext"]
+    "lib": ["esnext"],
+    "typeRoots": [ "./types", "./node_modules/@types"]
   },
-  "include": [
-    "src"
+  "exclude": [
+    "node_modules"
   ]
 }

@@ -1,0 +1,74 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`OrgDataRedux should match a snapshot 1`] = `undefined`;
+
+exports[`OrgDataRedux should match a snapshot 2`] = `undefined`;
+
+exports[`OrgDataRedux should match a snapshot 3`] = `undefined`;
+
+exports[`OrgDataRedux should match a snapshot 4`] = `Array []`;
+
+exports[`OrgDataRedux should match a snapshot 5`] = `Object {}`;
+
+exports[`OrgDataRedux should match a snapshot 6`] = `Array []`;
+
+exports[`OrgDataRedux should match a snapshot 7`] = `Array []`;
+
+exports[`OrgDataRedux should match a snapshot 8`] = `
+Object {
+  "agenda": Array [],
+  "agendaResults": Array [],
+  "lastCaptured": Array [],
+  "markedPlaces": Array [],
+  "notes": Array [],
+  "search": Array [],
+  "searchResults": Array [],
+}
+`;
+
+exports[`OrgDataRedux should match a snapshot 9`] = `Array []`;
+
+exports[`OrgDataRedux should match a snapshot 10`] = `undefined`;
+
+exports[`OrgDataRedux should match a snapshot 11`] = `undefined`;
+
+exports[`OrgDataRedux should match a snapshot 12`] = `Object {}`;
+
+exports[`OrgDataRedux should match a snapshot 13`] = `Array []`;
+
+exports[`OrgDataRedux should match a snapshot 14`] = `Array []`;
+
+exports[`OrgDataRedux should match a snapshot 15`] = `
+Object {
+  "end": "2018-11-19",
+  "start": "2018-11-19",
+}
+`;
+
+exports[`OrgDataRedux should match a snapshot 16`] = `
+Object {
+  "agenda": null,
+  "agendaResults": null,
+  "lastCaptured": null,
+  "markedPlaces": null,
+  "notes": null,
+  "search": null,
+  "searchResults": null,
+}
+`;
+
+exports[`OrgDataRedux should match a snapshot 17`] = `
+Object {
+  "agenda": false,
+  "agendaResults": false,
+  "lastCaptured": false,
+  "markedPlaces": false,
+  "notes": false,
+  "search": false,
+  "searchResults": false,
+}
+`;
+
+exports[`OrgDataRedux should match a snapshot 18`] = `false`;
+
+exports[`OrgDataRedux should match a snapshot 19`] = `Array []`;
