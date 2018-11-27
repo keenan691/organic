@@ -4,7 +4,9 @@
 
 More info soon.
 
-[[https://play.google.com/store/apps/details?id=com.from.chaos.to.organization.organic&hl=en][Available on Google Play]]
+** Installation
+
+- [[https://play.google.com/store/apps/details?id=com.from.chaos.to.organization.organic&hl=en][Available on Google Play]]
 
 ** Documentation
 
