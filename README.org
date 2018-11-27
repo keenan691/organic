@@ -2,11 +2,11 @@
 
 [[http://spacemacs.org][file:https://cdn.rawgit.com/syl20bnr/spacemacs/442d025779da2f62fc86c2082703697714db6514/assets/spacemacs-badge.svg]]
 
-file:https://github.com/bnankiewicz/organic/blob/master/src/images/promo.png
+file:https://cdn.rawgit.com/bnankiewicz/organic/blob/master/src/images/promo.png
 
 * Organic
 
-file:https://github.com/bnankiewicz/organic/blob/master/src/images/icon.svg
+file:https://cdn.rawgit.com/bnankiewicz/organic/blob/master/src/images/icon.svg
 file:https://github.com/bnankiewicz/organic/blob/master/src/images/splash-logo.svg
 
 * Documentation
