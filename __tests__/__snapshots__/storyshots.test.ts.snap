@@ -1,0 +1,436 @@
+// Jest Snapshot v1, https://goo.gl/fbAQLP
+
+exports[`Storyshots FileList basic 1`] = `
+<RCTScrollView
+  ItemSeparatorComponent={[Function]}
+  ListEmptyComponent={[Function]}
+  data={
+    Array [
+      Object {
+        "id": "899c56c6-99d0-539b-8744-0ca40ebb9c70",
+        "isChanged": true,
+        "metadata": Object {
+          "TITLE": "Ukupoh es.",
+        },
+        "path": undefined,
+      },
+      Object {
+        "id": "18e91d42-75b4-5f59-8aea-350649bb21d9",
+        "isChanged": true,
+        "lastSync": "2019-04-07T22:00:00.000Z",
+        "metadata": Object {
+          "TITLE": "Duh gew.",
+        },
+        "mtime": "2019-04-04T22:00:00.000Z",
+        "path": "path/file.org",
+      },
+      Object {
+        "id": "c23deda2-cacd-5546-a01d-9c1866edfea6",
+        "isChanged": false,
+        "lastSync": "2019-04-04T22:00:00.000Z",
+        "metadata": Object {
+          "TITLE": "Itijaer benidu.",
+        },
+        "mtime": "2019-04-07T22:00:00.000Z",
+        "path": "path/file.org",
+      },
+      Object {
+        "id": "3ca36cc5-d9ca-5aa1-8ef9-3255124c48b1",
+        "isChanged": true,
+        "lastSync": "2019-04-04T22:00:00.000Z",
+        "metadata": Object {
+          "TITLE": "Cegem pi.",
+        },
+        "mtime": "2019-04-07T22:00:00.000Z",
+        "path": "path/file.org",
+      },
+      Object {
+        "id": "3fb4f640-1a61-5429-a1f7-09ca34ce7579",
+        "isChanged": true,
+        "isConflicted": true,
+        "metadata": Object {
+          "TITLE": "Re gaferelan.",
+        },
+        "path": "path/file.org",
+      },
+    ]
+  }
+  disableVirtualization={false}
+  getItem={[Function]}
+  getItemCount={[Function]}
+  horizontal={false}
+  initialNumToRender={10}
+  keyExtractor={[Function]}
+  maxToRenderPerBatch={10}
+  numColumns={1}
+  onContentSizeChange={[Function]}
+  onEndReachedThreshold={2}
+  onLayout={[Function]}
+  onMomentumScrollEnd={[Function]}
+  onScroll={[Function]}
+  onScrollBeginDrag={[Function]}
+  onScrollEndDrag={[Function]}
+  removeClippedSubviews={false}
+  renderItem={[Function]}
+  scrollEventThrottle={50}
+  stickyHeaderIndices={Array []}
+  updateCellsBatchingPeriod={50}
+  viewabilityConfigCallbackPairs={Array []}
+  windowSize={21}
+>
+  <View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "backgroundColor": "#ECF0F1",
+            "opacity": 1,
+            "paddingBottom": 15,
+            "paddingHorizontal": 20,
+            "paddingTop": 15,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#6d8484",
+              "fontFamily": "Avenir-Book",
+              "fontSize": 20,
+            }
+          }
+        >
+          Ukupoh es.
+        </Text>
+      </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "#Dcdcdc",
+            "height": 1,
+            "marginHorizontal": 20,
+          }
+        }
+      />
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "backgroundColor": "#ECF0F1",
+            "opacity": 1,
+            "paddingBottom": 15,
+            "paddingHorizontal": 20,
+            "paddingTop": 15,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#6d8484",
+              "fontFamily": "Avenir-Book",
+              "fontSize": 20,
+            }
+          }
+        >
+          Duh gew.
+        </Text>
+        <View
+          style={
+            Object {
+              "marginTop": 5,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "flex-start",
+                  "flexDirection": "row",
+                },
+              ]
+            }
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#97a7a7",
+                  },
+                  Object {
+                    "color": "#e95e50",
+                  },
+                ]
+              }
+            >
+               
+              Local changes
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "#Dcdcdc",
+            "height": 1,
+            "marginHorizontal": 20,
+          }
+        }
+      />
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "backgroundColor": "#ECF0F1",
+            "opacity": 1,
+            "paddingBottom": 15,
+            "paddingHorizontal": 20,
+            "paddingTop": 15,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#6d8484",
+              "fontFamily": "Avenir-Book",
+              "fontSize": 20,
+            }
+          }
+        >
+          Itijaer benidu.
+        </Text>
+        <View
+          style={
+            Object {
+              "marginTop": 5,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "flex-start",
+                  "flexDirection": "row",
+                },
+              ]
+            }
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#97a7a7",
+                  },
+                  Object {
+                    "color": "#e95e50",
+                  },
+                ]
+              }
+            >
+               
+              Remote changes
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "#Dcdcdc",
+            "height": 1,
+            "marginHorizontal": 20,
+          }
+        }
+      />
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "backgroundColor": "#ECF0F1",
+            "opacity": 1,
+            "paddingBottom": 15,
+            "paddingHorizontal": 20,
+            "paddingTop": 15,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#6d8484",
+              "fontFamily": "Avenir-Book",
+              "fontSize": 20,
+            }
+          }
+        >
+          Cegem pi.
+        </Text>
+        <View
+          style={
+            Object {
+              "marginTop": 5,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "flex-start",
+                  "flexDirection": "row",
+                },
+              ]
+            }
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#97a7a7",
+                  },
+                  Object {
+                    "color": "#e95e50",
+                  },
+                ]
+              }
+            >
+               
+              Local and remote changes. Must resolve manually.
+            </Text>
+          </View>
+        </View>
+      </View>
+      <View
+        style={
+          Object {
+            "backgroundColor": "#Dcdcdc",
+            "height": 1,
+            "marginHorizontal": 20,
+          }
+        }
+      />
+    </View>
+    <View
+      onLayout={[Function]}
+      style={null}
+    >
+      <View
+        accessible={true}
+        isTVSelectable={true}
+        onResponderGrant={[Function]}
+        onResponderMove={[Function]}
+        onResponderRelease={[Function]}
+        onResponderTerminate={[Function]}
+        onResponderTerminationRequest={[Function]}
+        onStartShouldSetResponder={[Function]}
+        style={
+          Object {
+            "backgroundColor": "#ECF0F1",
+            "opacity": 1,
+            "paddingBottom": 15,
+            "paddingHorizontal": 20,
+            "paddingTop": 15,
+          }
+        }
+      >
+        <Text
+          style={
+            Object {
+              "color": "#6d8484",
+              "fontFamily": "Avenir-Book",
+              "fontSize": 20,
+            }
+          }
+        >
+          Re gaferelan.
+        </Text>
+        <View
+          style={
+            Object {
+              "marginTop": 5,
+            }
+          }
+        >
+          <View
+            style={
+              Array [
+                Object {
+                  "alignItems": "flex-start",
+                  "flexDirection": "row",
+                },
+              ]
+            }
+          >
+            <Text
+              style={
+                Array [
+                  Object {
+                    "color": "#97a7a7",
+                  },
+                  Object {
+                    "color": "#e95e50",
+                  },
+                ]
+              }
+            >
+               
+              Local changes
+            </Text>
+          </View>
+        </View>
+      </View>
+    </View>
+  </View>
+</RCTScrollView>
+`;

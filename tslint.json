@@ -1,29 +1,43 @@
 {
-  "extends": [
-    "tslint:recommended",
-    "tslint-config-standard",
-    "tslint-react",
-    "tslint-config-prettier"
-  ],
+  "defaultSeverity": "error",
+  "extends": ["tslint:recommended", "tslint-config-prettier"],
+  "jsRules": {},
   "rules": {
-    "jsx-boolean-value": "never",
-    "member-access": [true, "no-public"],
-    "member-ordering": [
+    "await-promise": [
       true,
-      {
-        "alphabetize": true,
-        "order": [
-          "public-static-field",
-          "public-instance-field",
-          "public-constructor",
-          "private-static-field",
-          "private-instance-field",
-          "private-constructor",
-          "public-instance-method",
-          "protected-instance-method",
-          "private-instance-method"
-        ]
-      }
+      "Bluebird",
+      "Thenable",
+      "SchemaBuilder",
+      "RequestPromise"
+    ],
+    "no-floating-promises": [
+      true,
+      "Bluebird",
+      "Thenable",
+      "SchemaBuilder",
+      "RequestPromise"
+    ],
+    "promise-function-async": true,
+    "ordered-imports": false,
+    "no-console": true,
+    "comment-format": false,
+    "no-var-requires": false,
+    "interface-name": false,
+    "no-implicit-dependencies": false,
+    "max-classes-per-file": false,
+    "no-duplicate-imports": false,
+    "no-unused-expression": [true, "allow-fast-null-checks"],
+    "no-empty-interface": false,
+    "no-switch-case-fall-through": true,
+    "object-literal-sort-keys": false,
+    "member-access": false,
+    "member-ordering": false,
+    "strict-type-predicates": true,
+    "strict-boolean-expressions": [
+      true,
+      "allow-null-union",
+      "allow-undefined-union",
+      "ignore-rhs"
     ]
   }
 }

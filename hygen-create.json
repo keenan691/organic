@@ -1,0 +1,17 @@
+{
+  "about": "This is a hygen-create definitions file. The hygen-create utility creates generators that can be executed using hygen.",
+  "hygen_create_version": "0.2.0",
+  "name": "component",
+  "files_and_dirs": {
+    "hygen-create.json": true,
+    "src/view/components/file-list/helpers.ts": true,
+    "src/view/components/file-list/index.tsx": true,
+    "src/view/components/file-list/item-sync-status.tsx": true,
+    "src/view/components/file-list/item.tsx": true,
+    "src/view/components/file-list/styles.ts": true,
+    "storybook/stories/file-list.tsx": true,
+    "storybook/stories/index.tsx": true
+  },
+  "templatize_using_name": "file-list",
+  "gen_parent_dir": false
+}

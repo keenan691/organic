@@ -1,20 +1,57 @@
-fix-imports:
-	find ./src -name "**.ts*" -exec importjs rewrite --overwrite {} \;
+# * React Native makefile
 
-prettier:
-	cd src
-	yarn prettier --write "**/*.ts*"
+# ** Run
 
-eslint-fix:
-	yarn eslint --fix
+run: adb-reverse
+	yarn start
 
-tsc:
-	yarn tsc -p ./ --noEmit
+adb-reverse:
+	adb reverse tcp:8081 tcp:8081
+	adb reverse tcp:9090 tcp:9090
+	adb reverse tcp:7007 tcp:7007
 
-tsc-watch:
-	yarn tsc -p ./ --noEmit -w
+# ** Installation
 
 install-clean-version: clean build install_build
+
+run-android:
+	react-native run-android
+
+yarn-install:
+	yarn install
+
+typesync:
+	typesync
+
+# ** Logs
+
+log:
+	adb logcat | grep 'ReactNative'
+
+log-debug:
+	adb logcat | grep 'D ReactNativeJS:'
+
+log-warning:
+	adb logcat | grep 'W ReactNativeJS:'
+
+log-error:
+	adb logcat | grep 'E ReactNativeJS:'
+
+log-info:
+	adb logcat | grep 'I ReactNativeJS:'
+
+# ** Tests
+
+test-update-snapshot:
+	yarn jest --updateSnapshot
+
+test:
+	yarn jest --bail --color --watch --notify
+
+test-current:
+	yarn test --bail --color --watch --notify -t Content
+
+# ** Build
 
 build:
 	cd android; ./gradlew assembleRelease
@@ -22,22 +59,32 @@ build:
 install-build:
 	react-native run-android --variant=release
 
-# test:
-# 	yarn jest --bail --color --watch --notify
+# ** Code fixing
 
-# test-current:
-# 	yarn test --bail --color --watch --notify -t Content
+fix-imports:
+	find ./src -name "**.{ts,tsx}" -exec importjs rewrite --overwrite {} \;
 
-install:
-	react-native run-android
+fix-prettier:
+	prettier --write "src/**/*.{ts,tsx}"
 
-log:
-	adb logcat | grep 'ReactNative'
+fix-eslint:
+	yarn eslint --fix
+
+fix-tslint:
+	tslint --project ./tsconfig.json --fix
+
+tsc:
+	yarn tsc -p ./ --noEmit
+
+tsc-watch:
+	yarn tsc -p ./ --noEmit -w
+
+# ** Clean
 
 kill:
 	fuser -k -n tcp 8081
 
-clean-react:
+clean-packager:
 	rm -rf /tmp/metro-cache; \
 	watchman watch-del-all; \
 	rm -rf $TMPDIR/react-native-packager-cache-*; \
@@ -51,12 +98,3 @@ clean-yarn:
 	yarn cache clean; \
 	rm -rf node_modules; \
 	yarn install; \
-
-run: bridge
-	yarn start
-
-add-types:
-	inv add-types
-
-bridge:
-	~/Android/Sdk/platform-tools/adb reverse tcp:8081 tcp:8081

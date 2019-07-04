@@ -5,4 +5,3 @@ syntax: glob
 .git
 coverage
 ignite
-android

@@ -1,9 +1,0 @@
-{
-  "configurations": [
-    {
-      "name": "Web project",
-      "type": "chrome",
-      "url": "file:///home/keenan/devSpace/projects/external-mind/playground.html"
-    }
-  ]
-}
