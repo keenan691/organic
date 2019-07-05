@@ -14,11 +14,13 @@ type Props = {
 const defaultProps = {
   showDetails: false,
   colorized: true,
+  highlighted: false
 }
 // TODO create render props
 function EntryHeadline(props: Props) {
+  const headlineType = (props.colorized ? 'C' : 'R') + (props.highlighted ? 'H' : '')
   return (
-    <Text style={styles[`h${props.level}${props.colorized ? 'C' : 'R'}`]}>
+    <Text style={styles[`h${props.level}${headlineType}`]}>
       {props.todo && (
         <Text style={[styles.todo, props.todo === 'DONE' ? styles.doneText : {}]}>
           {props.todo}{' '}
@@ -27,7 +29,6 @@ function EntryHeadline(props: Props) {
 
       {props.colorized && props.priority && <Text style={styles.priority}>[#{props.priority}] </Text>}
 
-      {/* <EntryContent content={props.headline} asHeadline={true} /> */}
       <Text>{props.headline}</Text>
 
       {props.colorized && props.tags.length > 0 && <Text style={styles.tags}>:{props.tags.join(':')}:</Text>}

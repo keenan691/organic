@@ -10,7 +10,7 @@ export const getItemInfo = (
 ) => {
   let index = 0
   const offset = reduceWhile(
-    currentOffset => currentOffset < absoluteY,
+    currentOffset => currentOffset < absoluteY + scrollPosition,
     (currentOffset, itemId) => {
       index += 1
       currentOffset += heights[itemId]
@@ -18,7 +18,7 @@ export const getItemInfo = (
     },
     0
   )(itemsOrder)
-  return [index, offset]
+  return [index, offset - scrollPosition]
 }
 
 /**

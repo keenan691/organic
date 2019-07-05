@@ -58,27 +58,46 @@ const keyExtractor = item => item.id
 
 function EntryList(props: Props) {
   const bench = useMeasure('EntryList')
-  // State
+  /**
+   * State
+   */
   // TODO może kopiowanie propsa data spowalnia wybieranie - sprawdzić jak to wpływa na wydajność
   // jeśli trzeba będzie to użyć immera i sprawdzić, datę można tez prznościć w metadanych akcji
   // mój dispatcher możeto automatycznie robić
   const [state, dispatch] = useMyReducer(
     reducer,
     initialState,
-    (state: State): State => ({
+    (state: typeof initialState) => ({
       ...state,
       data: props.items,
+      ordering: Object.keys(props.items).sort(key => props.items[key].position),
       mode: 'outline',
     })
   )
 
+  /**
+   * Selectors
+   */
+  const ordering = state.ordering
   const focusedEntry = selectors.getFocusedEntry(state)
-  // Select values
   const focusedEntryId = safeGet('id', focusedEntry)
-  const isEntryFocused = Boolean(focusedEntryId)
+  /* const isEntryFocused = Boolean(focusedEntryId) */
+  const isEntryFocused = false
   const isContentExpanded = false
-  const data = selectors.getEntries(state)
 
+  /* const isGlobalMenuVisible = !isEntryFocused */
+  const isGlobalMenuVisible = false
+
+  /**
+   * Callbacks
+   */
+  const setOrdering = useCallback( (ordering) => {
+    return dispatch(actions.setEntriesOrdering(ordering));
+  },[])
+
+  /**
+   * Refs
+   */
   const initialRefs: Refs = {
     entry: {
       commandMenuPosition: 'bottom',
@@ -94,6 +113,9 @@ function EntryList(props: Props) {
 
   const refs = useRef<Refs>(initialRefs)
 
+  /**
+   * Effects
+   */
   useEffect(() => {
     // Update refs
     const lastFocusedEntry = selectors.getLastFocusedEntry(state)
@@ -104,15 +126,17 @@ function EntryList(props: Props) {
     refs.current.entry.commandMenuPosition = commandMenuPosition
   })
 
-  // Layout Animation
   useLayoutEffect(() => {
     LayoutAnimation.configureNext(focusItemAnimation())
-  }, [focusedEntryId])
+  }, [focusedEntryId, ordering])
 
   useLayoutEffect(() => {
     LayoutAnimation.configureNext(contentAnimation(isContentExpanded))
   }, [state.contentVisibilityDict])
 
+  /**
+   * Dev
+   */
   // XXX Dev starup actions and measurenment tools
   useEffect(() => {
     const entryKeys = Object.keys(props.items)
@@ -134,21 +158,22 @@ function EntryList(props: Props) {
     <EntryListContext.Provider value={refs}>
       <View style={styles.container}>
         <ReorderableTreeFlatList
+          itemDict={props.items}
+          ordering={ordering}
+          setOrdering={setOrdering}
+          ListHeaderComponent={<CommandMenu type="global" show={isGlobalMenuVisible} />}
           renderItem={(props) => (
             <EntryListItem
               {...props}
               showContent={state.contentVisibilityDict[props.item.id]}
               isFocused={state.isFocused && state.jumpList[0] === props.item.id}
+            isFocused={false}
             />
           )}
-          beforeOutlineActivation={beforeOutlineActivationCallback}
-          ordering={selectors.getEntriesOrdering(state)}
           getItemLayout={getItemLayout}
-          ListHeaderComponent={<CommandMenu type="global" show={!isEntryFocused} />}
-          keyExtractor={keyExtractor}
-          data={data}
           ItemSeparatorComponent={Separator}
-          extraData={state}
+          beforeOutlineActivation={beforeOutlineActivationCallback}
+          keyExtractor={keyExtractor}
           ListEmptyComponent={EmptyComponent}
           initialNumToRender={30}
           maxToRenderPerBatch={30}

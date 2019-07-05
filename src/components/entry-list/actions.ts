@@ -12,8 +12,10 @@ const setMode = action('entry-list/SET_MODE')<{ mode: Mode }>()
 const toggleContent = action('entry-list/TOGGLE_CONTENT')<{ entryId: string }>()
 const toggleFocus = action('entry-list/TOGGLE_FOCUS')<{ entryId: string }>()
 const jump = action('entry-list/JUMP')<{ entryId: string }>()
+const setEntriesOrdering = action('entry-list/SET_ENTRIES_ORDERING')<string[]>()
 
 export default {
+  setEntriesOrdering,
   jump,
   toggleFocus,
   blurItem,

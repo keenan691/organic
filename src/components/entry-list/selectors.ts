@@ -6,13 +6,13 @@ import { State, NumberDict } from './types'
 const getLastFocusedEntryId = (state: State) =>  state.jumpList[0]
 
 const getEntriesOrdering = createSelector(
-  (state: State) => state.data,
+  (state: State) => state.itemsDict,
   data => Object.keys(data).sort(key => data[key].position)
 )
 
 const getEntries = createSelector(
   getEntriesOrdering,
-  (state: State) => state.data,
+  (state: State) => state.itemsDict,
   (ordering, data) => ordering.map(id => data[id])
 )
 
@@ -28,13 +28,13 @@ const getEntryPositionDict = createSelector(
     )
 )
 
-const getFocusedEntry = ({ data, jumpList, isFocused }: State): OrgEntry | null =>
-  (!isFocused || jumpList.length < 2) ? null : data[jumpList[0]]
+const getFocusedEntry = ({ itemsDict, jumpList, isFocused }: State): OrgEntry | null =>
+  (!isFocused || jumpList.length < 2) ? null : itemsDict[jumpList[0]]
 
 const getLastFocusedEntry = (state: State): OrgEntry | null => {
   const jumpList = state.jumpList
   if (jumpList.length < 2) return null
-  return state.data[jumpList[1]]
+  return state.itemsDict[jumpList[1]]
 }
 
 const getActionMenuPosition = createSelector(

@@ -1,14 +1,8 @@
 import { OrgEntry } from 'core/entries/store/types'
 import { ActionType } from 'typesafe-actions'
+import initialState from './state';
 
-export type State = {
-  contentVisibilityDict: BooleanDict
-  data: EntryDict
-  entryVisibilityDict: BooleanDict
-  isFocused: boolean,
-  jumpList: string[]
-  mode: string
-}
+export type State = typeof initialState
 
 export type Refs = {
   entry: {

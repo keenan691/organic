@@ -8,10 +8,10 @@ import styles from './styles'
 import actions from './actions'
 import CommandMenu from './elements/command-menu'
 import LevelIndicator from './elements/level-indicator'
-import { useStateMonitor } from 'helpers/hooks'
 
 type Props = {
   item: OrgEntry
+  iconName: React.ComponentProps<typeof LevelIndicator>['iconName']
 } & typeof defaultProps
 
 const defaultProps = {
@@ -19,6 +19,11 @@ const defaultProps = {
   showContent: false,
   isSelected: false,
   isFocused: false,
+  iconName: 'circle',
+  highlighted: false,
+  itemLayoutCallback: () => null,
+  activateCallback: () => null,
+  deactivateCallback: () => null,
 }
 
 function EntryListItem(props: Props) {
@@ -28,6 +33,8 @@ function EntryListItem(props: Props) {
     showContent,
     itemLayoutCallback,
     position,
+    iconName,
+    highlighted,
     activateCallback,
     deactivateCallback,
   } = props
@@ -43,18 +50,24 @@ function EntryListItem(props: Props) {
       onLayout={event => itemLayoutCallback(event, id)}
     >
       <View style={[styles.row, isFocused && styles.entryFocusedBg]}>
-        <LevelIndicator level={item.level} onPress={activateCallback} position={position} />
+        <LevelIndicator
+          level={item.level}
+          position={position}
+          iconName={iconName}
+          highlighted={highlighted}
+          onPress={activateCallback}
+        />
         <TouchableHighlight
           style={{ flex: 2 }}
           underlayColor="white"
           onLongPress={() => dispatch(actions.toggleContent({ entryId: id }))}
           onPress={() => {
             deactivateCallback()
-              return dispatch(actions.onItemPress({ entryId: id }));
+            dispatch(actions.onItemPress({ entryId: id }))
           }}
         >
           <View style={[styles.column]}>
-            <EntryHeadline colorized={true} {...item} />
+            <EntryHeadline colorized={true} highlighted={highlighted} {...item} />
             <EntryContent content={item.content} visible={showContent} />
           </View>
         </TouchableHighlight>

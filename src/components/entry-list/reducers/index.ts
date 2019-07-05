@@ -1,3 +1,4 @@
+import orderingReducer from './ordering'
 import { reduceReducers } from 'helpers/reducers'
 
 import initialState from '../state';
@@ -8,6 +9,7 @@ import togglesReducer from './toggles'
 
 // prettier-ignore
 const entryListReducer = reduceReducers(initialState, [
+  orderingReducer,
   commandsReducer,
   interactionsReducer,
   togglesReducer
