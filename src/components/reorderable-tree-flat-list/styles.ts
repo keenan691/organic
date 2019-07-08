@@ -1,8 +1,10 @@
 import { StyleSheet } from 'react-native'
 import { Fonts, Colors, Metrics } from 'view/themes'
+import globalStyles from 'view/styles/global';
 
 // prettier-ignore
 export default StyleSheet.create({
+  ...globalStyles,
   targetIndicator: {
       height: 1,
       width: '100%',

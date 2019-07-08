@@ -4,17 +4,18 @@ import { Animated } from "react-native";
 export type Refs = {
   itemHeights: ItemHeightCache
   scrollPosition:  number
-  temporaryItem: {
+  draggable: {
     translateY: typeof Animated.Value
     level: typeof Animated.Value
   }
   targetIndicator: {
-    offset: typeof Animated.Value
+    translateY: typeof Animated.Value
     opacity: typeof Animated.Value
   }
   move: {
     fromPostion:  number | null
-    toPostion:  number | null
+    toPosition:  number | null
+    toLevel:  number | null
   }
 }
 

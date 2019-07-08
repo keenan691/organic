@@ -1,36 +1,32 @@
-import { NumberDict } from 'components/entry-list/types'
-import { reduceWhile, move } from 'ramda'
-import { ItemHeightCache } from './types'
+import { move } from 'ramda'
+import { Refs } from './types'
+import { getSourcePosition, getTargetPosition, getItemLevelOffset } from './selectors'
+import { startShiftLevelAnimation } from './animations'
 
-export const getItemInfo = (
-  absoluteY: number,
-  scrollPosition: number,
-  heights: ItemHeightCache,
-  itemsOrder: number[]
-) => {
-  let index = 0
-  const offset = reduceWhile(
-    currentOffset => currentOffset < absoluteY + scrollPosition,
-    (currentOffset, itemId) => {
-      index += 1
-      currentOffset += heights[itemId]
-      return currentOffset
-    },
-    0
-  )(itemsOrder)
-  return [index, offset - scrollPosition]
+export const applyChanges = (
+  data: Refs,
+  ordering: string[],
+  levels: number[]
+): [string[], number[]] => {
+  const fromPosition = getSourcePosition(data)
+  const toPosition = getTargetPosition(data)
+  const toLevel = data.move.toLevel
+
+  const newOrdering = move(fromPosition, toPosition, ordering)
+  const newLevels = move(fromPosition, toPosition, levels)
+
+  newLevels[toPosition] = toLevel
+
+  return [newOrdering, newLevels]
 }
 
-/**
- * Computes offset for position. Doasn't take into account scroll position.
- */
-export const getItemOffset = (position: number, ordering: string[], itemHeights: NumberDict) =>
-  ordering.slice(0, position).reduce((acc, id) => {
-    return acc + itemHeights[id]
-  }, 0)
-
-export const changeItemPosition = (
-  position: number,
-  newPosition: number,
+export function shiftDraggableLevel(
+  data: Refs,
   ordering: string[],
-) => move(position, newPosition, ordering)
+  levels: number[],
+  direction: 'left' | 'right'
+) {
+  const delta = direction === 'right' ? 1 : -1
+  let newLevel = levels[data.move.toPosition - 1] + delta
+  data.move.toLevel = newLevel
+}

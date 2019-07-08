@@ -5,7 +5,7 @@ import FontAwesome, { Icons } from 'react-native-fontawesome'
 
 type Props = {
   name: keyof typeof Icons
-  style: object
+  style?: object
 }
 
 function Icon (props: Props) {

@@ -18,6 +18,7 @@ import { useMeasure, useStateMonitor } from 'helpers/hooks'
 import initialState from './state'
 import { TapGestureHandler, RectButton } from 'react-native-gesture-handler'
 import ReorderableTreeFlatList from 'components/reorderable-tree-flat-list'
+import { map } from 'ramda'
 
 type Props = {
   items: EntryDict
@@ -64,21 +65,22 @@ function EntryList(props: Props) {
   // TODO może kopiowanie propsa data spowalnia wybieranie - sprawdzić jak to wpływa na wydajność
   // jeśli trzeba będzie to użyć immera i sprawdzić, datę można tez prznościć w metadanych akcji
   // mój dispatcher możeto automatycznie robić
-  const [state, dispatch] = useMyReducer(
-    reducer,
-    initialState,
-    (state: typeof initialState) => ({
+  const [state, dispatch] = useMyReducer(reducer, initialState, (state: typeof initialState) => {
+    const ordering = Object.keys(props.items).sort(key => props.items[key].position)
+    return {
       ...state,
+      ordering,
+      levels: ordering.map(id => props.items[id].level),
       data: props.items,
-      ordering: Object.keys(props.items).sort(key => props.items[key].position),
       mode: 'outline',
-    })
-  )
+    }
+  })
 
   /**
    * Selectors
    */
   const ordering = state.ordering
+  const levels = state.levels
   const focusedEntry = selectors.getFocusedEntry(state)
   const focusedEntryId = safeGet('id', focusedEntry)
   /* const isEntryFocused = Boolean(focusedEntryId) */
@@ -91,9 +93,13 @@ function EntryList(props: Props) {
   /**
    * Callbacks
    */
-  const setOrdering = useCallback( (ordering) => {
-    return dispatch(actions.setEntriesOrdering(ordering));
-  },[])
+  const setOrdering = useCallback(ordering => {
+    return dispatch(actions.setEntriesOrdering(ordering))
+  }, [])
+
+  const setLevels = useCallback(levels => {
+    return dispatch(actions.setEntriesLevels(levels))
+  }, [])
 
   /**
    * Refs
@@ -138,18 +144,18 @@ function EntryList(props: Props) {
    * Dev
    */
   // XXX Dev starup actions and measurenment tools
-  useEffect(() => {
-    const entryKeys = Object.keys(props.items)
-    dispatch(
-      actions.onItemPress({
-        entryId: props.items[entryKeys[2]].id,
-      })
-    )
-  }, [])
-
+  /* useEffect(() => {
+   *   const entryKeys = Object.keys(props.items)
+   *   dispatch(
+   *     actions.onItemPress({
+   *       entryId: props.items[entryKeys[2]].id,
+   *     })
+   *   )
+   * }, [])
+   */
   const beforeOutlineActivationCallback = useCallback(() => {
     /* dispatch(actions.blurItem()) */
-  },[])
+  }, [])
 
   useStateMonitor(state)
   bench.step('rendering starts')
@@ -161,13 +167,15 @@ function EntryList(props: Props) {
           itemDict={props.items}
           ordering={ordering}
           setOrdering={setOrdering}
+          levels={levels}
+          setLevels={setLevels}
           ListHeaderComponent={<CommandMenu type="global" show={isGlobalMenuVisible} />}
-          renderItem={(props) => (
+          renderItem={props => (
             <EntryListItem
               {...props}
               showContent={state.contentVisibilityDict[props.item.id]}
               isFocused={state.isFocused && state.jumpList[0] === props.item.id}
-            isFocused={false}
+              isFocused={false}
             />
           )}
           getItemLayout={getItemLayout}

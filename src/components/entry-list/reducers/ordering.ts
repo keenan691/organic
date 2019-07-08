@@ -11,5 +11,11 @@ const orderingReducer = createReducer(initialState)
       ordering: payload
     }
   })
+  .handleAction(actions.setEntriesLevels, (state, { payload }) => {
+    return {
+      ...state,
+      levels: payload
+    }
+  })
 
 export default orderingReducer

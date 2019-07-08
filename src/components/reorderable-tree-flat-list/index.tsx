@@ -1,26 +1,6 @@
-/**
- * Visualizes entries as reorderable trees
- ** DONE use in EntryList and measure performance impact
- ** DONE add props types
- ** DONE apply reorder
- ** DONE handle activation
- ** TODO snap to grid / not available moves block
- ** TODO use headline as FakeEntry
- ** TODO optimize move triggers
- ** TODO add scroll triggered by position from end or beginning
- ** TODO add folding cycle when tapping outline button
- */
-import React, { useCallback, useRef, useState, useMemo } from 'react'
-import {
-  View,
-  Text,
-  Animated,
-  StyleSheet,
-  LayoutChangeEvent,
-  NativeScrollEvent,
-  NativeSyntheticEvent,
-} from 'react-native'
-import { BehaviorSubject, Observable } from 'rxjs'
+import React, { useCallback, useRef, useState } from 'react'
+import { Text, View, Animated, LayoutChangeEvent, Vibration } from 'react-native'
+import { BehaviorSubject, Subject } from 'rxjs'
 import {
   PanGestureHandlerGestureEvent,
   PanGestureHandlerStateChangeEvent,
@@ -28,209 +8,277 @@ import {
   State,
   gestureHandlerRootHOC,
   FlatList,
-  TouchableOpacity,
-  TouchableHighlight,
 } from 'react-native-gesture-handler'
-import { useObservable, useEventCallback } from 'rxjs-hooks'
-import { interval } from 'rxjs'
-import { map, tap, debounceTime, auditTime, filter } from 'rxjs/operators'
-import { path, prop, of, reduceWhile } from 'ramda'
-import { posix } from 'path'
+import { map, filter } from 'rxjs/operators'
 
 import styles from './styles'
-import { OrgEntry } from 'core/entries/store/types'
-import { getItemInfo, getItemOffset, changeItemPosition } from './helpers'
-import { Refs } from './types';
+import { applyChanges, shiftDraggableLevel } from './helpers'
+import { Refs } from './types'
+import { LevelIndicator, Icon } from 'elements'
+import { useMeasure } from 'helpers/hooks'
+import {
+  getAbsoluteItemPositionOffset,
+  getItemLevelOffset,
+  getSourcePosition,
+  getTargetPosition,
+  getItems,
+  getItemInfo,
+} from './selectors'
+import { startActivateAnimation, startReleaseAnimation, startShiftLevelAnimation } from './animations'
 
-// prettier-ignore
 type Props = {
+  itemDict: object
   ordering: string[]
+  levels: number[]
+  visibility: boolean[]
   setOrdering: (ordering: string[]) => void
-  foldDict: {[ itemId: string ]: 'children' | 'hidden' | 'all'}
-  itemDict: []
-} & typeof defaultProps & React.ComponentProps<typeof FlatList>
+  setLevels: (levels: number[]) => void
+} & typeof defaultProps &
+  React.ComponentProps<typeof FlatList>
 
 const defaultProps = {}
 
 function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
-  /**
-   * Constants
-   */
-  const { ordering, setOrdering } = props
-  const [selectedItemId, setSelectedItem] = useState(null)
+  const bench = useMeasure('ReorderableTree')
 
-  /**
-   * Refs
-   */
   const refs = useRef<Refs>({
     itemHeights: {},
-    scrollPosition: 0,
-    temporaryItem: {
+    draggable: {
       translateY: new Animated.Value(0),
+      startX: 0,
+      level: new Animated.Value(0),
+      opacity: new Animated.Value(0),
     },
     targetIndicator: {
-      offset: new Animated.Value(0),
+      translateY: new Animated.Value(0),
       opacity: new Animated.Value(0.2),
     },
     move: {
-      fromPostion: null,
-      toPostion: null,
+      fromPosition: null,
+      toPosition: null,
+      toLevel: null,
     },
+    panGesture: {
+      x: 0,
+      y: 0,
+    },
+    scrollPosition: 0,
     lastOffset: 0,
   })
 
+  const { ordering, setOrdering, levels, setLevels } = props
+
+  const [draggableItemLevel, setDraggableItemLevel] = useState()
+  const [activeItemId, setActiveItemId] = useState(null)
+
+  const activeItem = props.itemDict[activeItemId]
   const data = refs.current
+
+  const panState$ = new Subject().pipe(
+    map(({ nativeEvent }: PanGestureHandlerStateChangeEvent) => [
+      nativeEvent.state,
+      nativeEvent.oldState,
+      nativeEvent.translationX
+    ])
+  )
+
+  const dragEnd$ = panState$.pipe(
+    map(([_, oldState]) => oldState),
+    filter(oldState => oldState === State.ACTIVE)
+  )
+
+  const dragStart$ = panState$.pipe(
+    filter(([ state, oldState, translationX ]) => state === State.ACTIVE),
+  )
+
+  const pan$ = new Subject().pipe(
+    map((event: PanGestureHandlerGestureEvent) => event.nativeEvent)
+  )
 
   /**
    * Gesture activation/deactivation
    */
-  const [active, setActive] = useState(false)
-
-  const activateCallback = useCallback(
+  const turnItemToDraggable = useCallback(
     itemPosition => {
-      // Select for touch
-      // TODO in this layer only position should be id, there are no dict [id, id, id]
-      const offset = getItemOffset(itemPosition, ordering, data.itemHeights)
-      data.temporaryItem.translateY.setOffset(offset - data.scrollPosition)
-      data.temporaryItem.translateY.setValue(0)
-      data.move.fromPostion = itemPosition
+      const activeItemId = props.ordering[itemPosition]
+      const activeItemLevel = levels[itemPosition]
+      const absoluteItemOffset = getAbsoluteItemPositionOffset(
+        itemPosition,
+        ordering,
+        data.itemHeights
+      )
 
-      data.lastOffset = offset
-      const selectedItemId = props.ordering[itemPosition]
-      setSelectedItem(selectedItemId)
-      setActive(true)
+      data.draggable.translateY.setOffset(absoluteItemOffset - data.scrollPosition)
+      data.draggable.translateY.setValue(0)
+
+      data.draggable.level.setOffset(0)
+      data.draggable.level.setValue(getItemLevelOffset(activeItemLevel))
+
+      data.draggable.toLevel = activeItemLevel
+      data.draggable.startX = 0
+
+      data.move.fromPosition = itemPosition
+      data.lastOffset = absoluteItemOffset
+
+      setDraggableItemLevel(activeItemLevel)
+      setActiveItemId(activeItemId)
+      startActivateAnimation(data)
     },
-    [ordering]
+    [ordering, levels]
   )
 
-  const deactivateCallback = useCallback(itemPosition => {
-    setActive(false)
-  }, [])
-
-  const panState$ = new BehaviorSubject()
-    .pipe(filter(event => event !== undefined))
-
   /**
-   * Release
+   * Start dragging
    */
-  panState$
-    .subscribe(
-      ({
-        nativeEvent: { oldState, translationX, translationY },
-      }: PanGestureHandlerStateChangeEvent) => {
-        if (oldState === State.ACTIVE) {
-
-          const fromPosition = data.move.fromPostion
-          const toPosition = data.move.toPostion > fromPosition ? data.move.toPostion - 1 : data.move.toPostion
-
-          const offset = getItemOffset(toPosition, ordering, data.itemHeights) - data.scrollPosition
-          data.temporaryItem.translateY.setOffset(offset)
-          data.temporaryItem.translateY.setValue(0)
-          data.targetIndicator.offset.setValue(offset)
-
-          const newOrdering = changeItemPosition(fromPosition, toPosition , ordering)
-          setOrdering(newOrdering)
-          deactivateCallback(toPosition)
-          data.targetIndicator.opacity.setValue(0.01)
-        }
-      }
-    )
-
-  const panHandlerStateCallback = useCallback(event => panState$.next(event), [ordering])
-
+  /* dragStart$.subscribe(([state, odlState, translationX]) => {
+   *   console.tron.debug('drag start')
+   *   console.tron.debug(translationX)
+   * })
+   */
   /**
    * Track Pan Gesture
    */
-  const pan$ = new BehaviorSubject().pipe(
-    filter((event: PanGestureHandlerGestureEvent) => event !== undefined)
-  )
-
-  // Calculate position of temporary item
-  pan$.subscribe(({ nativeEvent: { translationX, translationY } }) => {
-    data.temporaryItem.translateY.setValue(translationY)
+  // Calculate position of draggable item
+  pan$.subscribe(( { translationX, translationY } ) => {
+    data.draggable.translateY.setValue(translationY)
+    data.draggable.level.setOffset(0)
+    data.panGesture.translateX  = translationX
   })
 
-  // Calculate position of targer indicator
+  // Calculate position of target indicator
   pan$
     .pipe(
-      map(event => event.nativeEvent.absoluteY),
-      map((y) => (y-data.itemHeights[ordering[data.move.fromPostion]])),
-      map(absoluteY => getItemInfo(absoluteY, data.scrollPosition, data.itemHeights, ordering))
+      map(({absoluteY}) => absoluteY),
+      map(y => y - data.itemHeights[ordering[data.move.fromPosition]]),
+      map(absoluteY => getItemInfo(data, absoluteY, ordering))
     )
     .subscribe(([position, offset]) => {
-      data.targetIndicator.offset.setValue(offset - 2)
-      data.targetIndicator.opacity.setValue(1)
-      data.move.toPostion = position
+      // Set new target position
+      if (data.move.toPosition !== position) {
+        // After change of target position calculate default level for this position
+        const targetLevel = levels[position - 1]
+
+        data.draggable.startX = data.panGesture.translateX
+        data.move.toLevel = targetLevel
+        data.move.toPosition = position
+
+        data.targetIndicator.opacity.setValue(1)
+        data.targetIndicator.translateY.setValue(offset - 2)
+
+        data.draggable.level.stopAnimation()
+        data.draggable.level.setValue(getItemLevelOffset(targetLevel))
+        data.draggable.level.setOffset(0)
+      }
     })
 
-  const onPanCallback = useCallback(event => pan$.next(event), [])
+  // TODO Set item color when move have been stabilized
+  pan$.pipe(map(({ velocityY } ) => velocityY)).subscribe(velocityY => {
+    if (Math.abs(velocityY) < 10) {
+      const targetLevel = levels[data.move.toPosition - 1]
+      setDraggableItemLevel(targetLevel)
+    }
+  })
+
+  // TODO Level shift
+  pan$.subscribe(({translationX}) => {
+    const dx = data.draggable.startX - translationX
+
+    if (Math.abs(dx) > 18) {
+      shiftDraggableLevel(data, ordering, levels, dx > 0 ? 'left' : 'right')
+      startShiftLevelAnimation(data, getItemLevelOffset(data.move.toLevel))
+      /* data.draggable.startX = translationX */
+    }
+  })
+
+  const onPanCallback = useCallback(event => pan$.next(event), [levels, ordering])
 
   /**
-   * Compensate flatlist scroll
+   * Release and apply changes
+   */
+  dragEnd$.subscribe(() => {
+    startReleaseAnimation(data, ordering)
+    data.targetIndicator.opacity.setValue(0.01)
+    data.draggable.startX = 0
+
+    const [newOrdering, newLevels] = applyChanges(data, ordering, levels)
+    setOrdering(newOrdering)
+    setLevels(newLevels)
+  })
+
+  const panHandlerStateCallback = useCallback(event => panState$.next(event), [ordering, levels])
+
+  /**
+   * TODO Compensate flatlist scroll
    */
   const scroll$ = new BehaviorSubject()
     .pipe(filter(event => event !== undefined))
     .subscribe(({ nativeEvent: { contentOffset } }) => {
       const height = contentOffset.y | 0
       data.scrollPosition = height
-      const newLocal = data.lastOffset - data.scrollPosition
-      data.temporaryItem.translateY.setOffset(newLocal)
-      data.temporaryItem.translateY.setValue(0)
+      const baseLevel = data.lastOffset - data.scrollPosition
+      data.draggable.translateY.setOffset(baseLevel)
+      data.draggable.translateY.setValue(0)
     })
 
   const onScrollEventCallback = useCallback(event => scroll$.next(event), [])
 
   /**
-   * Item size measurement and cache
+   * TODO Item size measurement and cache
    */
-  const itemLayoutCallback = useCallback((event: LayoutChangeEvent, itemId: number) => {
+  const onItemLayout = useCallback((event: LayoutChangeEvent, itemId: number) => {
     refs.current.itemHeights[itemId] = event.nativeEvent.layout.height
   }, [])
 
   /**
-   * Render item
+   * Render
    */
-  const renderItemCallback = ({ item, index }) =>
-    renderItem({
-      item,
-      position: index,
-      itemLayoutCallback,
-      activateCallback,
-      deactivateCallback,
-    })
+  const renderItemCallback = useCallback(
+    ({ item, index }) => (
+      <View style={styles.row} onLayout={event => onItemLayout(event, item.id)}>
+        <LevelIndicator
+          level={levels[index]}
+          position={index}
+          iconName="circle"
+          onPress={turnItemToDraggable}
+        />
+        {renderItem({ item, level: levels[index] })}
+      </View>
+    ),
+    [ordering, levels]
+  )
 
-  const renderTemporaryItemCallback = () =>
-    renderItem({
-      item: props.itemDict[selectedItemId],
-      iconName: 'circle-notch',
-      highlighted: true,
-    })
-
-  const items = ordering.map(id => props.itemDict[id])
-
-  /**
-   * Render component
-   */
-  console.tron.debug('render')
+  bench.step('reorderable')
   return (
     <ReorderableTreeFlatListContext.Provider value={refs}>
       <View>
         <FlatList
           renderItem={renderItemCallback}
-          data={items}
+          data={getItems(props)}
           onScroll={onScrollEventCallback}
           {...props}
         />
 
-        {active && (
+        {activeItemId && (
           <PanGestureHandler
             onGestureEvent={onPanCallback}
             onHandlerStateChange={panHandlerStateCallback}
           >
             <Animated.View
-              style={[styles.temporaryItem, { transform: [{ translateY: data.temporaryItem.translateY }] }]}
+              style={[
+                styles.temporaryItem,
+                {
+                  opacity: data.draggable.opacity,
+                  transform: [{ translateY: data.draggable.translateY }],
+                },
+              ]}
             >
-              {renderTemporaryItemCallback()}
+              <Animated.View
+                style={[styles.row, { transform: [{ translateX: data.draggable.level }] }]}
+              >
+                <Icon name="circleNotch" />
+                <Text> </Text>
+                {renderItem({ item: activeItem, level: draggableItemLevel })}
+              </Animated.View>
             </Animated.View>
           </PanGestureHandler>
         )}
@@ -239,7 +287,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
           style={[
             styles.targetIndicator,
             { opacity: data.targetIndicator.opacity },
-            { transform: [{ translateY: data.targetIndicator.offset }] },
+            { transform: [{ translateY: data.targetIndicator.translateY }] },
           ]}
         />
       </View>
@@ -250,10 +298,5 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
 ReorderableTreeFlatList.defaultProps = defaultProps
 
 export const ReorderableTreeFlatListContext = React.createContext<Context>({})
-
-const getStateName = state =>
-  Object.entries(State)
-    .filter(el => el[1] === state)
-    .map(el => el[0])
 
 export default gestureHandlerRootHOC(ReorderableTreeFlatList)

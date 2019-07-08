@@ -11,7 +11,6 @@ import LevelIndicator from './elements/level-indicator'
 
 type Props = {
   item: OrgEntry
-  iconName: React.ComponentProps<typeof LevelIndicator>['iconName']
 } & typeof defaultProps
 
 const defaultProps = {
@@ -19,11 +18,10 @@ const defaultProps = {
   showContent: false,
   isSelected: false,
   isFocused: false,
-  iconName: 'circle',
   highlighted: false,
-  itemLayoutCallback: () => null,
   activateCallback: () => null,
   deactivateCallback: () => null,
+  level: 0,
 }
 
 function EntryListItem(props: Props) {
@@ -31,12 +29,9 @@ function EntryListItem(props: Props) {
     item,
     isFocused,
     showContent,
-    itemLayoutCallback,
-    position,
-    iconName,
     highlighted,
-    activateCallback,
     deactivateCallback,
+    level
   } = props
   const id = item.id
   const { dispatch, entry } = useContext(EntryListContext).current
@@ -47,16 +42,8 @@ function EntryListItem(props: Props) {
         styles.container,
         { flexDirection: entry.commandMenuPosition === 'bottom' ? 'column' : 'column-reverse' },
       ]}
-      onLayout={event => itemLayoutCallback(event, id)}
     >
       <View style={[styles.row, isFocused && styles.entryFocusedBg]}>
-        <LevelIndicator
-          level={item.level}
-          position={position}
-          iconName={iconName}
-          highlighted={highlighted}
-          onPress={activateCallback}
-        />
         <TouchableHighlight
           style={{ flex: 2 }}
           underlayColor="white"
@@ -67,7 +54,7 @@ function EntryListItem(props: Props) {
           }}
         >
           <View style={[styles.column]}>
-            <EntryHeadline colorized={true} highlighted={highlighted} {...item} />
+            <EntryHeadline colorized={true} highlighted={highlighted} {...item} level={level} />
             <EntryContent content={item.content} visible={showContent} />
           </View>
         </TouchableHighlight>
