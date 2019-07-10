@@ -170,7 +170,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
       case 'h':
         const dx = data.draggable.levelOffset - translationX
         if (Math.abs(dx) > LEVEL_SHIFT_TRIGGER) {
-          shiftDraggableItemLevel(data, ordering, levels, dx > 0 ? 'left' : 'right')
+          shiftDraggableItemLevel(data, levels, dx > 0 ? 'left' : 'right')
           startShiftLevelAnimation(data)
           data.draggable.levelOffset = translationX
         }
@@ -179,6 +179,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
   })
 
   targetHasChanged$.subscribe(([newPosition, newOffset]) => {
+
     data.move.toPosition = newPosition
     data.draggable.levelOffset = data.panGesture.translateX
 

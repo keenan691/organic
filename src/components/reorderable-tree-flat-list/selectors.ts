@@ -6,11 +6,11 @@ import { createSelector } from 'reselect';
 
 export const getItemLevelOffset = (level: number) => (level - 1) * INDENT_SIZE
 
-export const getItemInfo = (
+export function getItemInfo(
   data: Refs,
   absoluteY: number,
   itemsOrder: number[]
-) => {
+) {
   const { itemHeights, scrollPosition } = data
   let index = 0
   const offset = reduceWhile(

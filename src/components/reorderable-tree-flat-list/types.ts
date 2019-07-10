@@ -13,7 +13,7 @@ export type Refs = {
     opacity: typeof Animated.Value
   }
   move: {
-    fromPostion:  number | null
+    fromPosition:  number | null
     toPosition:  number | null
     toLevel:  number | null
   }
