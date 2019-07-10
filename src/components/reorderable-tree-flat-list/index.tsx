@@ -47,7 +47,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
     itemHeights: {},
     draggable: {
       translateY: new Animated.Value(0),
-      startX: 0,
+      levelOffset: 0,
       level: new Animated.Value(0),
       opacity: new Animated.Value(0),
     },
@@ -121,10 +121,22 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
     })
   )
 
+  const scroll$ = new Subject()
+
   /**
-   * Gesture activation/deactivation
+   * Callbacks
    */
-  const turnItemToDraggable = useCallback(
+  const onPanCallback = useCallback(event => pan$.next(event), [levels, ordering])
+
+  const panHandlerStateCallback = useCallback(event => panState$.next(event), [ordering, levels])
+
+  const onScrollEventCallback = useCallback(event => scroll$.next(event), [])
+
+  const onItemLayoutCallback = useCallback((event: LayoutChangeEvent, itemId: number) => {
+    refs.current.itemHeights[itemId] = event.nativeEvent.layout.height
+  }, [])
+
+  const turnItemToDraggableCallback = useCallback(
     itemPosition => {
       const itemId = props.ordering[itemPosition]
       const itemLevel = levels[itemPosition]
@@ -142,7 +154,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
       data.move.toPosition = itemPosition
       data.move.toLevel = itemLevel
 
-      data.draggable.startX = 0
+      data.draggable.levelOffset = 0
       data.lastOffset = absoluteItemOffset
 
       setDraggableItemId(itemId)
@@ -154,7 +166,6 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
   /**
    * Track Pan Gesture
    */
-
   moveDirection$.subscribe(direction => {
     data.moveDirection = direction
   })
@@ -170,7 +181,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
 
   targetHasChanged$.subscribe(([newPosition, newOffset]) => {
     data.move.toPosition = newPosition
-    data.draggable.startX = data.panGesture.translateX
+    data.draggable.levelOffset = data.panGesture.translateX
 
     data.targetIndicator.opacity.setValue(1)
     data.targetIndicator.translateY.setValue(newOffset - 2)
@@ -185,65 +196,45 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
 
   // TODO Level shift
   pan$.subscribe(({ translationX }) => {
-    const dx = data.draggable.startX - translationX
+    const dx = data.draggable.levelOffset - translationX
 
     if (Math.abs(dx) > LEVEL_SHIFT_TRIGGER && data.moveDirection === 'h') {
       shiftDraggableLevel(data, ordering, levels, dx > 0 ? 'left' : 'right')
       startShiftLevelAnimation(data)
-      data.draggable.startX = translationX
+      data.draggable.levelOffset = translationX
     }
   })
 
-  const onPanCallback = useCallback(event => pan$.next(event), [levels, ordering])
-
-  /**
-   * Release and apply changes
-   */
   dragEnd$.subscribe(() => {
     startReleaseAnimation(data, ordering)
     data.targetIndicator.opacity.setValue(0.01)
-    data.draggable.startX = 0
+    data.draggable.levelOffset = 0
 
     const [newOrdering, newLevels] = applyChanges(data, ordering, levels)
     setOrdering(newOrdering)
     setLevels(newLevels)
   })
 
-  const panHandlerStateCallback = useCallback(event => panState$.next(event), [ordering, levels])
+  scroll$.subscribe(({ nativeEvent: { contentOffset } }) => {
+    const height = contentOffset.y | 0
+    const baseLevel = data.lastOffset - height
 
-  /**
-   * TODO Compensate flatlist scroll
-   */
-  const scroll$ = new BehaviorSubject()
-    .pipe(filter(event => event !== undefined))
-    .subscribe(({ nativeEvent: { contentOffset } }) => {
-      const height = contentOffset.y | 0
-      data.scrollPosition = height
-      const baseLevel = data.lastOffset - data.scrollPosition
-      data.draggable.translateY.setOffset(baseLevel)
-      data.draggable.translateY.setValue(0)
-    })
-
-  const onScrollEventCallback = useCallback(event => scroll$.next(event), [])
-
-  /**
-   * TODO Item size measurement and cache
-   */
-  const onItemLayout = useCallback((event: LayoutChangeEvent, itemId: number) => {
-    refs.current.itemHeights[itemId] = event.nativeEvent.layout.height
-  }, [])
+    data.scrollPosition = height
+    data.draggable.translateY.setOffset(baseLevel)
+    data.draggable.translateY.setValue(0)
+  })
 
   /**
    * Render
    */
   const renderItemCallback = useCallback(
     ({ item, index }) => (
-      <View style={styles.row} onLayout={event => onItemLayout(event, item.id)}>
+      <View style={styles.row} onLayout={event => onItemLayoutCallback(event, item.id)}>
         <LevelIndicator
           level={levels[index]}
           position={index}
           iconName="circle"
-          onPress={turnItemToDraggable}
+          onPress={turnItemToDraggableCallback}
         />
         {renderItem({ item, level: levels[index] })}
       </View>
