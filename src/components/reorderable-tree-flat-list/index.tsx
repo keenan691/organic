@@ -1,6 +1,6 @@
 import React, { useCallback, useRef, useState } from 'react'
-import { Text, View, Animated, LayoutChangeEvent, Vibration } from 'react-native'
-import { BehaviorSubject, Subject } from 'rxjs'
+import { Text, View, Animated, LayoutChangeEvent } from 'react-native'
+import { Subject } from 'rxjs'
 import {
   PanGestureHandlerGestureEvent,
   PanGestureHandlerStateChangeEvent,
@@ -9,11 +9,12 @@ import {
   gestureHandlerRootHOC,
   FlatList,
 } from 'react-native-gesture-handler'
-import { map, filter, tap, bufferCount } from 'rxjs/operators'
+import { map, filter, bufferCount } from 'rxjs/operators'
 
-import styles from './styles'
-import { applyChanges, shiftDraggableLevel } from './helpers'
 import { Refs } from './types'
+import { LEVEL_SHIFT_TRIGGER } from './constants'
+import styles from './styles'
+import { applyChanges, shiftDraggableItemLevel } from './helpers'
 import { LevelIndicator, Icon } from 'elements'
 import { useMeasure } from 'helpers/hooks'
 import {
@@ -27,7 +28,7 @@ import {
   startReleaseAnimation,
   startShiftLevelAnimation,
 } from './animations'
-import { LEVEL_SHIFT_TRIGGER } from './constants'
+
 type Props = {
   itemDict: object
   ordering: string[]
@@ -79,12 +80,8 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
   /**
    * Observables
    */
-  const panState$ = new Subject().pipe(
-    map(({ nativeEvent }: PanGestureHandlerStateChangeEvent) => [
-      nativeEvent.state,
-      nativeEvent.oldState,
-      nativeEvent.translationX,
-    ])
+  const panState$ = new Subject<PanGestureHandlerStateChangeEvent>().pipe(
+    map(({ nativeEvent }) => [nativeEvent.state, nativeEvent.oldState, nativeEvent.translationX])
   )
 
   const dragEnd$ = panState$.pipe(
@@ -92,11 +89,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
     filter(oldState => oldState === State.ACTIVE)
   )
 
-  const dragStart$ = panState$.pipe(
-    filter(([state, oldState, translationX]) => state === State.ACTIVE)
-  )
-
-  const pan$ = new Subject().pipe(map((event: PanGestureHandlerGestureEvent) => event.nativeEvent))
+  const pan$ = new Subject<PanGestureHandlerGestureEvent>().pipe(map(event => event.nativeEvent))
 
   const targetHasChanged$ = pan$.pipe(
     map(({ absoluteY }) => absoluteY),
@@ -110,11 +103,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
     bufferCount(15),
     map(velocity => {
       const accumulatedVelocity = velocity.reduce(
-        (acc, [x, y]) => {
-          acc[0] += Math.abs(x)
-          acc[1] += Math.abs(y)
-          return acc
-        },
+        (acc, [x, y]) => [acc[0] + Math.abs(x), acc[1] + Math.abs(y)],
         [0, 0]
       )
       return accumulatedVelocity[0] > accumulatedVelocity[1] ? 'h' : 'v'
@@ -128,7 +117,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
    */
   const onPanCallback = useCallback(event => pan$.next(event), [levels, ordering])
 
-  const panHandlerStateCallback = useCallback(event => panState$.next(event), [ordering, levels])
+  const onPanHandlerStateCallback = useCallback(event => panState$.next(event), [ordering, levels])
 
   const onScrollEventCallback = useCallback(event => scroll$.next(event), [])
 
@@ -174,8 +163,18 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
     data.panGesture.translateX = translationX
     data.panGesture.translateY = translationY
 
-    if (data.moveDirection === 'v') {
-      data.draggable.translateY.setValue(translationY)
+    switch (data.moveDirection) {
+      case 'v':
+        data.draggable.translateY.setValue(translationY)
+        break;
+      case 'h':
+        const dx = data.draggable.levelOffset - translationX
+        if (Math.abs(dx) > LEVEL_SHIFT_TRIGGER) {
+          shiftDraggableItemLevel(data, ordering, levels, dx > 0 ? 'left' : 'right')
+          startShiftLevelAnimation(data)
+          data.draggable.levelOffset = translationX
+        }
+        break
     }
   })
 
@@ -191,17 +190,6 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
       data.move.toLevel = targetLevel
       data.draggable.level.stopAnimation()
       startShiftLevelAnimation(data)
-    }
-  })
-
-  // TODO Level shift
-  pan$.subscribe(({ translationX }) => {
-    const dx = data.draggable.levelOffset - translationX
-
-    if (Math.abs(dx) > LEVEL_SHIFT_TRIGGER && data.moveDirection === 'h') {
-      shiftDraggableLevel(data, ordering, levels, dx > 0 ? 'left' : 'right')
-      startShiftLevelAnimation(data)
-      data.draggable.levelOffset = translationX
     }
   })
 
@@ -256,7 +244,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
         {activeItemId && (
           <PanGestureHandler
             onGestureEvent={onPanCallback}
-            onHandlerStateChange={panHandlerStateCallback}
+            onHandlerStateChange={onPanHandlerStateCallback}
           >
             <Animated.View
               style={[

@@ -20,13 +20,19 @@ export const applyChanges = (
   return [newOrdering, newLevels]
 }
 
-export function shiftDraggableLevel(
+export function shiftDraggableItemLevel(
   data: Refs,
   ordering: string[],
   levels: number[],
   direction: 'left' | 'right'
 ) {
   const delta = direction === 'right' ? 1 : -1
-  let newLevel = levels[data.move.toPosition - 1] + delta
-  data.move.toLevel = newLevel
+  // let newLevel = levels[data.move.toPosition - 1] + delta
+  const currentItemLevel = data.move.toLevel
+  const prevItemLevel = levels[data.move.toPosition - 1]
+  const nextItemLevel = levels[data.move.toPosition + 1]
+  const newLevel = currentItemLevel  + delta
+  if (newLevel > 0 && newLevel <= prevItemLevel + 1) {
+    data.move.toLevel = newLevel
+  }
 }
