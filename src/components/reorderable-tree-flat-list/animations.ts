@@ -1,13 +1,14 @@
 import { Animated } from "react-native";
-import { getDraggableToTargetOffset } from "./selectors";
+import { getDraggableToTargetOffset, getItemLevelOffset } from "./selectors";
 import { Refs } from "./types";
 
-export const startShiftLevelAnimation = (data: Refs, toValue: number) => {
+export const startShiftLevelAnimation = (data: Refs) => {
   if (!data.animating) {
     data.animating = true
+    const toValue = getItemLevelOffset(data.move.toLevel)
     Animated.timing(data.draggable.level, {
       toValue,
-      duration: 200,
+      duration: 70,
       useNativeDriver: true,
     }).start(() => {
       data.animating = false
@@ -33,7 +34,7 @@ export function startReleaseAnimation(data: Refs, ordering: string[]) {
     }),
     Animated.timing(data.draggable.opacity, {
       toValue: 0,
-      duration: 800,
+      duration: 500,
       useNativeDriver: true,
     }),
   ]).start()

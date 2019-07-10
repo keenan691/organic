@@ -9,7 +9,7 @@ import {
   gestureHandlerRootHOC,
   FlatList,
 } from 'react-native-gesture-handler'
-import { map, filter } from 'rxjs/operators'
+import { map, filter, tap, bufferCount } from 'rxjs/operators'
 
 import styles from './styles'
 import { applyChanges, shiftDraggableLevel } from './helpers'
@@ -19,13 +19,15 @@ import { useMeasure } from 'helpers/hooks'
 import {
   getAbsoluteItemPositionOffset,
   getItemLevelOffset,
-  getSourcePosition,
-  getTargetPosition,
   getItems,
   getItemInfo,
 } from './selectors'
-import { startActivateAnimation, startReleaseAnimation, startShiftLevelAnimation } from './animations'
-
+import {
+  startActivateAnimation,
+  startReleaseAnimation,
+  startShiftLevelAnimation,
+} from './animations'
+import { LEVEL_SHIFT_TRIGGER } from './constants'
 type Props = {
   itemDict: object
   ordering: string[]
@@ -64,6 +66,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
     },
     scrollPosition: 0,
     lastOffset: 0,
+    moveDirection: 'h',
   })
 
   const { ordering, setOrdering, levels, setLevels } = props
@@ -74,11 +77,14 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
   const activeItem = props.itemDict[activeItemId]
   const data = refs.current
 
+  /**
+   * Observables
+   */
   const panState$ = new Subject().pipe(
     map(({ nativeEvent }: PanGestureHandlerStateChangeEvent) => [
       nativeEvent.state,
       nativeEvent.oldState,
-      nativeEvent.translationX
+      nativeEvent.translationX,
     ])
   )
 
@@ -88,11 +94,32 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
   )
 
   const dragStart$ = panState$.pipe(
-    filter(([ state, oldState, translationX ]) => state === State.ACTIVE),
+    filter(([state, oldState, translationX]) => state === State.ACTIVE)
   )
 
-  const pan$ = new Subject().pipe(
-    map((event: PanGestureHandlerGestureEvent) => event.nativeEvent)
+  const pan$ = new Subject().pipe(map((event: PanGestureHandlerGestureEvent) => event.nativeEvent))
+
+  const targetHasChanged$ = pan$.pipe(
+    map(({ absoluteY }) => absoluteY),
+    map(y => y - data.itemHeights[ordering[data.move.fromPosition]] * 1.5),
+    map(absoluteY => getItemInfo(data, absoluteY, ordering)),
+    filter(([position, _]) => data.move.toPosition !== position && data.moveDirection === 'v')
+  )
+
+  const moveDirection$ = pan$.pipe(
+    map(({ velocityX, velocityY }) => [velocityX, velocityY]),
+    bufferCount(15),
+    map(velocity => {
+      const accumulatedVelocity = velocity.reduce(
+        (acc, [x, y]) => {
+          acc[0] += Math.abs(x)
+          acc[1] += Math.abs(y)
+          return acc
+        },
+        [0, 0]
+      )
+      return accumulatedVelocity[0] > accumulatedVelocity[1] ? 'h' : 'v'
+    })
   )
 
   /**
@@ -110,83 +137,62 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
 
       data.draggable.translateY.setOffset(absoluteItemOffset - data.scrollPosition)
       data.draggable.translateY.setValue(0)
-
-      data.draggable.level.setOffset(0)
       data.draggable.level.setValue(getItemLevelOffset(activeItemLevel))
 
-      data.draggable.toLevel = activeItemLevel
-      data.draggable.startX = 0
-
       data.move.fromPosition = itemPosition
+      data.move.toPosition = itemPosition
+      data.move.toLevel = activeItemLevel
+
+      data.draggable.startX = 0
       data.lastOffset = absoluteItemOffset
 
-      setDraggableItemLevel(activeItemLevel)
       setActiveItemId(activeItemId)
+      setDraggableItemLevel(activeItemLevel)
       startActivateAnimation(data)
     },
     [ordering, levels]
   )
 
   /**
-   * Start dragging
-   */
-  /* dragStart$.subscribe(([state, odlState, translationX]) => {
-   *   console.tron.debug('drag start')
-   *   console.tron.debug(translationX)
-   * })
-   */
-  /**
    * Track Pan Gesture
    */
-  // Calculate position of draggable item
-  pan$.subscribe(( { translationX, translationY } ) => {
-    data.draggable.translateY.setValue(translationY)
-    data.draggable.level.setOffset(0)
-    data.panGesture.translateX  = translationX
+
+  moveDirection$.subscribe(direction => {
+    data.moveDirection = direction
   })
 
-  // Calculate position of target indicator
-  pan$
-    .pipe(
-      map(({absoluteY}) => absoluteY),
-      map(y => y - data.itemHeights[ordering[data.move.fromPosition]]),
-      map(absoluteY => getItemInfo(data, absoluteY, ordering))
-    )
-    .subscribe(([position, offset]) => {
-      // Set new target position
-      if (data.move.toPosition !== position) {
-        // After change of target position calculate default level for this position
-        const targetLevel = levels[position - 1]
+  pan$.subscribe(({ translationX, translationY }) => {
+    data.panGesture.translateX = translationX
+    data.panGesture.translateY = translationY
 
-        data.draggable.startX = data.panGesture.translateX
-        data.move.toLevel = targetLevel
-        data.move.toPosition = position
+    if (data.moveDirection === 'v') {
+      data.draggable.translateY.setValue(translationY)
+    }
+  })
 
-        data.targetIndicator.opacity.setValue(1)
-        data.targetIndicator.translateY.setValue(offset - 2)
+  targetHasChanged$.subscribe(([newPosition, newOffset]) => {
+    data.move.toPosition = newPosition
+    data.draggable.startX = data.panGesture.translateX
 
-        data.draggable.level.stopAnimation()
-        data.draggable.level.setValue(getItemLevelOffset(targetLevel))
-        data.draggable.level.setOffset(0)
-      }
-    })
+    data.targetIndicator.opacity.setValue(1)
+    data.targetIndicator.translateY.setValue(newOffset - 2)
 
-  // TODO Set item color when move have been stabilized
-  pan$.pipe(map(({ velocityY } ) => velocityY)).subscribe(velocityY => {
-    if (Math.abs(velocityY) < 10) {
-      const targetLevel = levels[data.move.toPosition - 1]
-      setDraggableItemLevel(targetLevel)
+    const targetLevel = levels[newPosition - 1]
+    if (data.move.toLevel !== targetLevel) {
+      data.move.toLevel = targetLevel
+      data.draggable.level.stopAnimation()
+      startShiftLevelAnimation(data)
     }
   })
 
   // TODO Level shift
-  pan$.subscribe(({translationX}) => {
+  pan$.subscribe(({ translationX }) => {
     const dx = data.draggable.startX - translationX
 
-    if (Math.abs(dx) > 18) {
+    if (Math.abs(dx) > LEVEL_SHIFT_TRIGGER && data.moveDirection === 'h') {
       shiftDraggableLevel(data, ordering, levels, dx > 0 ? 'left' : 'right')
-      startShiftLevelAnimation(data, getItemLevelOffset(data.move.toLevel))
-      /* data.draggable.startX = translationX */
+      startShiftLevelAnimation(data)
+      data.draggable.startX = translationX
     }
   })
 
