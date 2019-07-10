@@ -71,8 +71,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
 
   const { ordering, setOrdering, levels, setLevels } = props
 
-  const [draggableItemLevel, setDraggableItemLevel] = useState()
-  const [activeItemId, setActiveItemId] = useState(null)
+  const [activeItemId, setDraggableItemId] = useState(null)
 
   const activeItem = props.itemDict[activeItemId]
   const data = refs.current
@@ -127,8 +126,8 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
    */
   const turnItemToDraggable = useCallback(
     itemPosition => {
-      const activeItemId = props.ordering[itemPosition]
-      const activeItemLevel = levels[itemPosition]
+      const itemId = props.ordering[itemPosition]
+      const itemLevel = levels[itemPosition]
       const absoluteItemOffset = getAbsoluteItemPositionOffset(
         itemPosition,
         ordering,
@@ -137,17 +136,16 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
 
       data.draggable.translateY.setOffset(absoluteItemOffset - data.scrollPosition)
       data.draggable.translateY.setValue(0)
-      data.draggable.level.setValue(getItemLevelOffset(activeItemLevel))
+      data.draggable.level.setValue(getItemLevelOffset(itemLevel))
 
       data.move.fromPosition = itemPosition
       data.move.toPosition = itemPosition
-      data.move.toLevel = activeItemLevel
+      data.move.toLevel = itemLevel
 
       data.draggable.startX = 0
       data.lastOffset = absoluteItemOffset
 
-      setActiveItemId(activeItemId)
-      setDraggableItemLevel(activeItemLevel)
+      setDraggableItemId(itemId)
       startActivateAnimation(data)
     },
     [ordering, levels]
@@ -283,7 +281,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
               >
                 <Icon name="circleNotch" />
                 <Text> </Text>
-                {renderItem({ item: activeItem, level: draggableItemLevel })}
+                {renderItem({ item: activeItem, level: data.move.toLevel })}
               </Animated.View>
             </Animated.View>
           </PanGestureHandler>
