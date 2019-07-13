@@ -1,16 +1,12 @@
-import { NumberDict } from 'components/entry-list/types'
+import { NumberDict, BooleanDict } from 'components/entry-list/types'
 import { reduceWhile, move } from 'ramda'
 import { ItemHeightCache, Refs } from './types'
 import { INDENT_SIZE } from './constants'
-import { createSelector } from 'reselect';
+import { createSelector } from 'reselect'
 
 export const getItemLevelOffset = (level: number) => (level - 1) * INDENT_SIZE
 
-export function getItemInfo(
-  data: Refs,
-  absoluteY: number,
-  itemsOrder: number[]
-) {
+export function getItemInfo(data: Refs, absoluteY: number, ordering: string[]) {
   const { itemHeights, scrollPosition } = data
   let index = 0
   const offset = reduceWhile(
@@ -21,17 +17,19 @@ export function getItemInfo(
       return currentOffset
     },
     0
-  )(itemsOrder)
+  )(ordering)
   return [index, offset - scrollPosition]
 }
 
 export const getAbsoluteItemPositionOffset = (
   position: number,
   ordering: string[],
+  visibility: BooleanDict,
   itemHeights: NumberDict
 ) =>
   ordering.slice(0, position).reduce((acc, id) => {
-    return acc + itemHeights[id]
+    console.tron.debug(visibility[id])
+    return visibility[id] ? acc + itemHeights[id] : acc
   }, 0)
 
 export const getItems = createSelector(
@@ -51,6 +49,14 @@ export const getSourcePosition = (data: Refs) => data.move.fromPosition
 
 export function getTargetPosition(data: Refs) {
   return data.move.toPosition > getSourcePosition(data)
-                              ? data.move.toPosition - 1
-                              : data.move.toPosition
+    ? data.move.toPosition - 1
+    : data.move.toPosition
+}
+
+export function getLastChildPosition(levels: number[], sourcePosition: number) {
+  let position = sourcePosition
+  do {
+    position += 1
+  } while (levels[position] > levels[sourcePosition])
+  return position - 1
 }

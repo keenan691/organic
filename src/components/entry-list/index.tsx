@@ -43,18 +43,6 @@ export const EntryListContext = React.createContext<Context>({
   dispatch: () => null,
 })
 
-const getItemLayout = (data, index) => {
-  /* const length = this.cache[data[index].id]; */
-  const length = 50
-  /* const offset = this.offsets[index]; */
-  const offset = 50 * index
-  return {
-    length,
-    offset,
-    index,
-  }
-}
-
 const keyExtractor = item => item.id
 
 function EntryList(props: Props) {
@@ -178,7 +166,6 @@ function EntryList(props: Props) {
               isFocused={false}
             />
           )}
-          getItemLayout={getItemLayout}
           ItemSeparatorComponent={Separator}
           beforeOutlineActivation={beforeOutlineActivationCallback}
           keyExtractor={keyExtractor}

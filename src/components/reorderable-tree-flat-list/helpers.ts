@@ -1,14 +1,18 @@
 import { move, range } from 'ramda'
 import { Refs } from './types'
-import { getSourcePosition, getTargetPosition, getItemLevelOffset } from './selectors'
+import { getSourcePosition, getTargetPosition, getLastChildPosition } from './selectors'
 import { startShiftLevelAnimation } from './animations'
 
-export function getLastChildPosition(levels: number[], sourcePosition: number) {
-  let position = sourcePosition
-  do {
-    position += 1
-  } while (levels[position] > levels[sourcePosition])
-  return position - 1
+export const getItemLayout = (data, index) => {
+  /* const length = this.cache[data[index].id]; */
+  const length = 50
+  /* const offset = this.offsets[index]; */
+  const offset = 50 * index
+  return {
+    length,
+    offset,
+    index,
+  }
 }
 
 export function applyChanges(

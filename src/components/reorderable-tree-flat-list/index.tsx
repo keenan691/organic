@@ -8,13 +8,14 @@ import {
   State,
   gestureHandlerRootHOC,
   FlatList,
+  TouchableOpacity,
 } from 'react-native-gesture-handler'
 import { map, filter, bufferCount } from 'rxjs/operators'
 
 import { Refs } from './types'
 import { LEVEL_SHIFT_TRIGGER } from './constants'
 import styles from './styles'
-import { applyChanges, shiftDraggableItemLevel } from './helpers'
+import { applyChanges, shiftDraggableItemLevel, getItemLayout } from './helpers'
 import { LevelIndicator, Icon } from 'elements'
 import { useMeasure } from 'helpers/hooks'
 import {
@@ -28,12 +29,12 @@ import {
   startReleaseAnimation,
   startShiftLevelAnimation,
 } from './animations'
+import { cycleSubtreeVisibility } from './visibility'
 
 type Props = {
   itemDict: object
   ordering: string[]
   levels: number[]
-  visibility: boolean[]
   setOrdering: (ordering: string[]) => void
   setLevels: (levels: number[]) => void
 } & typeof defaultProps &
@@ -73,6 +74,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
   const { ordering, setOrdering, levels, setLevels } = props
 
   const [activeItemId, setDraggableItemId] = useState(null)
+  const [visibility, setVisibility] = useState(() =>  ordering.reduce((acc, id) => ({...acc, [id]: true}), {}))
 
   const activeItem = props.itemDict[activeItemId]
   const data = refs.current
@@ -125,6 +127,12 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
     refs.current.itemHeights[itemId] = event.nativeEvent.layout.height
   }, [])
 
+  const cycleSubtreeVisibilityCallback = useCallback(
+    () =>
+      setVisibility(cycleSubtreeVisibility(data.move.fromPosition, ordering, levels, visibility)),
+    [ordering, levels, visibility]
+  )
+
   const turnItemToDraggableCallback = useCallback(
     itemPosition => {
       const itemId = props.ordering[itemPosition]
@@ -132,6 +140,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
       const absoluteItemOffset = getAbsoluteItemPositionOffset(
         itemPosition,
         ordering,
+        visibility,
         data.itemHeights
       )
 
@@ -149,7 +158,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
       setDraggableItemId(itemId)
       startActivateAnimation(data)
     },
-    [ordering, levels]
+    [ordering, levels, visibility]
   )
 
   /**
@@ -166,7 +175,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
     switch (data.moveDirection) {
       case 'v':
         data.draggable.translateY.setValue(translationY)
-        break;
+        break
       case 'h':
         const dx = data.draggable.levelOffset - translationX
         if (Math.abs(dx) > LEVEL_SHIFT_TRIGGER) {
@@ -179,7 +188,6 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
   })
 
   targetHasChanged$.subscribe(([newPosition, newOffset]) => {
-
     data.move.toPosition = newPosition
     data.draggable.levelOffset = data.panGesture.translateX
 
@@ -217,7 +225,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
    * Render
    */
   const renderItemCallback = useCallback(
-    ({ item, index }) => (
+    ({ item, index }) => visibility[item.id] && (
       <View style={styles.row} onLayout={event => onItemLayoutCallback(event, item.id)}>
         <LevelIndicator
           level={levels[index]}
@@ -228,7 +236,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
         {renderItem({ item, level: levels[index] })}
       </View>
     ),
-    [ordering, levels]
+    [ordering, levels, visibility]
   )
 
   bench.step('reorderable')
@@ -238,6 +246,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
         <FlatList
           renderItem={renderItemCallback}
           data={getItems(props)}
+          getItemLayout={getItemLayout}
           onScroll={onScrollEventCallback}
           {...props}
         />
@@ -259,7 +268,9 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
               <Animated.View
                 style={[styles.row, { transform: [{ translateX: data.draggable.level }] }]}
               >
-                <Icon name="circleNotch" />
+                <TouchableOpacity onPress={cycleSubtreeVisibilityCallback} >
+                  <Icon name="circleNotch" />
+                </TouchableOpacity>
                 <Text> </Text>
                 {renderItem({ item: activeItem, level: data.move.toLevel })}
               </Animated.View>
