@@ -24,8 +24,8 @@ export function startActivateAnimation(data: Refs) {
   }).start()
 }
 
-export function startReleaseAnimation(data: Refs, ordering: string[]) {
-  const dY = getDraggableToTargetOffset(data, ordering)
+export function startReleaseAnimation(data: Refs, ordering: string[], visibility: {}) {
+  const dY = getDraggableToTargetOffset(data, ordering, visibility)
   Animated.sequence([
     Animated.timing(data.draggable.translateY, {
       toValue: dY,

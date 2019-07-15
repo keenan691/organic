@@ -29,7 +29,7 @@ import {
   startReleaseAnimation,
   startShiftLevelAnimation,
 } from './animations'
-import { cycleSubtreeVisibility } from './visibility'
+import { cycleVisibility } from './visibility'
 
 type Props = {
   itemDict: object
@@ -129,7 +129,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
 
   const cycleSubtreeVisibilityCallback = useCallback(
     () =>
-      setVisibility(cycleSubtreeVisibility(data.move.fromPosition, ordering, levels, visibility)),
+      setVisibility(cycleVisibility(data.move.fromPosition, ordering, levels, visibility)),
     [ordering, levels, visibility]
   )
 
@@ -203,7 +203,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
   })
 
   dragEnd$.subscribe(() => {
-    startReleaseAnimation(data, ordering)
+    startReleaseAnimation(data, ordering, visibility)
     data.targetIndicator.opacity.setValue(0.01)
     data.draggable.levelOffset = 0
 

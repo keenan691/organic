@@ -1,11 +1,12 @@
-import { applyChanges, getLastChildPosition } from './helpers'
+import { applyChanges } from './helpers'
+import { getLastDescendantPosition } from './selectors';
 
 const ordering = ['1', '2', '3', '4', '5']
 const levels = [1, 2, 3, 1, 1]
 
 describe("getLastChildPosition", () => {
   it("should return last element of the first subtree", () => {
-    expect(getLastChildPosition(levels, 0)).toEqual(2)
+    expect(getLastDescendantPosition(levels, 0)).toEqual(2)
   })
 })
 

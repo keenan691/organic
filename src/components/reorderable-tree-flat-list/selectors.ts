@@ -38,9 +38,13 @@ export const getItems = createSelector(
   (itemDict, ordering) => ordering.map(id => itemDict[id])
 )
 
-export function getDraggableToTargetOffset(data: Refs, ordering: string[]) {
+export function getDraggableToTargetOffset(
+  data: Refs,
+  ordering: string[],
+  visibility: { [itemId: string]: boolean }
+) {
   return (
-    getAbsoluteItemPositionOffset(getTargetPosition(data), ordering, data.itemHeights) -
+    getAbsoluteItemPositionOffset(getTargetPosition(data), ordering, visibility, data.itemHeights) -
     data.lastOffset
   )
 }
@@ -53,7 +57,7 @@ export function getTargetPosition(data: Refs) {
     : data.move.toPosition
 }
 
-export function getLastChildPosition(levels: number[], sourcePosition: number) {
+export function getLastDescendantPosition(levels: number[], sourcePosition: number) {
   let position = sourcePosition
   do {
     position += 1

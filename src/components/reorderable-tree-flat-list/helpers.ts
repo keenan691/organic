@@ -1,6 +1,6 @@
 import { move, range } from 'ramda'
 import { Refs } from './types'
-import { getSourcePosition, getTargetPosition, getLastChildPosition } from './selectors'
+import { getSourcePosition, getTargetPosition, getLastDescendantPosition } from './selectors'
 import { startShiftLevelAnimation } from './animations'
 
 export const getItemLayout = (data, index) => {
@@ -24,7 +24,7 @@ export function applyChanges(
   const targetPosition = getTargetPosition(data)
 
   const levelDelta = data.move.toLevel - levels[sourcePosition]
-  const lastChildPosition = getLastChildPosition(levels, sourcePosition)
+  const lastChildPosition = getLastDescendantPosition(levels, sourcePosition)
 
   const subtreeRange = range(sourcePosition, lastChildPosition+1)
 
