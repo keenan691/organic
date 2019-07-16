@@ -31,6 +31,8 @@ function EntryListItem(props: Props) {
     showContent,
     highlighted,
     deactivateCallback,
+    defaultAction,
+    position,
     level
   } = props
   const id = item.id
@@ -49,8 +51,9 @@ function EntryListItem(props: Props) {
           underlayColor="white"
           onLongPress={() => dispatch(actions.toggleContent({ entryId: id }))}
           onPress={() => {
-            deactivateCallback()
-            dispatch(actions.onItemPress({ entryId: id }))
+            defaultAction && defaultAction(position)
+            {/* deactivateCallback()
+                dispatch(actions.onItemPress({ entryId: id })) */}
           }}
         >
           <View style={[styles.column]}>

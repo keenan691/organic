@@ -1,6 +1,23 @@
 import { Animated } from "react-native";
 import { getDraggableToTargetOffset, getItemLevelOffset } from "./selectors";
 import { Refs } from "./types";
+import { LayoutAnimation } from "react-native";
+
+export const foldAnimation = {
+  duration: 150,
+  update: {
+    property: LayoutAnimation.Properties.scaleXY,
+    type: LayoutAnimation.Types.easeOut,
+  },
+  create: {
+    property: LayoutAnimation.Properties.scaleXY,
+    type: LayoutAnimation.Types.easeOut,
+  },
+  delete: {
+    property: LayoutAnimation.Properties.scaleXY,
+    type: LayoutAnimation.Types.easeOut,
+  },
+}
 
 export const startShiftLevelAnimation = (data: Refs) => {
   if (!data.animating) {

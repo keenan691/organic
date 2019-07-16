@@ -31,8 +31,9 @@ import {
   startActivateAnimation,
   startReleaseAnimation,
   startShiftLevelAnimation,
+  foldAnimation,
 } from './animations'
-import { cycleItemVisibility, moreDetails, lessDetails } from './visibility'
+import { cycleItemVisibility, moreDetails, lessDetails, hasHiddenChildren } from './visibility'
 import { focusItemAnimation } from 'components/entry-list/animations'
 
 type Props = {
@@ -80,11 +81,12 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
 
   const { ordering, setOrdering, levels, setLevels } = props
 
-  const [activeItemId, setDraggableItemId] = useState(null)
+  const [activeItemPosition, setDraggableItemPosition] = useState(null)
   const [visibility, setVisibility] = useState(() =>
     ordering.reduce((acc, id) => ({ ...acc, [id]: true }), {})
   )
 
+  const activeItemId = ordering[activeItemPosition]
   const activeItem = props.itemDict[activeItemId]
   const data = refs.current
 
@@ -120,14 +122,14 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
       data.draggable.levelOffset = 0
       data.lastOffset = absoluteItemOffset
 
-      setDraggableItemId(itemId)
+      setDraggableItemPosition(itemPosition)
       startActivateAnimation(data)
     },
     [ordering, levels, visibility]
   )
 
   const cycleSubtreeVisibilityCallback = useCallback(
-    () => setVisibility(cycleItemVisibility(data.move.fromPosition, ordering, levels, visibility)),
+    position => setVisibility(cycleItemVisibility(position, ordering, levels, visibility)),
     [ordering, levels, visibility]
   )
 
@@ -272,22 +274,30 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
    * Render
    */
   useLayoutEffect(() => {
-    LayoutAnimation.configureNext(focusItemAnimation())
+    LayoutAnimation.configureNext(foldAnimation)
   }, [visibility])
 
   const renderItemCallback = useCallback(
-    ({ item, index }) =>
-      visibility[item.id] && (
-        <View style={styles.row} onLayout={event => onItemLayoutCallback(event, item.id)}>
-          <LevelIndicator
-            level={levels[index]}
-            position={index}
-            iconName="circle"
-            onPress={turnItemToDraggableCallback}
-          />
-          {renderItem({ item, level: levels[index] })}
-        </View>
-      ),
+    ({ item, index }) => {
+      return (
+        visibility[item.id] && (
+          <View style={styles.row} onLayout={event => onItemLayoutCallback(event, item.id)}>
+            <LevelIndicator
+              level={levels[index]}
+              hasHiddenChildren={hasHiddenChildren(index, visibility, ordering, levels)}
+              position={index}
+              onPress={cycleSubtreeVisibilityCallback}
+            />
+            {renderItem({
+              item,
+              level: levels[index],
+              position: index,
+              defaultAction: turnItemToDraggableCallback,
+            })}
+          </View>
+        )
+      )
+    },
     [ordering, levels, visibility]
   )
 
@@ -325,10 +335,18 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
                 <Animated.View
                   style={[styles.row, { transform: [{ translateX: data.draggable.level }] }]}
                 >
-                  <TouchableOpacity onPress={cycleSubtreeVisibilityCallback}>
-                    <Icon name="circleNotch" />
-                  </TouchableOpacity>
-                  <Text> </Text>
+                  <LevelIndicator
+                    level={levels[activeItemPosition]}
+                    flatDisplay={true}
+                    position={activeItemPosition}
+                    onPress={cycleSubtreeVisibilityCallback}
+                    hasHiddenChildren={hasHiddenChildren(
+                      activeItemPosition,
+                      visibility,
+                      ordering,
+                      levels
+                    )}
+                  />
                   {renderItem({ item: activeItem, level: data.move.toLevel })}
                 </Animated.View>
               </Animated.View>

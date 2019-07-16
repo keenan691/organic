@@ -2,6 +2,20 @@ import { range, pipe, map, cond, all, equals, T } from 'ramda'
 import { getLastDescendantPosition } from './selectors'
 import { BooleanDict } from 'components/entry-list/types'
 
+export const hasHiddenChildren = (
+  itemPosition: number,
+  visibility: {},
+  ordering: string[],
+  levels: number[]
+) => {
+  let position = itemPosition
+  do {
+    position += 1
+    if (!visibility[ordering[position]]) return true
+  } while (levels[position] > levels[itemPosition])
+  return false
+}
+
 const setVisibility = (positions: number[], ordering: string[], visibility: BooleanDict) => (
   visible: boolean
 ) => {
@@ -15,7 +29,11 @@ const setVisibility = (positions: number[], ordering: string[], visibility: Bool
   }
 }
 
-const modifyDetailsLevel = (direction: 'inc'| 'dec') => (ordering: string[], levels: number[], visibility: {}) => {
+const modifyDetailsLevel = (direction: 'inc' | 'dec') => (
+  ordering: string[],
+  levels: number[],
+  visibility: {}
+) => {
   const visibleLevels = levels.filter((_, position) => visibility[ordering[position]])
   const maxLevel = Math.max(...visibleLevels)
 
@@ -24,13 +42,13 @@ const modifyDetailsLevel = (direction: 'inc'| 'dec') => (ordering: string[], lev
   console.tron.debug(maxLevel)
   const isVisible = {
     dec: (level: number) => level < maxLevel,
-    inc: (level: number) => level <= maxLevel + 1
+    inc: (level: number) => level <= maxLevel + 1,
   }[direction]
 
-  const newVisibillity =  levels.reduce(
+  const newVisibillity = levels.reduce(
     (acc, level, position) => ({
       ...acc,
-      [ordering[position]]: isVisible(level)
+      [ordering[position]]: isVisible(level),
     }),
     {}
   )
