@@ -1,6 +1,6 @@
 import { NumberDict, BooleanDict } from 'components/entry-list/types'
 import { reduceWhile, move } from 'ramda'
-import { ItemHeightCache, Refs } from './types'
+import { Refs } from './types'
 import { INDENT_SIZE } from './constants'
 import { createSelector } from 'reselect'
 
@@ -27,10 +27,7 @@ export const getAbsoluteItemPositionOffset = (
   visibility: BooleanDict,
   itemHeights: NumberDict
 ) =>
-  ordering.slice(0, position).reduce((acc, id) => {
-    console.tron.debug(visibility[id])
-    return visibility[id] ? acc + itemHeights[id] : acc
-  }, 0)
+  ordering.slice(0, position).reduce((acc, id) => visibility[id] ? acc + itemHeights[id] : acc, 0)
 
 export const getItems = createSelector(
   props => props.itemDict,

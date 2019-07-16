@@ -1,12 +1,12 @@
-import { range, pipe, reduce, map, cond, all, equals, always, T } from 'ramda'
+import { range, pipe, map, cond, all, equals, T } from 'ramda'
 import { getLastDescendantPosition } from './selectors'
 import { BooleanDict } from 'components/entry-list/types'
 
 const setVisibility = (positions: number[], ordering: string[], visibility: BooleanDict) => (
-  newState: boolean
+  visible: boolean
 ) => {
   const changes = positions.reduce((acc, position) => {
-    acc[ordering[position]] = newState
+    acc[ordering[position]] = visible
     return acc
   }, {})
   return {
@@ -15,7 +15,33 @@ const setVisibility = (positions: number[], ordering: string[], visibility: Bool
   }
 }
 
-export function cycleVisibility(
+const modifyDetailsLevel = (direction: 'inc'| 'dec') => (ordering: string[], levels: number[], visibility: {}) => {
+  const visibleLevels = levels.filter((_, position) => visibility[ordering[position]])
+  const maxLevel = Math.max(...visibleLevels)
+
+  if (direction === 'dec' && maxLevel === 1) return visibility
+
+  console.tron.debug(maxLevel)
+  const isVisible = {
+    dec: (level: number) => level < maxLevel,
+    inc: (level: number) => level <= maxLevel + 1
+  }[direction]
+
+  const newVisibillity =  levels.reduce(
+    (acc, level, position) => ({
+      ...acc,
+      [ordering[position]]: isVisible(level)
+    }),
+    {}
+  )
+
+  return newVisibillity
+}
+
+export const moreDetails = modifyDetailsLevel('inc')
+export const lessDetails = modifyDetailsLevel('dec')
+
+export function cycleItemVisibility(
   itemPosition: number,
   ordering: string[],
   levels: number[],

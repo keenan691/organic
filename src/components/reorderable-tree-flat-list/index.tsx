@@ -1,16 +1,19 @@
-import React, { useCallback, useRef, useState } from 'react'
-import { Text, View, Animated, LayoutChangeEvent } from 'react-native'
+import React, { useCallback, useRef, useState, useLayoutEffect } from 'react'
+import { Text, View, Animated, LayoutChangeEvent, LayoutAnimation } from 'react-native'
 import { Subject } from 'rxjs'
 import {
   PanGestureHandlerGestureEvent,
   PanGestureHandlerStateChangeEvent,
   PanGestureHandler,
+  PinchGestureHandler,
   State,
   gestureHandlerRootHOC,
   FlatList,
   TouchableOpacity,
+  PinchGestureHandlerStateChangeEvent,
+  PinchGestureHandlerGestureEvent,
 } from 'react-native-gesture-handler'
-import { map, filter, bufferCount } from 'rxjs/operators'
+import { map, filter, bufferCount, bufferTime } from 'rxjs/operators'
 
 import { Refs } from './types'
 import { LEVEL_SHIFT_TRIGGER } from './constants'
@@ -29,7 +32,8 @@ import {
   startReleaseAnimation,
   startShiftLevelAnimation,
 } from './animations'
-import { cycleVisibility } from './visibility'
+import { cycleItemVisibility, moreDetails, lessDetails } from './visibility'
+import { focusItemAnimation } from 'components/entry-list/animations'
 
 type Props = {
   itemDict: object
@@ -67,6 +71,9 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
       y: 0,
     },
     scrollPosition: 0,
+    pinchGesture: {
+      isActive: false,
+    },
     lastOffset: 0,
     moveDirection: 'h',
   })
@@ -74,65 +81,23 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
   const { ordering, setOrdering, levels, setLevels } = props
 
   const [activeItemId, setDraggableItemId] = useState(null)
-  const [visibility, setVisibility] = useState(() =>  ordering.reduce((acc, id) => ({...acc, [id]: true}), {}))
+  const [visibility, setVisibility] = useState(() =>
+    ordering.reduce((acc, id) => ({ ...acc, [id]: true }), {})
+  )
 
   const activeItem = props.itemDict[activeItemId]
   const data = refs.current
 
   /**
-   * Observables
+   * Measures
    */
-  const panState$ = new Subject<PanGestureHandlerStateChangeEvent>().pipe(
-    map(({ nativeEvent }) => [nativeEvent.state, nativeEvent.oldState, nativeEvent.translationX])
-  )
-
-  const dragEnd$ = panState$.pipe(
-    map(([_, oldState]) => oldState),
-    filter(oldState => oldState === State.ACTIVE)
-  )
-
-  const pan$ = new Subject<PanGestureHandlerGestureEvent>().pipe(map(event => event.nativeEvent))
-
-  const targetHasChanged$ = pan$.pipe(
-    map(({ absoluteY }) => absoluteY),
-    map(y => y - data.itemHeights[ordering[data.move.fromPosition]] * 1.5),
-    map(absoluteY => getItemInfo(data, absoluteY, ordering)),
-    filter(([position, _]) => data.move.toPosition !== position && data.moveDirection === 'v')
-  )
-
-  const moveDirection$ = pan$.pipe(
-    map(({ velocityX, velocityY }) => [velocityX, velocityY]),
-    bufferCount(15),
-    map(velocity => {
-      const accumulatedVelocity = velocity.reduce(
-        (acc, [x, y]) => [acc[0] + Math.abs(x), acc[1] + Math.abs(y)],
-        [0, 0]
-      )
-      return accumulatedVelocity[0] > accumulatedVelocity[1] ? 'h' : 'v'
-    })
-  )
-
-  const scroll$ = new Subject()
-
-  /**
-   * Callbacks
-   */
-  const onPanCallback = useCallback(event => pan$.next(event), [levels, ordering])
-
-  const onPanHandlerStateCallback = useCallback(event => panState$.next(event), [ordering, levels])
-
-  const onScrollEventCallback = useCallback(event => scroll$.next(event), [])
-
   const onItemLayoutCallback = useCallback((event: LayoutChangeEvent, itemId: number) => {
     refs.current.itemHeights[itemId] = event.nativeEvent.layout.height
   }, [])
 
-  const cycleSubtreeVisibilityCallback = useCallback(
-    () =>
-      setVisibility(cycleVisibility(data.move.fromPosition, ordering, levels, visibility)),
-    [ordering, levels, visibility]
-  )
-
+  /**
+   * Draggable
+   */
   const turnItemToDraggableCallback = useCallback(
     itemPosition => {
       const itemId = props.ordering[itemPosition]
@@ -161,12 +126,45 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
     [ordering, levels, visibility]
   )
 
+  const cycleSubtreeVisibilityCallback = useCallback(
+    () => setVisibility(cycleItemVisibility(data.move.fromPosition, ordering, levels, visibility)),
+    [ordering, levels, visibility]
+  )
+
   /**
-   * Track Pan Gesture
+   * Pan Gesture
    */
-  moveDirection$.subscribe(direction => {
-    data.moveDirection = direction
-  })
+  const pan$ = new Subject<PanGestureHandlerGestureEvent>().pipe(map(event => event.nativeEvent))
+  const onPanCallback = useCallback(event => pan$.next(event), [levels, ordering])
+
+  const panState$ = new Subject<PanGestureHandlerStateChangeEvent>().pipe(
+    map(({ nativeEvent }) => [nativeEvent.state, nativeEvent.oldState, nativeEvent.translationX])
+  )
+  const onPanHandlerStateCallback = useCallback(event => panState$.next(event), [ordering, levels])
+
+  const targetHasChanged$ = pan$.pipe(
+    map(({ absoluteY }) => absoluteY),
+    map(y => y - data.itemHeights[ordering[data.move.fromPosition]] * 1.5),
+    map(absoluteY => getItemInfo(data, absoluteY, ordering)),
+    filter(([position, _]) => data.move.toPosition !== position && data.moveDirection === 'v')
+  )
+
+  const moveDirection$ = pan$.pipe(
+    map(({ velocityX, velocityY }) => [velocityX, velocityY]),
+    bufferCount(15),
+    map(velocity => {
+      const accumulatedVelocity = velocity.reduce(
+        (acc, [x, y]) => [acc[0] + Math.abs(x), acc[1] + Math.abs(y)],
+        [0, 0]
+      )
+      return accumulatedVelocity[0] > accumulatedVelocity[1] ? 'h' : 'v'
+    })
+  )
+
+  const dragEnd$ = panState$.pipe(
+    map(([_, oldState]) => oldState),
+    filter(oldState => oldState === State.ACTIVE)
+  )
 
   pan$.subscribe(({ translationX, translationY }) => {
     data.panGesture.translateX = translationX
@@ -185,6 +183,10 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
         }
         break
     }
+  })
+
+  moveDirection$.subscribe(direction => {
+    data.moveDirection = direction
   })
 
   targetHasChanged$.subscribe(([newPosition, newOffset]) => {
@@ -212,6 +214,12 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
     setLevels(newLevels)
   })
 
+  /**
+   * Scroll
+   */
+  const scroll$ = new Subject()
+  const onScrollEventCallback = useCallback(event => scroll$.next(event), [])
+
   scroll$.subscribe(({ nativeEvent: { contentOffset } }) => {
     const height = contentOffset.y | 0
     const baseLevel = data.lastOffset - height
@@ -222,70 +230,120 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
   })
 
   /**
+   * Pinch gesture
+   */
+  const pinch$ = new Subject<PinchGestureHandlerGestureEvent>().pipe(
+    map(event => event.nativeEvent)
+  )
+
+  const onPinchCallback = useCallback(event => pinch$.next(event), [levels, ordering, visibility])
+
+  const pinchState$ = new Subject<PinchGestureHandlerStateChangeEvent>().pipe(
+    map(({ nativeEvent }) => nativeEvent.state),
+    filter(state => state === State.ACTIVE)
+  )
+
+  const onPinchStateCallback = useCallback(event => pinchState$.next(event), [
+    ordering,
+    levels,
+    visibility,
+  ])
+
+  pinchState$.subscribe(state => {
+    data.pinchGesture.isActive = true
+  })
+
+  pinch$
+    .pipe(
+      /* auditTime(100), */
+      map(event => event.scale),
+      bufferTime(100),
+      map(scales => [scales[0] > scales[2] ? 'in' : 'out', scales[0]])
+    )
+    .subscribe(([direction, scale]) => {
+      if (data.pinchGesture.isActive && scale > 0.5) {
+        const transformVisibility = direction === 'in' ? lessDetails : moreDetails
+        setVisibility(transformVisibility(ordering, levels, visibility))
+        data.pinchGesture.isActive = false
+      }
+    })
+
+  /**
    * Render
    */
+  useLayoutEffect(() => {
+    LayoutAnimation.configureNext(focusItemAnimation())
+  }, [visibility])
+
   const renderItemCallback = useCallback(
-    ({ item, index }) => visibility[item.id] && (
-      <View style={styles.row} onLayout={event => onItemLayoutCallback(event, item.id)}>
-        <LevelIndicator
-          level={levels[index]}
-          position={index}
-          iconName="circle"
-          onPress={turnItemToDraggableCallback}
-        />
-        {renderItem({ item, level: levels[index] })}
-      </View>
-    ),
+    ({ item, index }) =>
+      visibility[item.id] && (
+        <View style={styles.row} onLayout={event => onItemLayoutCallback(event, item.id)}>
+          <LevelIndicator
+            level={levels[index]}
+            position={index}
+            iconName="circle"
+            onPress={turnItemToDraggableCallback}
+          />
+          {renderItem({ item, level: levels[index] })}
+        </View>
+      ),
     [ordering, levels, visibility]
   )
 
   bench.step('reorderable')
   return (
     <ReorderableTreeFlatListContext.Provider value={refs}>
-      <View>
-        <FlatList
-          renderItem={renderItemCallback}
-          data={getItems(props)}
-          getItemLayout={getItemLayout}
-          onScroll={onScrollEventCallback}
-          {...props}
-        />
+      <PinchGestureHandler
+        numberOfPointers={2}
+        onGestureEvent={onPinchCallback}
+        onHandlerStateChange={onPinchStateCallback}
+      >
+        <View>
+          <FlatList
+            renderItem={renderItemCallback}
+            data={getItems(props)}
+            getItemLayout={getItemLayout}
+            onScroll={onScrollEventCallback}
+            {...props}
+          />
 
-        {activeItemId && (
-          <PanGestureHandler
-            onGestureEvent={onPanCallback}
-            onHandlerStateChange={onPanHandlerStateCallback}
-          >
-            <Animated.View
-              style={[
-                styles.temporaryItem,
-                {
-                  opacity: data.draggable.opacity,
-                  transform: [{ translateY: data.draggable.translateY }],
-                },
-              ]}
+          {activeItemId && (
+            <PanGestureHandler
+              onGestureEvent={onPanCallback}
+              onHandlerStateChange={onPanHandlerStateCallback}
             >
               <Animated.View
-                style={[styles.row, { transform: [{ translateX: data.draggable.level }] }]}
+                style={[
+                  styles.temporaryItem,
+                  {
+                    opacity: data.draggable.opacity,
+                    transform: [{ translateY: data.draggable.translateY }],
+                  },
+                ]}
               >
-                <TouchableOpacity onPress={cycleSubtreeVisibilityCallback} >
-                  <Icon name="circleNotch" />
-                </TouchableOpacity>
-                <Text> </Text>
-                {renderItem({ item: activeItem, level: data.move.toLevel })}
+                <Animated.View
+                  style={[styles.row, { transform: [{ translateX: data.draggable.level }] }]}
+                >
+                  <TouchableOpacity onPress={cycleSubtreeVisibilityCallback}>
+                    <Icon name="circleNotch" />
+                  </TouchableOpacity>
+                  <Text> </Text>
+                  {renderItem({ item: activeItem, level: data.move.toLevel })}
+                </Animated.View>
               </Animated.View>
-            </Animated.View>
-          </PanGestureHandler>
-        )}
+            </PanGestureHandler>
+          )}
 
-        <Animated.View
-          style={[
-            styles.targetIndicator,
-            { opacity: data.targetIndicator.opacity },
-            { transform: [{ translateY: data.targetIndicator.translateY }] },
-          ]}
-        />
-      </View>
+          <Animated.View
+            style={[
+              styles.targetIndicator,
+              { opacity: data.targetIndicator.opacity },
+              { transform: [{ translateY: data.targetIndicator.translateY }] },
+            ]}
+          />
+        </View>
+      </PinchGestureHandler>
     </ReorderableTreeFlatListContext.Provider>
   )
 }

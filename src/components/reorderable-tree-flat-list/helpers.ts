@@ -1,9 +1,8 @@
 import { move, range } from 'ramda'
 import { Refs } from './types'
 import { getSourcePosition, getTargetPosition, getLastDescendantPosition } from './selectors'
-import { startShiftLevelAnimation } from './animations'
 
-export const getItemLayout = (data, index) => {
+export const getItemLayout = (data: any, index: number) => {
   /* const length = this.cache[data[index].id]; */
   const length = 50
   /* const offset = this.offsets[index]; */
