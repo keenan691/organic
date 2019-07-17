@@ -39,7 +39,6 @@ const modifyDetailsLevel = (direction: 'inc' | 'dec') => (
 
   if (direction === 'dec' && maxLevel === 1) return visibility
 
-  console.tron.debug(maxLevel)
   const isVisible = {
     dec: (level: number) => level < maxLevel,
     inc: (level: number) => level <= maxLevel + 1,

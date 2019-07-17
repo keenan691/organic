@@ -24,14 +24,11 @@ it('should cycle subtree visibility', () => {
 it("should increase/decrease level of details", () => {
   let visibilityDict = asDict(visibility)
   visibilityDict = moreDetails(ordering, levels, visibilityDict);
-  expect(visibilityDict).toEqual(asDict([true,true,false,true,true]))
-
-  visibilityDict = moreDetails(ordering, levels, visibilityDict);
-  expect(visibilityDict).toEqual(asDict([true,false, false,true,true]))
-
-  visibilityDict = moreDetails(ordering, levels, visibilityDict);
-  expect(visibilityDict).toEqual(asDict([true,false, false,true,true]))
+  expect(visibilityDict).toEqual(asDict([true,true,true,true,true]))
 
   visibilityDict = lessDetails(ordering, levels, visibilityDict);
   expect(visibilityDict).toEqual(asDict([true,true, false,true,true]))
+
+  visibilityDict = lessDetails(ordering, levels, visibilityDict);
+  expect(visibilityDict).toEqual(asDict([true,false, false,true,true]))
 })
