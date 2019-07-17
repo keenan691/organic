@@ -367,7 +367,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
             >
               <Animated.View
                 style={[
-                  styles.temporaryItem,
+                  styles.draggable,
                   {
                     opacity: data.draggable.opacity,
                     transform: [{ translateY: data.draggable.translateY }],

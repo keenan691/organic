@@ -18,7 +18,7 @@ export default StyleSheet.create({
       position: 'absolute',
       zIndex: 1,
   },
-  temporaryItem: {
+  draggable: {
     width: '100%',
     position: 'absolute',
     backgroundColor: Colors.lightGray,

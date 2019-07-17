@@ -3,7 +3,7 @@ import { View, TextInput } from 'react-native'
 import { Icon } from 'elements'
 import styles from './styles'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import LevelIndicator from './level-indicator';
+import LevelIndicator from './level-indicator'
 
 type Props = {
   level: number
@@ -50,9 +50,7 @@ class Draggable extends Component {
     return (
       <View style={styles.item}>
         <View style={{ position: 'absolute', top: -15, zIndex: 4, left: 200 }}>
-          <TouchableOpacity
-            onPress={onAddButtonPress}
-          >
+          <TouchableOpacity onPress={onAddButtonPress}>
             <Icon name="plusCircle" style={{ margin: 5 }} />
           </TouchableOpacity>
         </View>
@@ -71,13 +69,15 @@ class Draggable extends Component {
             autoFocus
           />
         ) : (
-          renderItem({
-            item,
-            level,
-            position,
-            editable: this.state.editable,
-            defaultAction: this.edit,
-          })
+          <TouchableOpacity onPress={this.edit}>
+            {renderItem({
+              item,
+              level,
+              position,
+              editable: this.state.editable,
+              defaultAction: this.edit,
+            })}
+          </TouchableOpacity>
         )}
       </View>
     )
