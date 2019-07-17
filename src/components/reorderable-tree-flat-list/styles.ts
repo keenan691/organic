@@ -6,6 +6,11 @@ import globalStyles from 'view/styles/global';
 export default StyleSheet.create({
   ...globalStyles,
   ...headlineStyles,
+  headlineIndicator: {
+    margin: Metrics.smallMargin,
+    fontSize: Fonts.size.h4,
+
+  },
   targetIndicator: {
       height: 1,
       width: '100%',
@@ -19,5 +24,10 @@ export default StyleSheet.create({
     backgroundColor: Colors.lightGray,
     opacity: 0.8,
     zIndex: 2,
+  },
+  item: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1
   },
 })

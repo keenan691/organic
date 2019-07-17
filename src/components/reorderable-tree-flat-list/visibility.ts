@@ -4,19 +4,19 @@ import { BooleanDict } from 'components/entry-list/types'
 
 export const hasHiddenChildren = (
   itemPosition: number,
-  visibility: {},
+  hiddenDict: {},
   ordering: string[],
   levels: number[]
 ) => {
   let position = itemPosition
   do {
     position += 1
-    if (!visibility[ordering[position]]) return true
+    if (hiddenDict[ordering[position]]) return true
   } while (levels[position] > levels[itemPosition])
   return false
 }
 
-const setVisibility = (positions: number[], ordering: string[], visibility: BooleanDict) => (
+const setNonVisibility = (positions: number[], ordering: string[], hiddenDict: BooleanDict) => (
   visible: boolean
 ) => {
   const changes = positions.reduce((acc, position) => {
@@ -24,7 +24,7 @@ const setVisibility = (positions: number[], ordering: string[], visibility: Bool
     return acc
   }, {})
   return {
-    ...visibility,
+    ...hiddenDict,
     ...changes,
   }
 }
@@ -32,12 +32,12 @@ const setVisibility = (positions: number[], ordering: string[], visibility: Bool
 const modifyDetailsLevel = (direction: 'inc' | 'dec') => (
   ordering: string[],
   levels: number[],
-  visibility: {}
+  hiddenDict: {}
 ) => {
-  const visibleLevels = levels.filter((_, position) => visibility[ordering[position]])
+  const visibleLevels = levels.filter((_, position) => !hiddenDict[ordering[position]])
   const maxLevel = Math.max(...visibleLevels)
 
-  if (direction === 'dec' && maxLevel === 1) return visibility
+  if (direction === 'dec' && maxLevel === 1) return hiddenDict
 
   const isVisible = {
     dec: (level: number) => level < maxLevel,
@@ -47,7 +47,7 @@ const modifyDetailsLevel = (direction: 'inc' | 'dec') => (
   const newVisibillity = levels.reduce(
     (acc, level, position) => ({
       ...acc,
-      [ordering[position]]: isVisible(level),
+      [ordering[position]]: !isVisible(level),
     }),
     {}
   )
@@ -62,26 +62,26 @@ export function cycleItemVisibility(
   itemPosition: number,
   ordering: string[],
   levels: number[],
-  visibility: BooleanDict
+  hiddenDict: BooleanDict
 ) {
   const lastDescendantPosition = getLastDescendantPosition(levels, itemPosition)
   const descendantsPositions = range(itemPosition + 1, lastDescendantPosition + 1)
 
-  if (descendantsPositions.length === 0) return visibility
+  if (descendantsPositions.length === 0) return hiddenDict
 
   const childrenPositions = descendantsPositions.filter(
     position => levels[position] === levels[itemPosition] + 1
   )
-  const mapToVisibilityArray = map((position: number) => visibility[ordering[position]])
-  const allVisible = all(equals(true))
-  const allHidden = all(equals(false))
-  const setDescendantsVisibility = setVisibility(descendantsPositions, ordering, visibility)
-  const setChildrenVisibility = setVisibility(childrenPositions, ordering, visibility)
-  const hideDescendants = () => setDescendantsVisibility(false)
-  const showDescendants = () => setDescendantsVisibility(true)
+  const mapToVisibilityArray = map((position: number) => hiddenDict[ordering[position]])
+  const allVisible = all(equals(false))
+  const allHidden = all(equals(true))
+  const setDescendantsNonVisibility = setNonVisibility(descendantsPositions, ordering, hiddenDict)
+  const setChildrenNonVisibility = setNonVisibility(childrenPositions, ordering, hiddenDict)
+  const hideDescendants = () => setDescendantsNonVisibility(true)
+  const showDescendants = () => setDescendantsNonVisibility(false)
   const showFirstLevelDescendants = () => ({
-    ...setDescendantsVisibility(false),
-    ...setChildrenVisibility(true),
+    ...setDescendantsNonVisibility(true),
+    ...setChildrenNonVisibility(false),
   })
 
   return pipe(

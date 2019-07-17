@@ -8,7 +8,6 @@ export const headlineStyles = levelColors.reduce(
     ...acc,
     [`h${idx + 1}C`]: {
       color,
-      fontSize: Fonts.size.regular,
     },
     [`h${idx + 1}CH`]: {
       color: shadeBlend(-0.4,color, Colors.white),

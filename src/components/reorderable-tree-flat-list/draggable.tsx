@@ -1,8 +1,9 @@
 import React, { Component } from 'react'
 import { View, TextInput } from 'react-native'
-import { LevelIndicator, Icon } from 'elements'
+import { Icon } from 'elements'
 import styles from './styles'
 import { TouchableOpacity } from 'react-native-gesture-handler'
+import LevelIndicator from './level-indicator';
 
 type Props = {
   level: number
@@ -47,7 +48,7 @@ class Draggable extends Component {
     const { onPress, renderItem, onAddButtonPress } = this.props
     if (!item) return null
     return (
-      <View style={styles.row}>
+      <View style={styles.item}>
         <View style={{ position: 'absolute', top: -15, zIndex: 4, left: 200 }}>
           <TouchableOpacity
             onPress={onAddButtonPress}

@@ -24,10 +24,10 @@ export function getItemInfo(data: Refs, absoluteY: number, ordering: string[]) {
 export const getAbsoluteItemPositionOffset = (
   position: number,
   ordering: string[],
-  visibility: BooleanDict,
+  hideDict: BooleanDict,
   itemHeights: NumberDict
 ) =>
-  ordering.slice(0, position).reduce((acc, id) => visibility[id] ? acc + itemHeights[id] : acc, 0)
+  ordering.slice(0, position).reduce((acc, id) => !hideDict[id] ? acc + itemHeights[id] : acc, 0)
 
 export const getItems = createSelector(
   props => props.itemDict,
@@ -38,10 +38,10 @@ export const getItems = createSelector(
 export function getDraggableToTargetOffset(
   data: Refs,
   ordering: string[],
-  visibility: { [itemId: string]: boolean }
+  hideDict: { [itemId: string]: boolean }
 ) {
   return (
-    getAbsoluteItemPositionOffset(getTargetPosition(data), ordering, visibility, data.itemHeights) -
+    getAbsoluteItemPositionOffset(getTargetPosition(data), ordering, hideDict, data.itemHeights) -
     data.lastOffset
   )
 }
