@@ -1,5 +1,5 @@
 import React, { useCallback, useRef, useState, useLayoutEffect } from 'react'
-import { Text, View, Animated, LayoutChangeEvent, LayoutAnimation } from 'react-native'
+import { View, Animated, LayoutChangeEvent, LayoutAnimation } from 'react-native'
 import { Subject } from 'rxjs'
 import {
   PanGestureHandlerGestureEvent,
@@ -9,7 +9,6 @@ import {
   State,
   gestureHandlerRootHOC,
   FlatList,
-  TouchableOpacity,
   PinchGestureHandlerStateChangeEvent,
   PinchGestureHandlerGestureEvent,
 } from 'react-native-gesture-handler'
@@ -19,7 +18,7 @@ import { Refs } from './types'
 import { LEVEL_SHIFT_TRIGGER } from './constants'
 import styles from './styles'
 import { applyChanges, shiftDraggableItemLevel, getItemLayout } from './helpers'
-import { LevelIndicator, Icon } from 'elements'
+import { LevelIndicator } from 'elements'
 import { useMeasure } from 'helpers/hooks'
 import {
   getAbsoluteItemPositionOffset,
@@ -34,7 +33,7 @@ import {
   foldAnimation,
 } from './animations'
 import { cycleItemVisibility, moreDetails, lessDetails, hasHiddenChildren } from './visibility'
-import { focusItemAnimation } from 'components/entry-list/animations'
+import Draggable from './draggable';
 
 type Props = {
   itemDict: object
@@ -71,6 +70,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
       x: 0,
       y: 0,
     },
+    text: new Animated.Value('sdf'),
     scrollPosition: 0,
     pinchGesture: {
       isActive: false,
@@ -81,13 +81,10 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
 
   const { ordering, setOrdering, levels, setLevels } = props
 
-  const [activeItemPosition, setDraggableItemPosition] = useState(null)
   const [visibility, setVisibility] = useState(() =>
     ordering.reduce((acc, id) => ({ ...acc, [id]: true }), {})
   )
 
-  const activeItemId = ordering[activeItemPosition]
-  const activeItem = props.itemDict[activeItemId]
   const data = refs.current
 
   /**
@@ -102,7 +99,6 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
    */
   const turnItemToDraggableCallback = useCallback(
     itemPosition => {
-      const itemId = props.ordering[itemPosition]
       const itemLevel = levels[itemPosition]
       const absoluteItemOffset = getAbsoluteItemPositionOffset(
         itemPosition,
@@ -122,7 +118,11 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
       data.draggable.levelOffset = 0
       data.lastOffset = absoluteItemOffset
 
-      setDraggableItemPosition(itemPosition)
+      draggableRef.current.setNativeProps({
+        item: props.itemDict[ordering[itemPosition]],
+        level: itemLevel,
+        position: itemPosition
+      })
       startActivateAnimation(data)
     },
     [ordering, levels, visibility]
@@ -182,6 +182,9 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
           shiftDraggableItemLevel(data, levels, dx > 0 ? 'left' : 'right')
           startShiftLevelAnimation(data)
           data.draggable.levelOffset = translationX
+          draggableRef.current.setNativeProps({
+            level: data.move.toLevel,
+          })
         }
         break
     }
@@ -204,6 +207,11 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
       data.draggable.level.stopAnimation()
       startShiftLevelAnimation(data)
     }
+
+    draggableRef.current.setNativeProps({
+      level: targetLevel,
+      position: newPosition
+    })
   })
 
   dragEnd$.subscribe(() => {
@@ -300,7 +308,8 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
     },
     [ordering, levels, visibility]
   )
-
+  const items = getItems(props)
+  const draggableRef = useRef()
   bench.step('reorderable')
   return (
     <ReorderableTreeFlatListContext.Provider value={refs}>
@@ -312,14 +321,13 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
         <View>
           <FlatList
             renderItem={renderItemCallback}
-            data={getItems(props)}
+            data={items}
             getItemLayout={getItemLayout}
             onScroll={onScrollEventCallback}
             {...props}
           />
 
-          {activeItemId && (
-            <PanGestureHandler
+          <PanGestureHandler
               onGestureEvent={onPanCallback}
               onHandlerStateChange={onPanHandlerStateCallback}
             >
@@ -335,23 +343,15 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
                 <Animated.View
                   style={[styles.row, { transform: [{ translateX: data.draggable.level }] }]}
                 >
-                  <LevelIndicator
-                    level={levels[activeItemPosition]}
-                    flatDisplay={true}
-                    position={activeItemPosition}
+                  <Draggable
                     onPress={cycleSubtreeVisibilityCallback}
-                    hasHiddenChildren={hasHiddenChildren(
-                      activeItemPosition,
-                      visibility,
-                      ordering,
-                      levels
-                    )}
-                  />
-                  {renderItem({ item: activeItem, level: data.move.toLevel })}
+                    renderItem={renderItem}
+                    ref={draggableRef}
+                    />
                 </Animated.View>
               </Animated.View>
             </PanGestureHandler>
-          )}
+
 
           <Animated.View
             style={[

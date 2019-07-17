@@ -1,10 +1,11 @@
 import { StyleSheet } from 'react-native'
 import { Fonts, Colors, Metrics } from 'view/themes'
+import { headlineStyles } from 'view/styles/levels';
 import globalStyles from 'view/styles/global';
 
-// prettier-ignore
 export default StyleSheet.create({
   ...globalStyles,
+  ...headlineStyles,
   targetIndicator: {
       height: 1,
       width: '100%',
@@ -15,7 +16,7 @@ export default StyleSheet.create({
   temporaryItem: {
     width: '100%',
     position: 'absolute',
-    backgroundColor: Colors.white,
+    backgroundColor: Colors.lightGray,
     opacity: 0.8,
     zIndex: 2,
   },

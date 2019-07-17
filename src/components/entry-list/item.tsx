@@ -19,6 +19,7 @@ const defaultProps = {
   isSelected: false,
   isFocused: false,
   highlighted: false,
+  editable: false,
   activateCallback: () => null,
   deactivateCallback: () => null,
   level: 0,
@@ -30,10 +31,11 @@ function EntryListItem(props: Props) {
     isFocused,
     showContent,
     highlighted,
+    editable,
     deactivateCallback,
     defaultAction,
     position,
-    level
+    level,
   } = props
   const id = item.id
   const { dispatch, entry } = useContext(EntryListContext).current
@@ -49,21 +51,22 @@ function EntryListItem(props: Props) {
         <TouchableHighlight
           style={{ flex: 2 }}
           underlayColor="white"
-          onLongPress={() => dispatch(actions.toggleContent({ entryId: id }))}
           onPress={() => {
             defaultAction && defaultAction(position)
-            {/* deactivateCallback()
-                dispatch(actions.onItemPress({ entryId: id })) */}
           }}
+          disabled={props.editable}
         >
           <View style={[styles.column]}>
-            <EntryHeadline colorized={true} highlighted={highlighted} {...item} level={level} />
+            <EntryHeadline
+              colorized={true}
+              editable={editable}
+              highlighted={highlighted}
+              {...item}
+              level={level}
+            />
             <EntryContent content={item.content} visible={showContent} />
           </View>
         </TouchableHighlight>
-        <View>
-          <Text>x</Text>
-        </View>
       </View>
       <CommandMenu type="item" show={isFocused} level={item.level} />
     </View>
