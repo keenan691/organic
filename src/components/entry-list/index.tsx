@@ -59,6 +59,7 @@ function EntryList(props: Props) {
       ...state,
       ordering,
       levels: ordering.map(id => props.items[id].level),
+      itemsDict: props.items,
       data: props.items,
       mode: 'outline',
     }
@@ -87,6 +88,10 @@ function EntryList(props: Props) {
 
   const setLevels = useCallback(levels => {
     return dispatch(actions.setEntriesLevels(levels))
+  }, [])
+
+  const addItem = useCallback((item) => {
+    return dispatch(actions.addItem(item))
   }, [])
 
   /**
@@ -152,11 +157,12 @@ function EntryList(props: Props) {
     <EntryListContext.Provider value={refs}>
       <View style={styles.container}>
         <ReorderableTreeFlatList
-          itemDict={props.items}
+          itemDict={state.itemsDict}
           ordering={ordering}
-          setOrdering={setOrdering}
           levels={levels}
+          setOrdering={setOrdering}
           setLevels={setLevels}
+          addItem={addItem}
           ListHeaderComponent={<CommandMenu type="global" show={isGlobalMenuVisible} />}
           renderItem={props => (
             <EntryListItem

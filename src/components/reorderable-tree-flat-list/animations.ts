@@ -35,7 +35,7 @@ export const startShiftLevelAnimation = (data: Refs) => {
 
 export function startActivateAnimation(data: Refs) {
   Animated.timing(data.draggable.opacity, {
-    toValue: 0.8,
+    toValue: 1,
     duration: 200,
     useNativeDriver: true,
   }).start()

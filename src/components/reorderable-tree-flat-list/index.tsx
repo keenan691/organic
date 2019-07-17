@@ -11,6 +11,7 @@ import {
   FlatList,
   PinchGestureHandlerStateChangeEvent,
   PinchGestureHandlerGestureEvent,
+  TouchableOpacity,
 } from 'react-native-gesture-handler'
 import { map, filter, bufferCount, bufferTime } from 'rxjs/operators'
 
@@ -18,7 +19,7 @@ import { Refs } from './types'
 import { LEVEL_SHIFT_TRIGGER } from './constants'
 import styles from './styles'
 import { applyChanges, shiftDraggableItemLevel, getItemLayout } from './helpers'
-import { LevelIndicator } from 'elements'
+import { LevelIndicator, Icon } from 'elements'
 import { useMeasure } from 'helpers/hooks'
 import {
   getAbsoluteItemPositionOffset,
@@ -41,6 +42,7 @@ type Props = {
   levels: number[]
   setOrdering: (ordering: string[]) => void
   setLevels: (levels: number[]) => void
+  addItem: (item, position) => void
 } & typeof defaultProps &
   React.ComponentProps<typeof FlatList>
 
@@ -106,6 +108,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
         visibility,
         data.itemHeights
       )
+      console.tron.debug(data.itemHeights)
 
       data.draggable.translateY.setOffset(absoluteItemOffset - data.scrollPosition)
       data.draggable.translateY.setValue(0)
@@ -279,6 +282,10 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
     })
 
   /**
+   * Add/Delete/Edit item
+   */
+
+  /**
    * Render
    */
   useLayoutEffect(() => {
@@ -288,7 +295,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
   const renderItemCallback = useCallback(
     ({ item, index }) => {
       return (
-        visibility[item.id] && (
+        (visibility[item.id] === true) && (
           <View style={styles.row} onLayout={event => onItemLayoutCallback(event, item.id)}>
             <LevelIndicator
               level={levels[index]}
@@ -338,14 +345,14 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
                     opacity: data.draggable.opacity,
                     transform: [{ translateY: data.draggable.translateY }],
                   },
-                ]}
-              >
+                ]}>
                 <Animated.View
                   style={[styles.row, { transform: [{ translateX: data.draggable.level }] }]}
                 >
                   <Draggable
                     onPress={cycleSubtreeVisibilityCallback}
                     renderItem={renderItem}
+                    onAddButtonPress={props.addItem}
                     ref={draggableRef}
                     />
                 </Animated.View>

@@ -1,7 +1,8 @@
 import React, { Component } from 'react'
 import { View, TextInput } from 'react-native'
-import { LevelIndicator } from 'elements'
+import { LevelIndicator, Icon } from 'elements'
 import styles from './styles'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 
 type Props = {
   level: number
@@ -10,6 +11,7 @@ type Props = {
   hasHiddenChildren: boolean
   item: object
   dataRefs: object
+  onAddButtonPress: () => void
 } & typeof defaultProps
 
 const defaultProps = {
@@ -42,10 +44,17 @@ class Draggable extends Component {
 
   render() {
     const { item, level, position, editedText } = this.state
-    const { onPress, renderItem } = this.props
+    const { onPress, renderItem, onAddButtonPress } = this.props
     if (!item) return null
     return (
       <View style={styles.row}>
+        <View style={{ position: 'absolute', top: -15, zIndex: 4, left: 200 }}>
+          <TouchableOpacity
+            onPress={onAddButtonPress}
+          >
+            <Icon name="plusCircle" style={{ margin: 5 }} />
+          </TouchableOpacity>
+        </View>
         <LevelIndicator
           level={level}
           flatDisplay={true}
@@ -73,6 +82,7 @@ class Draggable extends Component {
     )
   }
 }
+
 Draggable.defaultProps = defaultProps
 
 export default Draggable

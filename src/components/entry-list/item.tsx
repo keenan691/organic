@@ -1,5 +1,5 @@
 import React, { memo, useContext } from 'react'
-import { View, Text, TouchableHighlight } from 'react-native'
+import { View, Text} from 'react-native'
 
 import { EntryHeadline, EntryContent } from 'elements'
 import { OrgEntry } from 'core/entries/store/types'
@@ -8,6 +8,7 @@ import styles from './styles'
 import actions from './actions'
 import CommandMenu from './elements/command-menu'
 import LevelIndicator from './elements/level-indicator'
+import { TouchableHighlight } from 'react-native-gesture-handler';
 
 type Props = {
   item: OrgEntry

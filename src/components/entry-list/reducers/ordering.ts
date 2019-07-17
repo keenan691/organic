@@ -17,5 +17,13 @@ const orderingReducer = createReducer(initialState)
       levels: payload
     }
   })
+  .handleAction(actions.addItem, (state, { payload }) => {
+    return {
+      ...state,
+      itemsDict: {...state.itemsDict, 'newId': {id: 'newId', headline: 'new', tags: []}},
+      levels: [1, ...state.levels],
+      ordering: ['newId', ...state.ordering]
+    }
+  })
 
 export default orderingReducer
