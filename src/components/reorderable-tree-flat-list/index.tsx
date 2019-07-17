@@ -11,6 +11,7 @@ import {
   FlatList,
   PinchGestureHandlerStateChangeEvent,
   PinchGestureHandlerGestureEvent,
+  TouchableHighlight,
 } from 'react-native-gesture-handler'
 import { map, filter, bufferCount, bufferTime } from 'rxjs/operators'
 
@@ -316,6 +317,10 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
     ({ item, index }) => {
       return (
         (!hideDict[item.id]) && (
+          <TouchableHighlight
+            underlayColor="white"
+            onPress={() => turnItemToDraggableCallback(index)}
+          >
           <View style={styles.item} onLayout={event => onItemLayoutCallback(event, item.id)}>
             <LevelIndicator
               level={levels[index]}
@@ -330,6 +335,8 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
               defaultAction: turnItemToDraggableCallback,
             })}
           </View>
+
+          </TouchableHighlight>
         )
       )
     },

@@ -2,7 +2,7 @@ import React, { memo } from 'react'
 import { View, Text } from 'react-native'
 import styles from './styles'
 import { INDENT_WIDTH } from 'components/entry-list/constants'
-import { TouchableHighlight } from 'react-native-gesture-handler'
+import { TouchableOpacity } from 'react-native-gesture-handler'
 import { Icon } from 'elements'
 
 type Props = {
@@ -21,7 +21,7 @@ function LevelIndicator(props: Props) {
   const levelMargin = props.flatDisplay ? 0 : INDENT_WIDTH * (props.level - props.baseLevel)
   const iconName = props.iconName || getIconName(props)
   return (
-    <TouchableHighlight
+    <TouchableOpacity
       underlayColor="white"
       disabled={!props.position}
       onPress={() => props.onPress(props.position)}
@@ -29,7 +29,7 @@ function LevelIndicator(props: Props) {
       <View style={{ paddingLeft: levelMargin }}>
         <Icon style={[styles.headlineIndicator, styles[`h${props.level}C`]]} name={iconName} />
       </View>
-    </TouchableHighlight>
+    </TouchableOpacity>
   )
 }
 

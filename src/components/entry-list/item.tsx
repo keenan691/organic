@@ -42,24 +42,16 @@ function EntryListItem(props: Props) {
   const { dispatch, entry } = useContext(EntryListContext).current
 
   return (
-    <TouchableHighlight
-      underlayColor="white"
-      onPress={() => {
-        defaultAction && defaultAction(position)
-      }}
-      disabled={props.editable}
-    >
-      <View style={[styles.column]}>
-        <EntryHeadline
-          colorized={true}
-          editable={editable}
-          highlighted={highlighted}
-          {...item}
-          level={level}
-        />
-        <EntryContent content={item.content} visible={showContent} />
-      </View>
-    </TouchableHighlight>
+    <View style={[styles.column]}>
+      <EntryHeadline
+        colorized={true}
+        editable={editable}
+        highlighted={highlighted}
+        {...item}
+        level={level}
+      />
+      <EntryContent content={item.content} visible={showContent} />
+    </View>
   )
   return (
     <View
