@@ -41,6 +41,14 @@ export function startActivateAnimation(data: Refs) {
   }).start()
 }
 
+export function startMoveAnimation(data: Refs) {
+  Animated.timing(data.draggable.opacity, {
+    toValue: 0.8,
+    duration: 200,
+    useNativeDriver: true,
+  }).start()
+}
+
 export function startReleaseAnimation(data: Refs, ordering: string[], visibility: {}) {
   const dY = getDraggableToTargetOffset(data, ordering, visibility)
   Animated.sequence([

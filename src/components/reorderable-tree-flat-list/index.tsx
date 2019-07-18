@@ -32,6 +32,7 @@ import {
   startReleaseAnimation,
   startShiftLevelAnimation,
   foldAnimation,
+  startMoveAnimation,
 } from './animations'
 import { cycleItemVisibility, moreDetails, lessDetails, hasHiddenChildren } from './visibility'
 import Draggable from './draggable';
@@ -172,6 +173,10 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
     })
   )
 
+  const dragStart$ = panState$.pipe(
+    filter(([state]) => state === State.BEGAN)
+  )
+
   const dragEnd$ = panState$.pipe(
     map(([_, oldState]) => oldState),
     filter(oldState => oldState === State.ACTIVE)
@@ -221,6 +226,10 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
       level: targetLevel,
       position: newPosition
     })
+  })
+
+  dragStart$.subscribe(() => {
+    startMoveAnimation(data)
   })
 
   dragEnd$.subscribe(() => {
