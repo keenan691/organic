@@ -1,7 +1,7 @@
 import { Animated } from "react-native";
 import { getDraggableToTargetOffset, getItemLevelOffset } from "./selectors";
-import { Refs } from "./types";
 import { LayoutAnimation } from "react-native";
+import { AnimatedValues, Refs } from ".";
 
 export const foldAnimation = {
   duration: 150,
@@ -19,11 +19,11 @@ export const foldAnimation = {
   },
 }
 
-export const startShiftLevelAnimation = (data: Refs) => {
-  if (!data.animating) {
+export const startShiftLevelAnimation = (values: AnimatedValues, data: Refs) => {
+  if (!data.animating && data.move.toLevel) {
     data.animating = true
     const toValue = getItemLevelOffset(data.move.toLevel)
-    Animated.timing(data.draggable.level, {
+    Animated.timing(values.draggable.level, {
       toValue,
       duration: 70,
       useNativeDriver: true,
@@ -33,31 +33,31 @@ export const startShiftLevelAnimation = (data: Refs) => {
   }
 }
 
-export function startActivateAnimation(data: Refs) {
-  Animated.timing(data.draggable.opacity, {
+export function startActivateAnimation(values: AnimatedValues) {
+  Animated.timing(values.draggable.opacity, {
     toValue: 1,
     duration: 200,
     useNativeDriver: true,
   }).start()
 }
 
-export function startMoveAnimation(data: Refs) {
-  Animated.timing(data.draggable.opacity, {
+export function startDragAnimation(values: AnimatedValues) {
+  Animated.timing(values.draggable.opacity, {
     toValue: 0.8,
     duration: 200,
     useNativeDriver: true,
   }).start()
 }
 
-export function startReleaseAnimation(data: Refs, ordering: string[], visibility: {}) {
+export function endDragAnimation(values: AnimatedValues, data: Refs, ordering: string[], visibility: {}) {
   const dY = getDraggableToTargetOffset(data, ordering, visibility)
   Animated.sequence([
-    Animated.timing(data.draggable.translateY, {
+    Animated.timing(values.draggable.translateY, {
       toValue: dY,
       duration: 200,
       useNativeDriver: true,
     }),
-    Animated.timing(data.draggable.opacity, {
+    Animated.timing(values.draggable.opacity, {
       toValue: 0,
       duration: 500,
       useNativeDriver: true,

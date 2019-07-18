@@ -16,7 +16,7 @@ import { map, tap, debounceTime, auditTime } from 'rxjs/operators'
 import { path, prop, of, reduceWhile } from 'ramda'
 import { OrgEntry } from 'core/entries/store/types'
 import { posix } from 'path'
-import ReorderableTreeFlatList from 'components/reorderable-tree-flat-list';
+import Outliner from 'components/outliner';
 
 type Props = {} & typeof defaultProps
 const defaultProps = {}
@@ -122,7 +122,7 @@ function GesturesTwoDimentionsReorder({
 
 
   /* const FlatListComponent = FlatList */
-  const FlatListComponent = ReorderableTreeFlatList
+  const FlatListComponent = Outliner
 
   return (
     <View>

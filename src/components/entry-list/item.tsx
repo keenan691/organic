@@ -5,9 +5,7 @@ import { EntryHeadline, EntryContent } from 'elements'
 import { OrgEntry } from 'core/entries/store/types'
 import { EntryListContext } from '.'
 import styles from './styles'
-import actions from './actions'
 import CommandMenu from './elements/command-menu'
-import LevelIndicator from './elements/level-indicator'
 import { TouchableHighlight } from 'react-native-gesture-handler';
 
 type Props = {

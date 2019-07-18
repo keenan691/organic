@@ -1,8 +1,8 @@
 import { NumberDict, BooleanDict } from 'components/entry-list/types'
-import { reduceWhile, move } from 'ramda'
-import { Refs } from './types'
+import { reduceWhile } from 'ramda'
 import { INDENT_SIZE } from './constants'
 import { createSelector } from 'reselect'
+import { Refs } from '.';
 
 export const getItemLevelOffset = (level: number) => (level - 1) * INDENT_SIZE
 
@@ -11,7 +11,7 @@ export function getItemInfo(data: Refs, absoluteY: number, ordering: string[]) {
   let index = 0
   const offset = reduceWhile(
     currentOffset => currentOffset < absoluteY + scrollPosition,
-    (currentOffset, itemId) => {
+    (currentOffset, itemId: string) => {
       index += 1
       currentOffset += itemHeights[itemId]
       return currentOffset

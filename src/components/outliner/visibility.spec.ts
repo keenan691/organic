@@ -3,7 +3,7 @@ import { cycleItemVisibility, moreDetails, lessDetails } from './visibility'
 const ordering = ['1', '2', '3', '4', '5']
 const levels = [1, 2, 3, 1, 1]
 const hiddenPositions = [false, false, false, false, false]
-const cycleVisibility = (hiddenPositions, position) =>
+const cycleVisibility = (hiddenPositions: { [position: string]: boolean }, position: number) =>
   cycleItemVisibility(position, ordering, levels, hiddenPositions)
 const asDict = (array: boolean[]) =>
   array.reduce(

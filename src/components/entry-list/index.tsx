@@ -17,7 +17,7 @@ import { focusItemAnimation, contentAnimation } from './animations'
 import { useMeasure, useStateMonitor } from 'helpers/hooks'
 import initialState from './state'
 import { TapGestureHandler, RectButton } from 'react-native-gesture-handler'
-import ReorderableTreeFlatList from 'components/reorderable-tree-flat-list'
+import ReorderableTreeFlatList from 'components/outliner'
 import { map } from 'ramda'
 
 type Props = {

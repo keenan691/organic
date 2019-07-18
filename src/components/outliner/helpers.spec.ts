@@ -15,11 +15,15 @@ it("should move item without children to the last position", () => {
     ['1', '2', '3', '5', '4'],
     [1, 2, 3, 1, 1]
   ]
-  expect(applyChanges({move: {
-    fromPosition: 3,
-    toPosition: 5,
-    toLevel: 1
-  }}, ordering, levels)).toEqual(expected)
+  expect(applyChanges({
+      data: {
+      move: {
+          fromPosition: 3,
+          toPosition: 5,
+          toLevel: 1
+      }
+      }, ordering, levels
+      })).toEqual(expected)
 })
 
 it("should move item without children to the last position", () => {
@@ -27,11 +31,15 @@ it("should move item without children to the last position", () => {
     ['1', '2', '3', '5', '4'],
     [1, 2, 3, 1, 1]
   ]
-  expect(applyChanges({move: {
-    fromPosition: 4,
-    toPosition: 3,
-    toLevel: 1
-  }}, ordering, levels)).toEqual(expected)
+  expect(applyChanges({
+      data: {
+      move: {
+          fromPosition: 4,
+          toPosition: 3,
+          toLevel: 1
+      }
+      }, ordering, levels
+      })).toEqual(expected)
 })
 
 it("should move subtree to the last position", () => {
@@ -41,11 +49,15 @@ it("should move subtree to the last position", () => {
     ['4', '5', '1', '2', '3'],
     [1, 1, 1, 2, 3]
   ]
-  expect(applyChanges({move: {
-    fromPosition: 0,
-    toPosition: 5,
-    toLevel: 1
-  }}, ordering, levels)).toEqual(expected)
+  expect(applyChanges({
+      data: {
+      move: {
+          fromPosition: 0,
+          toPosition: 5,
+          toLevel: 1
+      }
+      }, ordering, levels
+      })).toEqual(expected)
 })
 
 it("should move subtree up", () => {
@@ -54,9 +66,13 @@ it("should move subtree up", () => {
     ['3', '4', '5', '1', '2'],
     [1, 2, 3, 1, 1]
   ]
-  expect(applyChanges({move: {
-    fromPosition: 2,
-    toPosition: 0,
-    toLevel: 1
-  }}, ordering, levels)).toEqual(expected)
+  expect(applyChanges({
+      data: {
+      move: {
+          fromPosition: 2,
+          toPosition: 0,
+          toLevel: 1
+      }
+      }, ordering, levels
+      })).toEqual(expected)
 })

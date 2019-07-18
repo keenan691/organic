@@ -3,49 +3,57 @@ import { View, TextInput } from 'react-native'
 import { Icon } from 'elements'
 import styles from './styles'
 import { TouchableOpacity } from 'react-native-gesture-handler'
-import LevelIndicator from './level-indicator'
+import ItemIndicator from './item-indicator'
+import { BooleanDict } from 'components/entry-list/types';
 
 type Props = {
-  level: number
-  position: number
-  onPress: (itemPosition: number) => void
-  hasHiddenChildren: boolean
-  item: object
-  dataRefs: object
+  onItemIndicatorPress: (itemPosition: number) => void
+  onItemPress: (itemPosition: number) => void
   onAddButtonPress: () => void
-} & typeof defaultProps
-
-const defaultProps = {
-  text: '',
+  hideDict: BooleanDict
+  levels: number[]
+  ordering: string[]
+  renderItem: (obj: any) => React.ReactNode
 }
 
-class Draggable extends Component {
-  state = {
-    item: null,
-    level: 0,
-    position: 0,
-    editable: false,
-    editedText: '',
-  }
+type State = ReturnType<typeof createState>
+const createState = () => ({
+  item: null as { headline:  string} | null,
+  level: 0,
+  position: 0,
+  editable: false,
+  hasChildren: false,
+  editedText: '',
+})
 
-  setNativeProps = newState => {
+class ItemDraggable extends Component<Props, State> {
+  state = createState()
+
+  setNativeProps = (newState: any) => {
     this.setState({ ...newState, editable: false })
   }
 
   edit = () => {
     this.setState(prevState => ({
       editable: true,
-      editedText: prevState.item.headline,
+      editedText: (prevState.item && prevState.item.headline) || '',
     }))
   }
 
-  changeText = text => {
+  changeText = (text: any) => {
     this.setState({ editedText: text })
+  }
+
+  onItemIndicatorPress = () => {
+    this.props.onItemIndicatorPress(this.state.position)
+    this.setState((prevState) => ({
+      hasChildren: !prevState.hasChildren
+    }))
   }
 
   render() {
     const { item, level, position, editedText } = this.state
-    const { onPress, renderItem, onAddButtonPress } = this.props
+    const { renderItem, onAddButtonPress } = this.props
     if (!item) return null
     return (
       <View style={styles.item}>
@@ -54,12 +62,12 @@ class Draggable extends Component {
             <Icon name="plusCircle" style={{ margin: 5 }} />
           </TouchableOpacity>
         </View>
-        <LevelIndicator
+        <ItemIndicator
           level={level}
           flatDisplay={true}
           position={position}
-          onPress={onPress}
-          hasHiddenChildren={false}
+          onPress={this.onItemIndicatorPress}
+          hasChildren={this.state.hasChildren}
         />
         {this.state.editable ? (
           <TextInput
@@ -84,6 +92,4 @@ class Draggable extends Component {
   }
 }
 
-Draggable.defaultProps = defaultProps
-
-export default Draggable
+export default ItemDraggable
