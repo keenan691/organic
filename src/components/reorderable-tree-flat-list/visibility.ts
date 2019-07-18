@@ -2,16 +2,25 @@ import { range, pipe, map, cond, all, equals, T } from 'ramda'
 import { getLastDescendantPosition } from './selectors'
 import { BooleanDict } from 'components/entry-list/types'
 
+export const hasChildren = (
+  itemPosition: number,
+  levels: number[]
+) => {
+  const itemLevel = levels[itemPosition]
+  return itemPosition < levels.length && levels[itemPosition + 1] > itemLevel
+}
+
 export const hasHiddenChildren = (
   itemPosition: number,
   hiddenDict: {},
   ordering: string[],
   levels: number[]
 ) => {
+  const childLevel = levels[itemPosition] + 1
   let position = itemPosition
   do {
     position += 1
-    if (hiddenDict[ordering[position]]) return true
+    if (levels[position] === childLevel && hiddenDict[ordering[position]]) return true
   } while (levels[position] > levels[itemPosition])
   return false
 }

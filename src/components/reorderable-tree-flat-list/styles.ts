@@ -6,11 +6,6 @@ import globalStyles from 'view/styles/global';
 export default StyleSheet.create({
   ...globalStyles,
   ...headlineStyles,
-  headlineIndicator: {
-    margin: Metrics.smallMargin,
-    fontSize: Fonts.size.h4,
-
-  },
   targetIndicator: {
       height: 1,
       width: '100%',
@@ -23,14 +18,33 @@ export default StyleSheet.create({
     position: 'absolute',
     backgroundColor: Colors.lightGray,
     borderColor: Colors.darkerGray,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    opacity: 0.8,
+    // borderTopWidth: 1,
+    // borderBottomWidth: 1,
+    // opacity: 0.8,
     zIndex: 2,
   },
   item: {
     flexDirection: 'row',
     alignItems: 'center',
     flex: 1
+  },
+  headlineIndicator: {
+    margin: Metrics.smallMargin,
+    fontSize: Fonts.size.h4,
+    backgroundColor: Colors.blue,
+    borderRadius: 20,
+    borderWidth: 2,
+    borderColor: Colors.lightGray,
+    width: 22,
+    height: 22,
+    padding: Metrics.smallMargin,
+  },
+  headlineIndicatorIcon: {
+    color: Colors.white,
+    marginTop: -4,
+    // position: 'absolute',
+    // top: 0,
+    // left: 0,
+    // fontSize: Fonts.size.regular,
   },
 })

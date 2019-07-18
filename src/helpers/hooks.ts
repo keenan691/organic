@@ -2,6 +2,14 @@ import { useState, useRef, useEffect, useReducer, useCallback } from 'react'
 import { omit, pipe, filter, compose, nth, complement, isNil } from 'ramda'
 import { objectDiff } from 'helpers/object';
 
+export function usePrevious(value) {
+  const ref = useRef();
+  useEffect(() => {
+    ref.current = value;
+  });
+  return ref.current;
+}
+
 export function useMeasure(name: string) {
   const bench = console.tron.benchmark(name)
   useEffect(() => {

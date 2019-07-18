@@ -34,7 +34,7 @@ import {
   foldAnimation,
   startMoveAnimation,
 } from './animations'
-import { cycleItemVisibility, moreDetails, lessDetails, hasHiddenChildren } from './visibility'
+import { cycleItemVisibility, moreDetails, lessDetails, hasHiddenChildren, hasChildren } from './visibility'
 import Draggable from './draggable';
 
 type Props = {
@@ -334,6 +334,7 @@ function ReorderableTreeFlatList({ renderItem, ...props }: Props) {
             <LevelIndicator
               level={levels[index]}
               hasHiddenChildren={hasHiddenChildren(index, hideDict, ordering, levels)}
+              hasChildren={hasChildren(index, levels)}
               position={index}
               onPress={cycleSubtreeVisibilityCallback}
             />
