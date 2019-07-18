@@ -6,7 +6,9 @@ export type Refs = {
   scrollPosition:  number
   draggable: {
     translateY: typeof Animated.Value
+    levelOffset:  number
     level: typeof Animated.Value
+    opacity: typeof Animated.Value
   }
   targetIndicator: {
     translateY: typeof Animated.Value

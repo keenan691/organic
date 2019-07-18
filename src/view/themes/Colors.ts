@@ -105,6 +105,7 @@ const whiteTheme = {
   // pastel: shadeBlend(0.3, colors.green),
   pastel: colors.complement2,
   lightGray: shadeBlend(0.8, colors.secondary),
+  darkerGray: shadeBlend(0.7, colors.secondary),
   ...colors,
 
   // bg: colors.secondary,
