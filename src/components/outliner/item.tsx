@@ -8,7 +8,7 @@ import styles from './styles'
 
 type Props = {
   hideDict: BooleanDict
-  item: { id:  string }
+  item: { id:  string, content: string }
   levels: number[]
   ordering: string[]
   onItemIndicatorPress: (itemPosition: number) => void
@@ -40,6 +40,7 @@ function Item(props: Props) {
           level={levels[position]}
           hasHiddenChildren={hasHiddenChildren(position, hideDict, ordering, levels)}
           hasChildren={hasChildren(position, levels)}
+          hasContent={Boolean(item.content)}
           position={position}
           onPress={onItemIndicatorPress}
         />

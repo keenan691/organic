@@ -28,10 +28,18 @@ export default StyleSheet.create({
     alignItems: 'center',
     flex: 1
   },
+  row: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    flex: 1
+  },
+  column: {
+    flexDirection: 'column',
+    flex: 1
+  },
   headlineIndicator: {
     margin: Metrics.smallMargin,
     fontSize: Fonts.size.h4,
-    backgroundColor: Colors.blue,
     borderRadius: 20,
     borderWidth: 2,
     borderColor: Colors.lightGray,
@@ -46,5 +54,14 @@ export default StyleSheet.create({
     // top: 0,
     // left: 0,
     // fontSize: Fonts.size.regular,
+  },
+  headlineIndicatorHasContent: {
+    // borderColor: Colors.violet
+  },
+  contentPreviewText: {
+    ...Fonts.style.label,
+    fontSize: Fonts.size.small,
+    color: Colors.white,
+    marginTop: -5
   },
 })

@@ -17,6 +17,7 @@ const defaultProps = {
   flatDisplay: false,
   hasHiddenChildren: false,
   hasChildren: false,
+  hasContent: false
 }
 
 function ItemIndicator(props: Props) {
@@ -49,6 +50,7 @@ function ItemIndicator(props: Props) {
           style={[
             { transform: [{ rotate: iconSpinInterpolated.current }] },
             styles.headlineIndicator,
+            styles.headlineIndicatorHasContent,
             styles[`h${props.level}BG`],
           ]}
         >

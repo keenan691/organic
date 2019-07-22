@@ -1,10 +1,10 @@
 import React, { Component } from 'react'
-import { View, TextInput } from 'react-native'
+import { View, TextInput, Text } from 'react-native'
 import { Icon } from 'elements'
 import styles from './styles'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import ItemIndicator from './item-indicator'
-import { BooleanDict } from 'components/entry-list/types';
+import { BooleanDict } from 'components/entry-list/types'
 
 type Props = {
   onItemIndicatorPress: (itemPosition: number) => void
@@ -18,11 +18,12 @@ type Props = {
 
 type State = ReturnType<typeof createState>
 const createState = () => ({
-  item: null as { headline:  string} | null,
+  item: null as { headline: string; content: string } | null,
   level: 0,
   position: 0,
   editable: false,
   hasChildren: false,
+  contentVisiblisty: 'hidden' as 'hidden' | 'preview' | 'visible',
   editedText: '',
 })
 
@@ -46,8 +47,8 @@ class ItemDraggable extends Component<Props, State> {
 
   onItemIndicatorPress = () => {
     this.props.onItemIndicatorPress(this.state.position)
-    this.setState((prevState) => ({
-      hasChildren: !prevState.hasChildren
+    this.setState(prevState => ({
+      hasChildren: !prevState.hasChildren,
     }))
   }
 
@@ -56,7 +57,7 @@ class ItemDraggable extends Component<Props, State> {
     const { renderItem, onAddButtonPress } = this.props
     if (!item) return null
     return (
-      <View style={styles.item}>
+      <View style={styles.row}>
         <View style={{ position: 'absolute', top: -15, zIndex: 4, left: 200 }}>
           <TouchableOpacity onPress={onAddButtonPress}>
             <Icon name="plusCircle" style={{ margin: 5 }} />
@@ -77,15 +78,22 @@ class ItemDraggable extends Component<Props, State> {
             autoFocus
           />
         ) : (
-          <TouchableOpacity onPress={this.edit}>
-            {renderItem({
-              item,
-              level,
-              position,
-              editable: this.state.editable,
-              defaultAction: this.edit,
-            })}
-          </TouchableOpacity>
+          <View style={styles.column}>
+            <TouchableOpacity onPress={this.edit}>
+              {renderItem({
+                item,
+                level,
+                position,
+                editable: this.state.editable,
+                defaultAction: this.edit,
+              })}
+            </TouchableOpacity>
+            {item.content && <View>
+              <Text style={styles.contentPreviewText} numberOfLines={1} ellipsizeMode={'tail'}>
+                {item.content}
+              </Text>
+            </View>}
+          </View>
         )}
       </View>
     )
