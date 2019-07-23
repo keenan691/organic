@@ -28,6 +28,7 @@ const createState = () => ({
   editable: false,
   itemState: 'inactive' as 'inactive' | 'active' | 'dragged' | 'edit',
   hasChildren: false,
+  hasHiddenChildren: false,
   contentVisibility: 'hidden' as 'hidden' | 'preview' | 'visible',
   showAddButtons: false,
   editedText: '',
@@ -50,7 +51,7 @@ class ItemDraggable extends Component<Props, State> {
   onItemIndicatorPress = () => {
     this.props.onItemIndicatorPress(this.state.position)
     this.setState(prevState => ({
-      hasChildren: !prevState.hasChildren,
+      hasHiddenChildren: !prevState.hasHiddenChildren
     }))
   }
 
@@ -77,6 +78,7 @@ class ItemDraggable extends Component<Props, State> {
           position={position}
           onPress={this.onItemIndicatorPress}
           hasChildren={this.state.hasChildren}
+          hasHiddenChildren={this.state.hasHiddenChildren}
         />
         <View style={styles.column}>
           <TouchableOpacity onPress={this.props.editItem}>

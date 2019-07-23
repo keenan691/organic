@@ -2,7 +2,7 @@ import React, { useCallback, useState, useEffect } from 'react'
 import { LayoutChangeEvent, Dimensions } from 'react-native'
 import { getAbsoluteItemPositionOffset, getItemLevelOffset, getItems } from './selectors'
 import { startActivateAnimation } from './animations'
-import { cycleItemVisibility } from './visibility'
+import { cycleItemVisibility, hasHiddenChildren, hasChildren } from './visibility'
 import { Refs, AnimatedValues } from '.'
 import { ItemData } from './types'
 import ItemDraggable from './item-draggable'
@@ -110,6 +110,8 @@ export function useItems(
       level: itemLevel,
       position: itemPosition,
       itemState: 'active',
+      hasHiddenChildren:hasHiddenChildren(itemPosition, hideDict, ordering, levels),
+      hasChildren:hasChildren(itemPosition, levels)
     })
 
     startActivateAnimation(animatedValues)
