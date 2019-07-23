@@ -6,12 +6,15 @@ import { BooleanDict } from 'components/entry-list/types'
 import ItemIndicator from './item-indicator'
 import styles from './styles'
 import { Colors } from 'view/themes'
+import { ITEM_PADDING_VERTICAL, HEADLINE_FONT_SIZE } from './constants';
+import { EntryHeadline } from 'elements';
 
 type Props = {
   hideDict: BooleanDict
   item: { id: string; content: string }
   levels: number[]
   ordering: string[]
+  itemHeight?:  number
   onItemIndicatorPress: (itemPosition: number) => void
   onItemPress: (itemPosition: number) => void
   onItemLayoutCallback: (event: LayoutChangeEvent, itemId: string) => void
@@ -28,15 +31,18 @@ function Item(props: Props) {
     onItemIndicatorPress,
     onItemPress,
     ordering,
+    itemHeight,
     onItemLayoutCallback,
     levels,
     position,
     renderItem,
   } = props
   if (hideDict[item.id]) return null
+  const level = levels[position]
   return (
     <TouchableHighlight underlayColor={Colors.white} onPress={() => onItemPress(position)}>
-      <View style={styles.item} onLayout={event => onItemLayoutCallback(event, item.id)}>
+      <View style={[styles.item, itemHeight && { height:  itemHeight }]}
+        onLayout={event => onItemLayoutCallback(event, item.id)}>
         <ItemIndicator
           level={levels[position]}
           hasHiddenChildren={hasHiddenChildren(position, hideDict, ordering, levels)}
@@ -45,11 +51,13 @@ function Item(props: Props) {
           position={position}
           onPress={onItemIndicatorPress}
         />
-        {renderItem({
-          item,
-          level: levels[position],
-          position: position,
-        })}
+        <EntryHeadline
+          colorized={true}
+          {...item}
+          level={level}
+          position={position}
+          fontSize={HEADLINE_FONT_SIZE}
+        />
       </View>
     </TouchableHighlight>
   )

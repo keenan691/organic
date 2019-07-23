@@ -2,18 +2,6 @@ import { move, range } from 'ramda'
 import { getSourcePosition, getTargetPosition, getLastDescendantPosition } from './selectors'
 import { Refs } from '.';
 
-export const getItemLayout = (data: any, index: number) => {
-  /* const length = this.cache[data[index].id]; */
-  const length = 50
-  /* const offset = this.offsets[index]; */
-  const offset = 50 * index
-  return {
-    length,
-    offset,
-    index,
-  }
-}
-
 export function applyChanges(
   data: Refs,
   ordering: string[],

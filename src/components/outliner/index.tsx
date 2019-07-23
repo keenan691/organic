@@ -1,5 +1,5 @@
 import React, { useRef, useState, useLayoutEffect } from 'react'
-import { View, Animated, LayoutAnimation } from 'react-native'
+import { View, Animated, LayoutAnimation, Text } from 'react-native'
 import {
   FlatList,
   PanGestureHandler,
@@ -8,7 +8,6 @@ import {
 } from 'react-native-gesture-handler'
 
 import styles from './styles'
-import { getItemLayout } from './helpers'
 import { useMeasure } from 'helpers/hooks'
 import { foldAnimation } from './animations'
 import ItemDraggable from './item-draggable'
@@ -43,7 +42,7 @@ const createAnimatedValues = () => ({
 })
 
 const gestureData = {
-  itemHeights: {} as {[itemId: string]:  number},
+  itemHeights: [] as  number[],
   panGesture: {
     x: 0,
     y: 0,
@@ -81,7 +80,6 @@ function Outliner({ renderItem, ...props }: Props) {
     ordering.reduce((acc, id) => ({ ...acc, [id]: false }), {})
   )
 
-
   const itemsData = { hideDict, levels, ordering }
 
   const {
@@ -91,6 +89,8 @@ function Outliner({ renderItem, ...props }: Props) {
     onItemLayoutCallback,
     onItemPress,
     editItem,
+    getItemLayout,
+    loadingItems
   } = useItems(itemsData, refsData, draggableItemRef, props, setItemVisibility, animatedValues)
 
   const { onPanCallback, onPanHandlerStateCallback } = usePanGesture(
@@ -110,10 +110,18 @@ function Outliner({ renderItem, ...props }: Props) {
 
   const onScrollEventCallback = useScroll(refsData, animatedValues)
 
+
   useLayoutEffect(() => {
     LayoutAnimation.configureNext(foldAnimation)
   }, [hideDict])
 
+  if (loadingItems) {
+    return (<View>
+      <Text>
+        Loading
+      </Text>
+    </View>)
+  }
   bench.step('reorderable')
   return (
     <ReorderableTreeFlatListContext.Provider value={refs}>
@@ -130,6 +138,7 @@ function Outliner({ renderItem, ...props }: Props) {
                 onItemPress={onItemPress}
                 onItemIndicatorPress={onItemIndicatorPress}
                 onItemLayoutCallback={onItemLayoutCallback}
+                itemHeight={refsData.itemHeights[index]}
                 renderItem={renderItem}
                 {...itemsData}
               />
@@ -137,6 +146,7 @@ function Outliner({ renderItem, ...props }: Props) {
             data={items}
             getItemLayout={getItemLayout}
             onScroll={onScrollEventCallback}
+          scrollEventThrottle={8}
             {...props}
           />
 
@@ -163,6 +173,7 @@ function Outliner({ renderItem, ...props }: Props) {
                   renderItem={renderItem}
                   editItem={editItem}
                   ref={draggableItemRef}
+                  refs={refs}
                   {...itemsData}
                 />
               </Animated.View>

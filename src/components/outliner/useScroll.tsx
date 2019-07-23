@@ -7,6 +7,7 @@ export function useScroll(data: Refs, animatedValues: AnimatedValues) {
   const onScrollEventCallback = useCallback(event => scroll$.next(event), [])
 
   scroll$.subscribe(({ nativeEvent: { contentOffset } }) => {
+    console.tron.debug('df')
     const height = contentOffset.y | 0
     const baseLevel = data.lastOffset - height
     data.scrollPosition = height

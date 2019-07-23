@@ -32,7 +32,7 @@ export function usePanGesture(
 
   const targetHasChanged$ = pan$.pipe(
     map(({ absoluteY }) => absoluteY),
-    map(y => y - data.itemHeights[ordering[data.move.fromPosition]] * 1.5),
+    map(y => y - data.itemHeights[data.move.fromPosition] * 1.5),
     map(absoluteY => getItemInfo(data, absoluteY, ordering)),
     filter(([position, _]) => data.move.toPosition !== position && data.moveAxis === 'v')
   )
@@ -105,7 +105,6 @@ export function usePanGesture(
     draggableRef.current.setState({
       itemState: 'inactive'
     })
-    console.tron.debug('sdf')
     endDragAnimation(animatedValues, data, ordering, hideDict)
     animatedValues.targetIndicator.opacity.setValue(0.01)
     data.draggable.levelOffset = 0

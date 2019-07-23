@@ -13,7 +13,7 @@ export function getItemInfo(data: Refs, absoluteY: number, ordering: string[]) {
     currentOffset => currentOffset < absoluteY + scrollPosition,
     (currentOffset, itemId: string) => {
       index += 1
-      currentOffset += itemHeights[itemId]
+      currentOffset += itemHeights[index+1]
       return currentOffset
     },
     0
@@ -25,9 +25,9 @@ export const getAbsoluteItemPositionOffset = (
   position: number,
   ordering: string[],
   hideDict: BooleanDict,
-  itemHeights: NumberDict
+  itemHeights:  number[]
 ) =>
-  ordering.slice(0, position).reduce((acc, id) => !hideDict[id] ? acc + itemHeights[id] : acc, 0)
+  ordering.slice(0, position).reduce((acc, id) => !hideDict[id] ? acc + itemHeights[position] : acc, 0)
 
 export const getItems = createSelector(
   props => props.itemDict,

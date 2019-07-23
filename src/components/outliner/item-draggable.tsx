@@ -1,4 +1,4 @@
-import React, { Component } from 'react'
+import React, { Component} from 'react'
 import { View, TextInput, Text, LayoutAnimation } from 'react-native'
 import { Icon, EntryHeadline } from 'elements'
 import styles from './styles'
@@ -6,6 +6,7 @@ import { TouchableOpacity } from 'react-native-gesture-handler'
 import ItemIndicator from './item-indicator'
 import { BooleanDict } from 'components/entry-list/types'
 import { foldAnimation } from './animations'
+import { Refs } from '.';
 
 type Props = {
   onItemIndicatorPress: (itemPosition: number) => void
@@ -14,6 +15,7 @@ type Props = {
   hideDict: BooleanDict
   levels: number[]
   ordering: string[]
+  refs: Refs
   renderItem: (obj: any) => React.ReactNode
 }
 
@@ -64,9 +66,10 @@ class ItemDraggable extends Component<Props, State> {
 
   render() {
     const { item, level, position, editedText, itemState } = this.state
+    const height = this.props.refs.current.itemHeights[position] - 2
     if (!item || itemState === 'inactive') return null
     return (
-      <View style={styles.row}>
+      <View style={[ styles.row , { height }]}>
         <ItemIndicator
           level={level}
           flatDisplay={true}

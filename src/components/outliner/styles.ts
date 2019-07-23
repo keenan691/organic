@@ -38,7 +38,6 @@ export default StyleSheet.create({
     flex: 1
   },
   headlineIndicator: {
-    margin: Metrics.smallMargin,
     fontSize: Fonts.size.h4,
     borderRadius: 20,
     borderWidth: 2,
@@ -46,6 +45,10 @@ export default StyleSheet.create({
     width: 22,
     height: 22,
     padding: Metrics.smallMargin,
+  },
+  headlineIndicatorWrapper: {
+    alignItems: 'flex-end',
+    marginRight: Metrics.smallMargin,
   },
   headlineIndicatorIcon: {
     color: Colors.white,
@@ -62,6 +65,6 @@ export default StyleSheet.create({
     ...Fonts.style.label,
     fontSize: Fonts.size.small,
     // color: Colors.te,
-    marginTop: -7
+    // marginTop: -7
   },
 })

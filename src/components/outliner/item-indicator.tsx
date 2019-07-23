@@ -22,7 +22,7 @@ const defaultProps = {
 
 function ItemIndicator(props: Props) {
   const { flatDisplay, level, hasHiddenChildren, baseLevel } = props
-  const levelMargin = flatDisplay ? 0 : INDENT_WIDTH * (level - baseLevel)
+  const width =  flatDisplay ? INDENT_WIDTH : INDENT_WIDTH * level
   const iconName = props.iconName || getIconName(props) || null
 
   const iconSpinValue = useRef(new Animated.Value(0))
@@ -45,7 +45,7 @@ function ItemIndicator(props: Props) {
     <TouchableOpacity
       onPress={() => props.onPress(props.position)}
     >
-      <View style={[{ paddingLeft: levelMargin }]}>
+      <View style={[ styles.headlineIndicatorWrapper,{ width } ]}>
         <Animated.View
           style={[
             { transform: [{ rotate: iconSpinInterpolated.current }] },

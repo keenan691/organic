@@ -9511,6 +9511,11 @@ react-native-swipe-gestures@^1.0.3:
   resolved "https://registry.yarnpkg.com/react-native-swipe-gestures/-/react-native-swipe-gestures-1.0.3.tgz#4160f8d459627323f3a3d2770af4bcd82fd054f5"
   integrity sha512-KOouRzPB2fHFjVombsSdRfYo8SFeNVa4Ho4B5il87DuuF26sPNOtb3je+qaT/xVptedOsCzRPJGbWFMsaBApgg==
 
+react-native-text-size@^3.0.0:
+  version "3.0.0"
+  resolved "https://registry.yarnpkg.com/react-native-text-size/-/react-native-text-size-3.0.0.tgz#2a85757cb44c7497ad6422ebb2d53344c6634821"
+  integrity sha512-FCYpPVd8PYwgt6JSU7+k7eQtJtTAdupQVGqUNPViy/ggoUY0GlQL+rskRkuq/xd0PDro2jKkdo0w/LtAxZDh6A==
+
 react-native@^0.59.5:
   version "0.59.9"
   resolved "https://registry.yarnpkg.com/react-native/-/react-native-0.59.9.tgz#c94ee4fa35121720c05235a2dd6cdd2784bf5177"

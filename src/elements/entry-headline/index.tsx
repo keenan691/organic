@@ -9,6 +9,7 @@ type Props = {
   category: string
   now?: string
   baseLevel?: number
+  fontSize:  number
   changeText: () => void
 } & OrgEntry &
   typeof defaultProps
@@ -21,19 +22,21 @@ const defaultProps = {
 }
 
 function EntryHeadline(props: Props) {
+  const { fontSize, level } = props
+  const textStyles = [styles[`h${level}C`], fontSize && {fontSize}]
   return (
     <View
       pointerEvents={!props.editable ? 'none' : 'auto'}>
       {props.editable ? (
         <TextInput
-          style={[styles[`h${props.level}C`], { padding: 0 }]}
+          style={[...textStyles, { padding: 0 }]}
           onChangeText={props.changeText}
           value={props.headline}
           selectTextOnFocus
           autoFocus
         />
       ) : (
-        <Text style={styles[`h${props.level}C`]}>{props.headline}</Text>
+        <Text style={textStyles}>{props.headline}</Text>
       )}
     </View>
   )
