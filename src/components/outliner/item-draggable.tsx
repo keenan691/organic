@@ -7,6 +7,7 @@ import ItemIndicator from './item-indicator'
 import { BooleanDict } from 'components/entry-list/types'
 import { foldAnimation } from './animations'
 import { Refs } from '.';
+import { INDENT_SIZE } from './constants';
 
 type Props = {
   onItemIndicatorPress: (itemPosition: number) => void
@@ -56,7 +57,7 @@ class ItemDraggable extends Component<Props, State> {
   renderAddButtons = () => {
     const { onAddButtonPress } = this.props
     return (
-      <View style={{ position: 'absolute', top: -15, zIndex: 4, left: 200 }}>
+      <View style={{ position: 'absolute', top: -15, zIndex: 4, left: 200 - INDENT_SIZE * this.state.level }}>
         <TouchableOpacity onPress={onAddButtonPress}>
           <Icon name="plusCircle" style={{ margin: 5 }} />
         </TouchableOpacity>

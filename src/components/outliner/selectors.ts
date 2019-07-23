@@ -40,10 +40,8 @@ export function getDraggableToTargetOffset(
   ordering: string[],
   hideDict: { [itemId: string]: boolean }
 ) {
-  return (
-    getAbsoluteItemPositionOffset(getTargetPosition(data), ordering, hideDict, data.itemHeights) -
-    data.lastOffset
-  )
+  return getAbsoluteItemPositionOffset(getTargetPosition(data), ordering, hideDict, data.itemHeights) - data.lastOffset
+
 }
 
 export const getSourcePosition = (data: Refs) => data.move.fromPosition

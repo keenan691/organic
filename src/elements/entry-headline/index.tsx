@@ -4,6 +4,7 @@ import { Text, View, TextInputChangeEventData } from 'react-native'
 import styles from './styles'
 import { OrgEntry } from 'core/entries/store/types'
 import { TextInput } from 'react-native-gesture-handler'
+import { Colors } from 'view/themes';
 
 type Props = {
   category: string
@@ -34,6 +35,7 @@ function EntryHeadline(props: Props) {
           value={props.headline}
           selectTextOnFocus
           autoFocus
+        selectionColor={Colors.darkerGray}
         />
       ) : (
         <Text style={textStyles}>{props.headline}</Text>

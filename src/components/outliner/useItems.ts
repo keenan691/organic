@@ -94,7 +94,7 @@ export function useItems(
       data.itemHeights
     )
 
-    animatedValues.draggable.translateY.setOffset(absoluteItemOffset - data.scrollPosition)
+    animatedValues.draggable.translateY.setOffset( absoluteItemOffset - data.scrollPosition )
     animatedValues.draggable.translateY.setValue(0)
     animatedValues.draggable.level.setValue(getItemLevelOffset(itemLevel))
 

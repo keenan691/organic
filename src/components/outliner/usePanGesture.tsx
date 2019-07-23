@@ -23,6 +23,7 @@ export function usePanGesture(
   animatedValues: AnimatedValues
 ) {
   const pan$ = new Subject<PanGestureHandlerGestureEvent>().pipe(map(event => event.nativeEvent))
+
   const panState$ = new Subject<PanGestureHandlerStateChangeEvent>().pipe(
     map(({ nativeEvent }) => [nativeEvent.state, nativeEvent.oldState, nativeEvent.translationX])
   )
@@ -57,7 +58,6 @@ export function usePanGesture(
     data.panGesture.translateY = translationY
     switch (data.moveAxis) {
       case 'v':
-        animatedValues.draggable.translateY.setValue(translationY)
         break
       case 'h':
         const dx = data.draggable.levelOffset - translationX

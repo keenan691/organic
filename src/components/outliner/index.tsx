@@ -39,10 +39,11 @@ const createAnimatedValues = () => ({
     opacity: new Animated.Value(0.2),
     translateY: new Animated.Value(0),
   },
+  scroll: new Animated.Value(0),
 })
 
 const gestureData = {
-  itemHeights: [] as  number[],
+  itemHeights: [] as number[],
   panGesture: {
     x: 0,
     y: 0,
@@ -53,7 +54,7 @@ const gestureData = {
   lastOffset: 0,
   draggable: {
     levelOffset: 0,
-    state: 'inactive' as 'inactive' | 'active' | 'edit'
+    state: 'inactive' as 'inactive' | 'active' | 'edit',
   },
   moveAxis: 'h',
   move: {
@@ -90,7 +91,7 @@ function Outliner({ renderItem, ...props }: Props) {
     onItemPress,
     editItem,
     getItemLayout,
-    loadingItems
+    loadingItems,
   } = useItems(itemsData, refsData, draggableItemRef, props, setItemVisibility, animatedValues)
 
   const { onPanCallback, onPanHandlerStateCallback } = usePanGesture(
@@ -110,17 +111,16 @@ function Outliner({ renderItem, ...props }: Props) {
 
   const onScrollEventCallback = useScroll(refsData, animatedValues)
 
-
   useLayoutEffect(() => {
     LayoutAnimation.configureNext(foldAnimation)
   }, [hideDict])
 
   if (loadingItems) {
-    return (<View>
-      <Text>
-        Loading
-      </Text>
-    </View>)
+    return (
+      <View>
+        <Text>Loading</Text>
+      </View>
+    )
   }
   bench.step('reorderable')
   return (
@@ -130,7 +130,7 @@ function Outliner({ renderItem, ...props }: Props) {
         onHandlerStateChange={onPinchStateCallback}
       >
         <View>
-          <FlatList
+          <Animated.FlatList
             renderItem={({ item, index }) => (
               <Item
                 item={item}
@@ -145,13 +145,23 @@ function Outliner({ renderItem, ...props }: Props) {
             )}
             data={items}
             getItemLayout={getItemLayout}
-            onScroll={onScrollEventCallback}
-          scrollEventThrottle={8}
+            onScroll={Animated.event(
+              [{ nativeEvent: { contentOffset: { y: animatedValues.scroll } } }],
+              { useNativeDriver: true }
+            )}
             {...props}
           />
 
           <PanGestureHandler
-            onGestureEvent={onPanCallback}
+            onGestureEvent={Animated.event(
+              [{ nativeEvent: { translationY: animatedValues.draggable.translateY } }],
+              {
+                useNativeDriver: true,
+                listener: event => {
+                  onPanCallback(event)
+                },
+              }
+            )}
             onHandlerStateChange={onPanHandlerStateCallback}
           >
             <Animated.View
@@ -159,12 +169,22 @@ function Outliner({ renderItem, ...props }: Props) {
                 styles.draggable,
                 {
                   opacity: animatedValues.draggable.opacity,
-                  transform: [{ translateY: animatedValues.draggable.translateY }],
+                  transform: [
+                    {
+                      translateY: Animated.add(
+                        animatedValues.draggable.translateY,
+                        Animated.divide(animatedValues.scroll, -1)
+                      ),
+                    },
+                  ],
                 },
               ]}
             >
               <Animated.View
-                style={[styles.row, { transform: [{ translateX: animatedValues.draggable.level }] }]}
+                style={[
+                  styles.row,
+                  { transform: [{ translateX: animatedValues.draggable.level }] },
+                ]}
               >
                 <ItemDraggable
                   onAddButtonPress={createNewItem}
@@ -177,7 +197,6 @@ function Outliner({ renderItem, ...props }: Props) {
                   {...itemsData}
                 />
               </Animated.View>
-
             </Animated.View>
           </PanGestureHandler>
 
