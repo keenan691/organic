@@ -33,7 +33,7 @@ export function usePanGesture(
 
   const targetHasChanged$ = pan$.pipe(
     map(({ absoluteY }) => absoluteY),
-    map(y => y - data.itemHeights[data.move.fromPosition] * 1.5),
+    map(y => y - data.itemHeights[data.move.fromPosition] * 1),
     map(absoluteY => getItemInfo(data, absoluteY, ordering)),
     filter(([position, _]) => data.move.toPosition !== position && data.moveAxis === 'v')
   )
