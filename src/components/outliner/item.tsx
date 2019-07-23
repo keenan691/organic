@@ -1,21 +1,22 @@
-import React from 'react'
+import React, { useCallback } from 'react'
 import { View, LayoutChangeEvent } from 'react-native'
 import { TouchableHighlight } from 'react-native-gesture-handler'
 import { hasHiddenChildren, hasChildren } from './visibility'
 import { BooleanDict } from 'components/entry-list/types'
 import ItemIndicator from './item-indicator'
 import styles from './styles'
+import { Colors } from 'view/themes'
 
 type Props = {
   hideDict: BooleanDict
-  item: { id:  string, content: string }
+  item: { id: string; content: string }
   levels: number[]
   ordering: string[]
   onItemIndicatorPress: (itemPosition: number) => void
   onItemPress: (itemPosition: number) => void
   onItemLayoutCallback: (event: LayoutChangeEvent, itemId: string) => void
   position: number
-  renderItem: (item:  object) => React.ReactElement
+  renderItem: (item: object) => React.ReactElement
 } & typeof defaultProps
 
 const defaultProps = {}
@@ -34,7 +35,7 @@ function Item(props: Props) {
   } = props
   if (hideDict[item.id]) return null
   return (
-    <TouchableHighlight underlayColor="white" onPress={() => onItemPress(position)}>
+    <TouchableHighlight underlayColor={Colors.white} onPress={() => onItemPress(position)}>
       <View style={styles.item} onLayout={event => onItemLayoutCallback(event, item.id)}>
         <ItemIndicator
           level={levels[position]}
@@ -48,7 +49,6 @@ function Item(props: Props) {
           item,
           level: levels[position],
           position: position,
-          defaultAction: onItemPress,
         })}
       </View>
     </TouchableHighlight>

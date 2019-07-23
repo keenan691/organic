@@ -12,11 +12,12 @@ import { getItemInfo } from './selectors'
 import { endDragAnimation, startDragAnimation, startShiftLevelAnimation } from './animations'
 import { Refs, AnimatedValues } from '.'
 import { ItemData } from './types'
+import ItemDraggable from './item-draggable';
 
 export function usePanGesture(
   { levels, ordering, hideDict }: ItemData,
   data: Refs,
-  draggableRef: React.MutableRefObject<undefined>,
+  draggableRef: React.MutableRefObject<ItemDraggable>,
   setOrdering: (ordering: string[]) => void,
   setLevels: (levels: number[]) => void,
   animatedValues: AnimatedValues
@@ -48,7 +49,7 @@ export function usePanGesture(
     })
   )
 
-  const dragStart$ = panState$.pipe(filter(([state]) => state === State.BEGAN))
+  const dragStart$ = panState$.pipe(filter(([state]) => state === State.ACTIVE))
   const dragEnd$ = panState$.pipe(filter(([_, oldState]) => oldState === State.ACTIVE))
 
   pan$.subscribe(({ translationX, translationY }) => {
@@ -64,7 +65,7 @@ export function usePanGesture(
           shiftDraggableItemLevel(data, levels, dx > 0 ? 'left' : 'right')
           startShiftLevelAnimation(animatedValues, data)
           data.draggable.levelOffset = translationX
-          draggableRef.current.setNativeProps({
+          draggableRef.current.setState({
             level: data.move.toLevel,
           })
         }
@@ -87,17 +88,24 @@ export function usePanGesture(
       animatedValues.draggable.level.stopAnimation()
       startShiftLevelAnimation(animatedValues, data)
     }
-    draggableRef.current.setNativeProps({
+    draggableRef.current.setState({
       level: targetLevel,
       position: newPosition,
     })
   })
 
   dragStart$.subscribe(() => {
+    draggableRef.current.setState({
+      itemState: 'dragged'
+    })
     startDragAnimation(animatedValues)
   })
 
   dragEnd$.subscribe(() => {
+    draggableRef.current.setState({
+      itemState: 'inactive'
+    })
+    console.tron.debug('sdf')
     endDragAnimation(animatedValues, data, ordering, hideDict)
     animatedValues.targetIndicator.opacity.setValue(0.01)
     data.draggable.levelOffset = 0

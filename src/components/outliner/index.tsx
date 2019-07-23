@@ -54,6 +54,7 @@ const gestureData = {
   lastOffset: 0,
   draggable: {
     levelOffset: 0,
+    state: 'inactive' as 'inactive' | 'active' | 'edit'
   },
   moveAxis: 'h',
   move: {
@@ -80,6 +81,7 @@ function Outliner({ renderItem, ...props }: Props) {
     ordering.reduce((acc, id) => ({ ...acc, [id]: false }), {})
   )
 
+
   const itemsData = { hideDict, levels, ordering }
 
   const {
@@ -88,6 +90,7 @@ function Outliner({ renderItem, ...props }: Props) {
     onItemIndicatorPress,
     onItemLayoutCallback,
     onItemPress,
+    editItem,
   } = useItems(itemsData, refsData, draggableItemRef, props, setItemVisibility, animatedValues)
 
   const { onPanCallback, onPanHandlerStateCallback } = usePanGesture(
@@ -158,10 +161,12 @@ function Outliner({ renderItem, ...props }: Props) {
                   onItemPress={onItemPress}
                   onItemIndicatorPress={onItemIndicatorPress}
                   renderItem={renderItem}
+                  editItem={editItem}
                   ref={draggableItemRef}
                   {...itemsData}
                 />
               </Animated.View>
+
             </Animated.View>
           </PanGestureHandler>
 

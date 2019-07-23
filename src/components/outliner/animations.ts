@@ -4,7 +4,7 @@ import { LayoutAnimation } from "react-native";
 import { AnimatedValues, Refs } from ".";
 
 export const foldAnimation = {
-  duration: 150,
+  duration: 250,
   update: {
     property: LayoutAnimation.Properties.scaleXY,
     type: LayoutAnimation.Types.easeOut,
@@ -15,6 +15,22 @@ export const foldAnimation = {
   },
   delete: {
     property: LayoutAnimation.Properties.scaleXY,
+    type: LayoutAnimation.Types.easeOut,
+  },
+}
+
+export const opacityAnimation = {
+  duration: 1500,
+  update: {
+    property: LayoutAnimation.Properties.opacity,
+    type: LayoutAnimation.Types.easeOut,
+  },
+  create: {
+    property: LayoutAnimation.Properties.opacity,
+    type: LayoutAnimation.Types.easeOut,
+  },
+  delete: {
+    property: LayoutAnimation.Properties.opacity,
     type: LayoutAnimation.Types.easeOut,
   },
 }

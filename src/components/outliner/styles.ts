@@ -18,8 +18,8 @@ export default StyleSheet.create({
     position: 'absolute',
     backgroundColor: Colors.lightGray,
     borderColor: Colors.darkerGray,
-    // borderTopWidth: 1,
-    // borderBottomWidth: 1,
+    borderTopWidth: 1,
+    borderBottomWidth: 1,
     // opacity: 0.8,
     zIndex: 2,
   },
@@ -61,7 +61,7 @@ export default StyleSheet.create({
   contentPreviewText: {
     ...Fonts.style.label,
     fontSize: Fonts.size.small,
-    color: Colors.white,
-    marginTop: -5
+    // color: Colors.te,
+    marginTop: -7
   },
 })

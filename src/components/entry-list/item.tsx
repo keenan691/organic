@@ -7,6 +7,7 @@ import { EntryListContext } from '.'
 import styles from './styles'
 import CommandMenu from './elements/command-menu'
 import { TouchableHighlight } from 'react-native-gesture-handler';
+import { Colors } from 'view/themes';
 
 type Props = {
   item: OrgEntry
@@ -41,14 +42,13 @@ function EntryListItem(props: Props) {
 
   return (
     <View style={[styles.column]}>
-      <EntryHeadline
-        colorized={true}
-        editable={editable}
-        highlighted={highlighted}
-        {...item}
-        level={level}
-      />
-      <EntryContent content={item.content} visible={showContent} />
+        <EntryHeadline
+          colorized={true}
+          editable={false}
+          highlighted={highlighted}
+          {...item}
+          level={level}
+        />
     </View>
   )
   return (
@@ -59,15 +59,13 @@ function EntryListItem(props: Props) {
       ]}
     >
       <View style={[styles.row, isFocused && styles.entryFocusedBg]}>
-        <TouchableHighlight
-          style={{ flex: 2 }}
-          underlayColor="white"
-          onPress={() => {
-            defaultAction && defaultAction(position)
-          }}
-          disabled={props.editable}
-        >
           <View style={[styles.column]}>
+            <TouchableHighlight
+              onPress={() => {
+                defaultAction && defaultAction(position)
+              }}
+              disabled={props.editable}
+            >
             <EntryHeadline
               colorized={true}
               editable={editable}
@@ -75,11 +73,9 @@ function EntryListItem(props: Props) {
               {...item}
               level={level}
             />
-            <EntryContent content={item.content} visible={showContent} />
+            </TouchableHighlight>
           </View>
-        </TouchableHighlight>
       </View>
-      <CommandMenu type="item" show={isFocused} level={item.level} />
     </View>
   )
 }
