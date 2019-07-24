@@ -32,14 +32,14 @@ const measure = async (texts: string[], level: number, screenWidth: number) => {
 }
 
 export const measureItems = async (texts: string[], levels: number[]) => {
+  const heights = Array(texts.length)
+  const screenWidth = Dimensions.get('screen').width
+
   const positionsGroupedByLevel = texts.reduce((acc, _, idx) => {
     const level = levels[idx]
     acc[level].push(idx)
     return acc
   }, createEmptyLevelsDict(levels))
-
-  const heights = Array(texts.length)
-  const screenWidth = Dimensions.get('screen').width
 
   await Promise.all(Object.keys(positionsGroupedByLevel).map(async level => {
     const positions = positionsGroupedByLevel[level]
@@ -63,9 +63,11 @@ export function useItems(
 ) {
   const [loading, setLoading] = useState(true)
 
-  useEffect(async () => {
-    data.itemHeights = await measureItems(ordering.map(id => props.itemDict[id].headline), levels)
-    setLoading(false)
+  useEffect(() => {
+    measureItems(ordering.map(id => props.itemDict[id].headline), levels).then((heights) => {
+      data.itemHeights = heights
+      setLoading(false)
+    })
   }, [])
 
   const onItemLayoutCallback = useCallback((event: LayoutChangeEvent, itemId: string) => {
