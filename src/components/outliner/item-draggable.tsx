@@ -1,18 +1,19 @@
-import React, { Component} from 'react'
-import { View, TextInput, Text, LayoutAnimation } from 'react-native'
+import React, { Component } from 'react'
+import { View, TextInput, Text, LayoutAnimation, Keyboard } from 'react-native'
 import { Icon, EntryHeadline } from 'elements'
 import styles from './styles'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import ItemIndicator from './item-indicator'
 import { BooleanDict } from 'components/entry-list/types'
 import { foldAnimation } from './animations'
-import { Refs } from '.';
-import { INDENT_SIZE } from './constants';
+import { Refs } from '.'
+import { INDENT_SIZE } from './constants'
 
 type Props = {
   onItemIndicatorPress: (itemPosition: number) => void
   onItemPress: (itemPosition: number) => void
   onAddButtonPress: () => void
+  focus: (index) => void
   hideDict: BooleanDict
   levels: number[]
   ordering: string[]
@@ -22,7 +23,7 @@ type Props = {
 
 type State = ReturnType<typeof createState>
 const createState = () => ({
-  item: null as { headline: string; content: string } | null,
+  item: null as { headline: string; content: string; id: string } | null,
   level: 0,
   position: 0,
   editable: false,
@@ -37,10 +38,31 @@ const createState = () => ({
 class ItemDraggable extends Component<Props, State> {
   state = createState()
 
+  componentWillMount = () => {
+    this._keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
+      // Run animations only in case keyboard was hidden manually
+      if (this.state.itemState === 'edit') {
+        this.setState({
+          itemState: 'dragged',
+        })
+        setTimeout(() => {
+          this.setState({
+            itemState: 'active',
+          })
+          LayoutAnimation.configureNext(foldAnimation)
+        }, 1)
+      }
+    })
+  }
+
+  componentWillUnmount = () => {
+    this._keyboardDidHideListener.remove()
+  }
+
   activate = () => {
     setTimeout(() => {
       this.setState({
-        itemState: 'active'
+        itemState: 'active',
       })
       LayoutAnimation.configureNext(foldAnimation)
     }, 50)
@@ -53,9 +75,10 @@ class ItemDraggable extends Component<Props, State> {
     LayoutAnimation.configureNext(foldAnimation)
     setTimeout(() => {
       this.setState({
-        itemState: 'edit'
+        itemState: 'edit',
       })
-    }, 200)
+      this.props.focus(this.state.position)
+    }, 50)
   }
 
   changeText = (text: any) => {
@@ -65,14 +88,21 @@ class ItemDraggable extends Component<Props, State> {
   onItemIndicatorPress = () => {
     this.props.onItemIndicatorPress(this.state.position)
     this.setState(prevState => ({
-      hasHiddenChildren: !prevState.hasHiddenChildren
+      hasHiddenChildren: !prevState.hasHiddenChildren,
     }))
   }
 
   renderAddButtons = () => {
     const { onAddButtonPress } = this.props
     return (
-      <View style={{ position: 'absolute', top: -15, zIndex: 4, left: 200 - INDENT_SIZE * this.state.level }}>
+      <View
+        style={{
+          position: 'absolute',
+          top: -15,
+          zIndex: 4,
+          left: 200 - INDENT_SIZE * this.state.level,
+        }}
+      >
         <TouchableOpacity onPress={onAddButtonPress}>
           <Icon name="plusCircle" style={{ margin: 5 }} />
         </TouchableOpacity>
@@ -85,7 +115,7 @@ class ItemDraggable extends Component<Props, State> {
     const height = this.props.refs.current.itemHeights[position] - 2
     if (!item || itemState === 'inactive') return null
     return (
-      <View style={[ styles.row , { height }]}>
+      <View style={[styles.row, { height }]}>
         <ItemIndicator
           level={level}
           flatDisplay={true}

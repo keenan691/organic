@@ -76,6 +76,8 @@ function Outliner({ renderItem, ...props }: Props) {
   const refsData = refs.current
 
   const draggableItemRef = useRef<ItemDraggable>()
+  const flatlistRef = useRef<FlatList<{}>>()
+
 
   const [hideDict, setItemVisibility] = useState(() =>
     ordering.reduce((acc, id) => ({ ...acc, [id]: false }), {})
@@ -142,6 +144,7 @@ function Outliner({ renderItem, ...props }: Props) {
                 {...itemsData}
               />
             )}
+            ref={flatlistRef}
             data={items}
             getItemLayout={getItemLayout}
             onScroll={Animated.event(
@@ -193,6 +196,13 @@ function Outliner({ renderItem, ...props }: Props) {
                   onItemIndicatorPress={onItemIndicatorPress}
                   renderItem={renderItem}
                   ref={draggableItemRef}
+                  focus={(index) => {
+                    console.tron.debug(index)
+                    flatlistRef.current.getNode().scrollToIndex({
+                      index,
+                      viewPosition: 0.2
+                    })
+                  }}
                   refs={refs}
                   {...itemsData}
                 />
