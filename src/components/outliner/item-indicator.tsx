@@ -4,6 +4,7 @@ import styles from './styles'
 import { INDENT_WIDTH } from 'components/entry-list/constants'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { Icon } from 'elements'
+import { usePrevious } from 'helpers/hooks'
 
 type Props = {
   level: number
@@ -17,12 +18,12 @@ const defaultProps = {
   flatDisplay: false,
   hasHiddenChildren: false,
   hasChildren: false,
-  hasContent: false
+  hasContent: false,
 }
 
 function ItemIndicator(props: Props) {
-  const { flatDisplay, level, hasHiddenChildren, baseLevel } = props
-  const width =  flatDisplay ? INDENT_WIDTH : INDENT_WIDTH * level
+  const { flatDisplay, level, hasHiddenChildren, baseLevel, position } = props
+  const width = flatDisplay ? INDENT_WIDTH : INDENT_WIDTH * level
   const iconName = props.iconName || getIconName(props) || null
 
   const iconSpinValue = useRef(new Animated.Value(0))
@@ -33,19 +34,29 @@ function ItemIndicator(props: Props) {
     })
   )
 
+  const prevPosition = usePrevious(position)
+
+  const newIconSpinValue = hasHiddenChildren ? 1 : 0
+
+  // Do not animate when identity of visualized item changes
+  // This is special use case for ItemDraggable
+  if (position !== prevPosition) {
+    iconSpinValue.current.setValue(newIconSpinValue)
+  }
+
   useEffect(() => {
-    Animated.timing(iconSpinValue.current, {
-      toValue: hasHiddenChildren ? 1 : 0,
-      duration: 200,
-      easing: Easing.linear
-    }).start()
+    if (position === prevPosition) {
+      Animated.timing(iconSpinValue.current, {
+        toValue: newIconSpinValue,
+        duration: 200,
+        easing: Easing.linear,
+      }).start()
+    }
   }, [hasHiddenChildren])
 
   return (
-    <TouchableOpacity
-      onPress={() => props.onPress(props.position)}
-    >
-      <View style={[ styles.headlineIndicatorWrapper,{ width } ]}>
+    <TouchableOpacity onPress={() => props.onPress(props.position)}>
+      <View style={[styles.headlineIndicatorWrapper, { width }]}>
         <Animated.View
           style={[
             { transform: [{ rotate: iconSpinInterpolated.current }] },
@@ -54,10 +65,12 @@ function ItemIndicator(props: Props) {
             styles[`h${props.level}BG`],
           ]}
         >
-          {iconName && <Icon
-            name={iconName}
-            style={[styles.headlineIndicatorIcon, styles[`h${props.level}CH`]]}
-          /> }
+          {iconName && (
+            <Icon
+              name={iconName}
+              style={[styles.headlineIndicatorIcon, styles[`h${props.level}CH`]]}
+            />
+          )}
         </Animated.View>
       </View>
     </TouchableOpacity>

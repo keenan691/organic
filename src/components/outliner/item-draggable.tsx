@@ -45,6 +45,7 @@ class ItemDraggable extends Component<Props, State> {
       LayoutAnimation.configureNext(foldAnimation)
     }, 50)
   }
+
   edit = () => {
     this.setState({
       itemState: 'dragged',
@@ -56,10 +57,6 @@ class ItemDraggable extends Component<Props, State> {
       })
     }, 200)
   }
-
-  /* activate = () => {
-   *   this.setState({itemState: 'active'})
-   * } */
 
   changeText = (text: any) => {
     this.setState({ editedText: text })
