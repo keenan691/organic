@@ -146,7 +146,9 @@ function Outliner({ renderItem, ...props }: Props) {
             getItemLayout={getItemLayout}
             onScroll={Animated.event(
               [{ nativeEvent: { contentOffset: { y: animatedValues.scroll } } }],
-              { useNativeDriver: true }
+              { useNativeDriver: true,
+                listener: onScrollEventCallback
+              }
             )}
             {...props}
           />

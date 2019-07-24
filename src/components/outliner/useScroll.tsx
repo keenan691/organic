@@ -10,8 +10,6 @@ export function useScroll(data: Refs, animatedValues: AnimatedValues) {
     const height = contentOffset.y | 0
     const baseLevel = data.lastOffset - height
     data.scrollPosition = height
-    animatedValues.draggable.translateY.setOffset(baseLevel)
-    animatedValues.draggable.translateY.setValue(0)
   })
 
   return onScrollEventCallback
