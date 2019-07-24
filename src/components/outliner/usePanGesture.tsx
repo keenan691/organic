@@ -28,13 +28,13 @@ export function usePanGesture(
     map(({ nativeEvent }) => [nativeEvent.state, nativeEvent.oldState, nativeEvent.translationX])
   )
 
-  const onPanCallback = useCallback(event => pan$.next(event), [levels, ordering])
-  const onPanHandlerStateCallback = useCallback(event => panState$.next(event), [ordering, levels])
+  const onPanCallback = useCallback(event => pan$.next(event), [levels, ordering, hideDict])
+  const onPanHandlerStateCallback = useCallback(event => panState$.next(event), [ordering, levels, hideDict])
 
   const targetHasChanged$ = pan$.pipe(
     map(({ absoluteY }) => absoluteY),
     map(y => y - data.itemHeights[data.move.fromPosition] * 1),
-    map(absoluteY => getItemInfo(data, absoluteY, ordering)),
+    map(absoluteY => getItemInfo(data, absoluteY, ordering, hideDict)),
     filter(([position, _]) => data.move.toPosition !== position && data.moveAxis === 'v')
   )
 

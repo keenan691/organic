@@ -89,7 +89,6 @@ function Outliner({ renderItem, ...props }: Props) {
     onItemIndicatorPress,
     onItemLayoutCallback,
     onItemPress,
-    editItem,
     getItemLayout,
     loadingItems,
   } = useItems(itemsData, refsData, draggableItemRef, props, setItemVisibility, animatedValues)
@@ -191,7 +190,6 @@ function Outliner({ renderItem, ...props }: Props) {
                   onItemPress={onItemPress}
                   onItemIndicatorPress={onItemIndicatorPress}
                   renderItem={renderItem}
-                  editItem={editItem}
                   ref={draggableItemRef}
                   refs={refs}
                   {...itemsData}

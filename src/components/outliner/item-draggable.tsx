@@ -37,12 +37,29 @@ const createState = () => ({
 class ItemDraggable extends Component<Props, State> {
   state = createState()
 
-  edit = () => {
-    LayoutAnimation.configureNext(foldAnimation)
-    this.setState({
-      itemState: 'edit',
-    })
+  activate = () => {
+    setTimeout(() => {
+      this.setState({
+        itemState: 'active'
+      })
+      LayoutAnimation.configureNext(foldAnimation)
+    }, 50)
   }
+  edit = () => {
+    this.setState({
+      itemState: 'dragged',
+    })
+    LayoutAnimation.configureNext(foldAnimation)
+    setTimeout(() => {
+      this.setState({
+        itemState: 'edit'
+      })
+    }, 200)
+  }
+
+  /* activate = () => {
+   *   this.setState({itemState: 'active'})
+   * } */
 
   changeText = (text: any) => {
     this.setState({ editedText: text })
@@ -81,7 +98,7 @@ class ItemDraggable extends Component<Props, State> {
           hasHiddenChildren={this.state.hasHiddenChildren}
         />
         <View style={styles.column}>
-          <TouchableOpacity onPress={this.props.editItem}>
+          <TouchableOpacity onPress={this.edit}>
             <EntryHeadline
               colorized={true}
               editable={itemState === 'edit'}

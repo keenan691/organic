@@ -37,7 +37,7 @@ function ItemIndicator(props: Props) {
     Animated.timing(iconSpinValue.current, {
       toValue: hasHiddenChildren ? 1 : 0,
       duration: 200,
-      easing: Easing.linear,
+      easing: Easing.linear
     }).start()
   }, [hasHiddenChildren])
 

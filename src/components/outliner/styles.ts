@@ -64,7 +64,7 @@ export default StyleSheet.create({
   contentPreviewText: {
     ...Fonts.style.label,
     fontSize: Fonts.size.small,
-    // color: Colors.te,
+    color: Colors.white,
     // marginTop: -7
   },
 })

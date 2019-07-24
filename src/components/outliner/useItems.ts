@@ -1,7 +1,7 @@
 import React, { useCallback, useState, useEffect } from 'react'
-import { LayoutChangeEvent, Dimensions } from 'react-native'
+import { LayoutChangeEvent, Dimensions, LayoutAnimation } from 'react-native'
 import { getAbsoluteItemPositionOffset, getItemLevelOffset, getItems } from './selectors'
-import { startActivateAnimation } from './animations'
+import { startActivateAnimation, foldAnimation } from './animations'
 import { cycleItemVisibility, hasHiddenChildren, hasChildren } from './visibility'
 import { Refs, AnimatedValues } from '.'
 import { ItemData } from './types'
@@ -109,16 +109,14 @@ export function useItems(
       item: props.itemDict[ordering[itemPosition]],
       level: itemLevel,
       position: itemPosition,
-      itemState: 'active',
+      itemState: 'dragged',
       hasHiddenChildren:hasHiddenChildren(itemPosition, hideDict, ordering, levels),
       hasChildren:hasChildren(itemPosition, levels)
     })
 
-    startActivateAnimation(animatedValues)
-  }
+    draggableRef.current.activate()
 
-  const editItem = () => {
-    draggableRef.current.edit()
+    startActivateAnimation(animatedValues)
   }
 
   const createNewItem = useCallback(
@@ -154,7 +152,6 @@ export function useItems(
     onItemIndicatorPress,
     onItemLayoutCallback,
     onItemPress,
-    editItem,
     getItemLayout,
     loadingItems: loading
   }
