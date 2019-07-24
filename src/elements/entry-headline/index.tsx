@@ -1,4 +1,4 @@
-import React, { memo } from 'react'
+import React, { memo, useState, useEffect } from 'react'
 import { Text, View, TextInputChangeEventData } from 'react-native'
 
 import styles from './styles'
@@ -11,7 +11,7 @@ type Props = {
   now?: string
   baseLevel?: number
   fontSize:  number
-  changeText: () => void
+  onSubmit?: (text: string ) => void
 } & OrgEntry &
   typeof defaultProps
 
@@ -23,16 +23,24 @@ const defaultProps = {
 }
 
 function EntryHeadline(props: Props) {
-  const { fontSize, level } = props
+  const { fontSize, level, headline } = props
   const textStyles = [styles[`h${level}C`], fontSize && {fontSize}]
+
+  const [text, setText] = useState(props.headline)
+
+  useEffect(() => {
+    setText(headline)
+  }  ,[headline])
+
   return (
     <View
       pointerEvents={!props.editable ? 'none' : 'auto'}>
       {props.editable ? (
         <TextInput
           style={[...textStyles, { padding: 0 }]}
-          onChangeText={props.changeText}
-          value={props.headline}
+          onChangeText={setText}
+          onSubmitEditing={props.onSubmit}
+          value={text}
           selectTextOnFocus
           autoFocus
         selectionColor={Colors.darkerGray}

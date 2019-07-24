@@ -17,10 +17,6 @@ export default StyleSheet.create({
     width: '100%',
     position: 'absolute',
     backgroundColor: Colors.lightGray,
-    borderColor: Colors.darkerGray,
-    borderTopWidth: 1,
-    borderBottomWidth: 1,
-    // opacity: 0.8,
     zIndex: 2,
   },
   item: {
@@ -53,18 +49,12 @@ export default StyleSheet.create({
   headlineIndicatorIcon: {
     color: Colors.white,
     marginTop: -4,
-    // position: 'absolute',
-    // top: 0,
-    // left: 0,
-    // fontSize: Fonts.size.regular,
   },
   headlineIndicatorHasContent: {
-    // borderColor: Colors.violet
   },
   contentPreviewText: {
     ...Fonts.style.label,
     fontSize: Fonts.size.small,
-    color: Colors.white,
-    // marginTop: -7
+    color: Colors.base01,
   },
 })

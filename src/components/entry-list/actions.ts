@@ -15,8 +15,12 @@ const jump = action('entry-list/JUMP')<{ entryId: string }>()
 const setEntriesOrdering = action('entry-list/SET_ENTRIES_ORDERING')<string[]>()
 const setEntriesLevels = action('entry-list/SET_ENTRIES_LEVELS')<any>()
 const addItem = action('entry-list/ADD_ITEM')<any>()
+const deleteItems = action('entry-list/DELETE_ITEMS')<number[]>()
+const changeItems = action('entry-list/CHANGE_ITEMS')<any>()
 
 export default {
+  changeItems,
+  deleteItems,
   addItem,
   setEntriesLevels,
   setEntriesOrdering,

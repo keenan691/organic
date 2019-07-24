@@ -14,7 +14,6 @@ export function getItemInfo(
 ) {
   const { itemHeights, scrollPosition } = data
   let index = 0
-  console.tron.debug(scrollPosition)
   const offset = reduceWhile(
     currentOffset => currentOffset < absoluteY + scrollPosition,
     (currentOffset, itemId: string) => {

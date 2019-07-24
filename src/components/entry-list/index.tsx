@@ -94,6 +94,14 @@ function EntryList(props: Props) {
     return dispatch(actions.addItem(item))
   }, [])
 
+  const deleteItems = useCallback((positions:  number[]) => {
+    return dispatch(actions.deleteItems(positions))
+  }, [])
+
+  const changeItems = useCallback((itemsChanges) => {
+    return dispatch(actions.changeItems(itemsChanges))
+  }, [])
+
   /**
    * Refs
    */
@@ -162,6 +170,8 @@ function EntryList(props: Props) {
           levels={levels}
           setOrdering={setOrdering}
           setLevels={setLevels}
+          deleteItems={deleteItems}
+          changeItems={changeItems}
           addItem={addItem}
           ListHeaderComponent={<CommandMenu type="global" show={isGlobalMenuVisible} />}
           renderItem={props => (

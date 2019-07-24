@@ -19,6 +19,7 @@ import { usePanGesture } from './usePanGesture'
 
 type Props = {
   addItem: (item: object) => void
+  deleteItems: (positions:  number[]) => void
   itemDict: object
   levels: number[]
   ordering: string[]
@@ -76,8 +77,14 @@ function Outliner({ renderItem, ...props }: Props) {
   const refsData = refs.current
 
   const draggableItemRef = useRef<ItemDraggable>()
-  const flatlistRef = useRef<FlatList<{}>>()
 
+  const flatlistRef = useRef<FlatList<{}>>()
+  const focusItem = (index: number) => {
+    flatlistRef.current.getNode().scrollToIndex({
+      index,
+      viewPosition: 0.2,
+    })
+  }
 
   const [hideDict, setItemVisibility] = useState(() =>
     ordering.reduce((acc, id) => ({ ...acc, [id]: false }), {})
@@ -90,10 +97,18 @@ function Outliner({ renderItem, ...props }: Props) {
     createNewItem,
     onItemIndicatorPress,
     onItemLayoutCallback,
-    onItemPress,
+    activateItem,
     getItemLayout,
     loadingItems,
-  } = useItems(itemsData, refsData, draggableItemRef, props, setItemVisibility, animatedValues)
+  } = useItems(
+    itemsData,
+    refsData,
+    draggableItemRef,
+    props,
+    setItemVisibility,
+    animatedValues,
+    focusItem
+  )
 
   const { onPanCallback, onPanHandlerStateCallback } = usePanGesture(
     itemsData,
@@ -136,7 +151,7 @@ function Outliner({ renderItem, ...props }: Props) {
               <Item
                 item={item}
                 position={index}
-                onItemPress={onItemPress}
+                onItemPress={activateItem}
                 onItemIndicatorPress={onItemIndicatorPress}
                 onItemLayoutCallback={onItemLayoutCallback}
                 itemHeight={refsData.itemHeights[index]}
@@ -149,9 +164,7 @@ function Outliner({ renderItem, ...props }: Props) {
             getItemLayout={getItemLayout}
             onScroll={Animated.event(
               [{ nativeEvent: { contentOffset: { y: animatedValues.scroll } } }],
-              { useNativeDriver: true,
-                listener: onScrollEventCallback
-              }
+              { useNativeDriver: true, listener: onScrollEventCallback }
             )}
             {...props}
           />
@@ -192,17 +205,14 @@ function Outliner({ renderItem, ...props }: Props) {
               >
                 <ItemDraggable
                   onAddButtonPress={createNewItem}
-                  onItemPress={onItemPress}
+                  onItemPress={activateItem}
                   onItemIndicatorPress={onItemIndicatorPress}
                   renderItem={renderItem}
                   ref={draggableItemRef}
-                  focus={(index) => {
-                    console.tron.debug(index)
-                    flatlistRef.current.getNode().scrollToIndex({
-                      index,
-                      viewPosition: 0.2
-                    })
-                  }}
+                  focus={focusItem}
+                  activateItem={activateItem}
+                  deleteItems={props.deleteItems}
+                  changeItems={props.changeItems}
                   refs={refs}
                   {...itemsData}
                 />

@@ -38,20 +38,33 @@ const createState = () => ({
 class ItemDraggable extends Component<Props, State> {
   state = createState()
 
+  deactivateEditState = () => {
+    if (this.state.itemState !== 'edit') return
+
+    // Back to previous position if edited item have an empty headline
+    if (!this.state.item.headline) {
+      this.props.deleteItems([this.state.position])
+      this.props.activateItem(this.state.position)
+    } else {
+      this.props.changeItems([this.state.item])
+    }
+
+    // Animations
+    this.setState({
+      itemState: 'dragged',
+    })
+
+    setTimeout(() => {
+      this.setState({
+        itemState: 'active',
+      })
+      LayoutAnimation.configureNext(foldAnimation)
+    }, 1)
+  }
+
   componentWillMount = () => {
     this._keyboardDidHideListener = Keyboard.addListener('keyboardDidHide', () => {
-      // Run animations only in case keyboard was hidden manually
-      if (this.state.itemState === 'edit') {
-        this.setState({
-          itemState: 'dragged',
-        })
-        setTimeout(() => {
-          this.setState({
-            itemState: 'active',
-          })
-          LayoutAnimation.configureNext(foldAnimation)
-        }, 1)
-      }
+      this.deactivateEditState()
     })
   }
 
@@ -92,19 +105,22 @@ class ItemDraggable extends Component<Props, State> {
     }))
   }
 
-  renderAddButtons = () => {
+  renderAddButtons = (position: 'top' | 'bottom') => {
     const { onAddButtonPress } = this.props
     return (
       <View
-        style={{
-          position: 'absolute',
-          top: -15,
-          zIndex: 4,
-          left: 200 - INDENT_SIZE * this.state.level,
-        }}
+        style={[
+          {
+            position: 'absolute',
+            zIndex: 4,
+            flexDirection: 'row',
+            left: 200 - INDENT_SIZE * this.state.level,
+          },
+          { [position]: -15 },
+        ]}
       >
-        <TouchableOpacity onPress={onAddButtonPress}>
-          <Icon name="plusCircle" style={{ margin: 5 }} />
+        <TouchableOpacity onPress={() => onAddButtonPress(position)}>
+          <Icon name="plusCircle" style={[{ margin: 5 }, styles[`h${this.state.level}C`]]} />
         </TouchableOpacity>
       </View>
     )
@@ -124,7 +140,7 @@ class ItemDraggable extends Component<Props, State> {
           hasChildren={this.state.hasChildren}
           hasHiddenChildren={this.state.hasHiddenChildren}
         />
-        <View style={styles.column}>
+        <View style={[styles.column, { justifyContent: 'center', height }]}>
           <TouchableOpacity onPress={this.edit}>
             <EntryHeadline
               colorized={true}
@@ -132,6 +148,20 @@ class ItemDraggable extends Component<Props, State> {
               {...item}
               level={level}
               position={position}
+              onSubmit={({ nativeEvent: { text } }) => {
+                this.setState((prevState) => ({
+                  item: {
+                    ...prevState,
+                    headline: text
+                  }
+                }))
+                this.props.changeItems([
+                  {
+                    ...this.state.item,
+                    headline: text,
+                  },
+                ])
+              }}
             />
             {item.content && itemState === 'active' && (
               <View>
@@ -141,7 +171,8 @@ class ItemDraggable extends Component<Props, State> {
               </View>
             )}
           </TouchableOpacity>
-          {itemState === 'active' && this.renderAddButtons()}
+          {itemState === 'active' && this.renderAddButtons('top')}
+          {itemState === 'active' && this.renderAddButtons('bottom')}
         </View>
       </View>
     )
