@@ -1,5 +1,5 @@
 ---
-to: src/view/components/<%= h.changeCase.param(name) %>/item.tsx
+to: src/view/components/<%= h.changeCase.param(name) %>/Item.tsx
 ---
 import React from 'react'
 import { Text, TouchableOpacity } from 'react-native'

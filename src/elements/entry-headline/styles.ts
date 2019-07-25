@@ -50,4 +50,8 @@ export default StyleSheet.create({
   link: {
     textDecorationLine: 'underline',
   },
+  file: {
+    fontSize: Fonts.size.h4,
+    fontWeight: 'bold',
+  },
 })

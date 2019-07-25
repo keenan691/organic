@@ -1,5 +1,5 @@
-import { applyChanges } from './helpers'
-import { getLastDescendantPosition } from './selectors';
+import {getLastDescendantPosition} from "./useItems";
+import { applyChanges } from "./applyChanges";
 
 const ordering = ['1', '2', '3', '4', '5']
 const levels = [1, 2, 3, 1, 1]

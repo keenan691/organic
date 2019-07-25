@@ -1,11 +1,22 @@
-import { range, pipe, map, cond, all, equals, T } from 'ramda'
-import { getLastDescendantPosition } from './selectors'
-import { BooleanDict } from 'components/entry-list/types'
+import { useState, useLayoutEffect } from 'react'
+import { BooleanDict } from '../entry-list/types'
+import { all, equals, map, pipe, range, T, cond } from 'ramda'
+import {getLastDescendantPosition} from "./useItems";
+import { foldAnimation } from './animations';
+import { LayoutAnimation } from 'react-native';
 
-export const hasChildren = (
-  itemPosition: number,
-  levels: number[]
-) => {
+export function useVisibility(ordering: string[]): [any, any] {
+  const [hideDict, setItemVisibility] = useState(() => ordering.reduce((acc, id) => ({ ...acc, [id]: false }), {}))
+
+  useLayoutEffect(() => {
+    LayoutAnimation.configureNext(foldAnimation)
+  }, [hideDict])
+
+  return [hideDict, setItemVisibility]
+
+}
+
+export const hasChildren = (itemPosition: number, levels: number[]) => {
   const itemLevel = levels[itemPosition]
   return itemPosition < levels.length && levels[itemPosition + 1] > itemLevel
 }
@@ -20,7 +31,9 @@ export const hasHiddenChildren = (
   let position = itemPosition
   do {
     position += 1
-    if (levels[position] === childLevel && hiddenDict[ordering[position]]) return true
+    if (levels[position] === childLevel && hiddenDict[ordering[position]]) {
+      return true
+    }
   } while (levels[position] > levels[itemPosition])
   return false
 }
@@ -37,7 +50,6 @@ const setNonVisibility = (positions: number[], ordering: string[], hiddenDict: B
     ...changes,
   }
 }
-
 const modifyDetailsLevel = (direction: 'inc' | 'dec') => (
   ordering: string[],
   levels: number[],
@@ -46,7 +58,9 @@ const modifyDetailsLevel = (direction: 'inc' | 'dec') => (
   const visibleLevels = levels.filter((_, position) => !hiddenDict[ordering[position]])
   const maxLevel = Math.max(...visibleLevels)
 
-  if (direction === 'dec' && maxLevel === 1) return hiddenDict
+  if (direction === 'dec' && maxLevel === 1) {
+    return hiddenDict
+  }
 
   const isVisible = {
     dec: (level: number) => level < maxLevel,
@@ -63,7 +77,6 @@ const modifyDetailsLevel = (direction: 'inc' | 'dec') => (
 
   return newVisibillity
 }
-
 export const moreDetails = modifyDetailsLevel('inc')
 export const lessDetails = modifyDetailsLevel('dec')
 
@@ -76,7 +89,9 @@ export function cycleItemVisibility(
   const lastDescendantPosition = getLastDescendantPosition(levels, itemPosition)
   const descendantsPositions = range(itemPosition + 1, lastDescendantPosition + 1)
 
-  if (descendantsPositions.length === 0) return hiddenDict
+  if (descendantsPositions.length === 0) {
+    return hiddenDict
+  }
 
   const childrenPositions = descendantsPositions.filter(
     position => levels[position] === levels[itemPosition] + 1

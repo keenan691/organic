@@ -3,7 +3,6 @@ import { Text, View } from 'react-native'
 import { Icon } from 'elements';
 
 import ActionButton from 'react-native-action-button'
-import styles from './styles';
 
 type Props = {} & typeof defaultProps
 

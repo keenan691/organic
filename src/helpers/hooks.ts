@@ -1,6 +1,9 @@
-import { useState, useRef, useEffect, useReducer, useCallback } from 'react'
-import { omit, pipe, filter, compose, nth, complement, isNil } from 'ramda'
-import { objectDiff } from 'helpers/object';
+import {Reducer, useCallback, useEffect, useReducer, useRef} from 'react'
+import {complement, compose, filter, isNil, nth} from 'ramda'
+import {objectDiff} from 'helpers/object';
+import {Action} from "../components/entry-list/types";
+import {logAction} from "./debug";
+
 
 export function usePrevious(value) {
   const ref = useRef();
@@ -54,4 +57,23 @@ export function useStateMonitor(state: {}) {
   }
 
   prevStateRef.current = state
+}
+
+export function useDebugReducer<R extends Reducer<S, F>, S, F>(red: R, initS: S, init: F): [S, (action: Action) => void] {
+  // TODO save last dispatched action of type interactive
+  // TODO create custom action type with diaplay name
+  // TODO toggle monitoring
+  const [state, dispatch] = useReducer(red, initS, init);
+
+  const wrappedDispatch = useCallback(action => {
+    const updatedAction = {
+      ...action,
+      meta: {dispatch: wrappedDispatch},
+    };
+    __DEV__ &&
+    logAction(updatedAction);
+    return dispatch(updatedAction);
+  }, []);
+
+  return [state, wrappedDispatch];
 }

@@ -1,4 +1,4 @@
-import React from 'react'
+import React, { memo } from 'react'
 import { Text, TouchableOpacity } from 'react-native'
 import styles from './styles'
 
@@ -16,4 +16,4 @@ function Empty({ itemName, message }: EmptyProps) {
   )
 }
 
-export default Empty
+export default memo(Empty)

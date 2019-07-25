@@ -6,9 +6,9 @@ import {
   State,
 } from 'react-native-gesture-handler'
 import { map, filter, bufferTime } from 'rxjs/operators'
-import { lessDetails, moreDetails } from './visibility'
 import { Refs } from '.'
 import { ItemData } from './types'
+import {lessDetails, moreDetails} from "./useVisibility";
 
 export function usePinchGesture(
   { levels, ordering, hideDict }: ItemData,

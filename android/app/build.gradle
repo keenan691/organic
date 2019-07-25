@@ -145,6 +145,7 @@ android {
 }
 
 dependencies {
+    implementation project(':react-native-reanimated')
     implementation project(':react-native-text-size')
     implementation project(':react-native-gesture-handler')
     implementation project(':realm')

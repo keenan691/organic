@@ -3,6 +3,7 @@ package com.from.chaos.to.organization.organic;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.swmansion.reanimated.ReanimatedPackage;
 import com.github.amarcruz.rntextsize.RNTextSizePackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import io.realm.react.RealmReactPackage;
@@ -48,6 +49,7 @@ public class MainApplication extends NavigationApplication {
           new RNFSPackage(),
           new RNTextSizePackage(),
           new RNGestureHandlerPackage(),
+          new ReanimatedPackage(),
           new ReactNativeDocumentPicker(),
           new ReactNativeDialogsPackage()
       );

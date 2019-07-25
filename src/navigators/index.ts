@@ -6,6 +6,10 @@ import { appConfig } from 'config/app'
 import { registerScreens } from 'view/screens'
 import { showSplash } from './navigation'
 import store from 'store'
+import { UIManager } from 'react-native';
+
+UIManager.setLayoutAnimationEnabledExperimental &&
+UIManager.setLayoutAnimationEnabledExperimental(true)
 
 const app = () => {
   Navigation.events().registerAppLaunchedListener(() => {

@@ -5,6 +5,7 @@ import { INDENT_WIDTH } from 'components/entry-list/constants'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { Icon } from 'elements'
 import { usePrevious } from 'helpers/hooks'
+import { getItemColor } from 'view/themes/org-colors';
 
 type Props = {
   level: number
@@ -22,10 +23,11 @@ const defaultProps = {
 }
 
 function ItemIndicator(props: Props) {
-  const { flatDisplay, level, hasHiddenChildren, baseLevel, position } = props
+  const { flatDisplay, level, hasHiddenChildren, baseLevel, position, type } = props
   const width = flatDisplay ? INDENT_WIDTH : INDENT_WIDTH * level
   const iconName = props.iconName || getIconName(props) || null
 
+  const color = getItemColor({ level, type})
   const iconSpinValue = useRef(new Animated.Value(0))
   const iconSpinInterpolated = useRef(
     iconSpinValue.current.interpolate({
@@ -59,10 +61,10 @@ function ItemIndicator(props: Props) {
       <View style={[styles.headlineIndicatorWrapper, { width }]}>
         <Animated.View
           style={[
-            { transform: [{ rotate: iconSpinInterpolated.current }] },
+            {
+              backgroundColor: color,
+              transform: [{ rotate: iconSpinInterpolated.current }] },
             styles.headlineIndicator,
-            styles.headlineIndicatorHasContent,
-            styles[`h${props.level}BG`],
           ]}
         >
           {iconName && (
@@ -79,8 +81,9 @@ function ItemIndicator(props: Props) {
 
 ItemIndicator.defaultProps = defaultProps
 
-const getIconName = (props: Props) => {
-  if (props.hasChildren) return 'angleRight'
+const getIconName = ({hasChildren, type}: Props) => {
+  if (type==='workspace') return  'genderless'
+  if (hasChildren) return 'angleRight'
   return
 }
 

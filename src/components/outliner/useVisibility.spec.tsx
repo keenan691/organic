@@ -1,4 +1,4 @@
-import { cycleItemVisibility, moreDetails, lessDetails } from './visibility'
+import {cycleItemVisibility, lessDetails, moreDetails} from "./useVisibility";
 
 const ordering = ['1', '2', '3', '4', '5']
 const levels = [1, 2, 3, 1, 1]

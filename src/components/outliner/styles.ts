@@ -13,7 +13,7 @@ export default StyleSheet.create({
       position: 'absolute',
       zIndex: 1,
   },
-  draggable: {
+  draggableWrapper: {
     width: '100%',
     position: 'absolute',
     backgroundColor: Colors.lightGray,
@@ -49,8 +49,6 @@ export default StyleSheet.create({
   headlineIndicatorIcon: {
     color: Colors.white,
     marginTop: -4,
-  },
-  headlineIndicatorHasContent: {
   },
   contentPreviewText: {
     ...Fonts.style.label,

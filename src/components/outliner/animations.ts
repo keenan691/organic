@@ -1,10 +1,10 @@
 import { Animated } from "react-native";
-import { getDraggableToTargetOffset, getItemLevelOffset } from "./selectors";
 import { LayoutAnimation } from "react-native";
 import { AnimatedValues, Refs } from ".";
+import {getDraggableToTargetOffset, getItemLevelOffset} from "./useItems";
 
 export const foldAnimation = {
-  duration: 80,
+  duration: 300,
   update: {
     property: LayoutAnimation.Properties.scaleXY,
     type: LayoutAnimation.Types.easeOut,

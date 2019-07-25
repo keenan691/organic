@@ -7,12 +7,12 @@ import {
 } from 'react-native-gesture-handler'
 import { map, filter, bufferCount } from 'rxjs/operators'
 import { LEVEL_SHIFT_TRIGGER } from './constants'
-import { applyChanges} from './helpers'
-import { getItemInfo } from './selectors'
 import { endDragAnimation, startDragAnimation, startShiftLevelAnimation } from './animations'
 import { Refs, AnimatedValues } from '.'
+import { applyChanges } from "./applyChanges";
 import { ItemData } from './types'
-import ItemDraggable from './item-draggable';
+import ItemDraggable from './ItemDraggable'
+import { getItemInfo } from './useItems'
 
 export function usePanGesture(
   { levels, ordering, hideDict }: ItemData,
@@ -29,7 +29,11 @@ export function usePanGesture(
   )
 
   const onPanCallback = useCallback(event => pan$.next(event), [levels, ordering, hideDict])
-  const onPanHandlerStateCallback = useCallback(event => panState$.next(event), [ordering, levels, hideDict])
+  const onPanHandlerStateCallback = useCallback(event => panState$.next(event), [
+    ordering,
+    levels,
+    hideDict,
+  ])
 
   const targetHasChanged$ = pan$.pipe(
     map(({ absoluteY }) => absoluteY),
@@ -96,19 +100,19 @@ export function usePanGesture(
 
   dragStart$.subscribe(() => {
     draggableRef.current.setState({
-      itemState: 'dragged'
+      itemState: 'dragged',
     })
     startDragAnimation(animatedValues)
   })
 
   dragEnd$.subscribe(() => {
     draggableRef.current.setState({
-      itemState: 'inactive'
+      itemState: 'inactive',
     })
     endDragAnimation(animatedValues, data, ordering, hideDict)
     animatedValues.targetIndicator.opacity.setValue(0.01)
     data.draggable.levelOffset = 0
-    const [newOrdering, newLevels] = applyChanges( data, ordering, levels )
+    const [newOrdering, newLevels] = applyChanges(data, ordering, levels)
     setOrdering(newOrdering)
     setLevels(newLevels)
   })

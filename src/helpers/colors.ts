@@ -1,3 +1,4 @@
+
 const measure = (text = 'perf: ', fun) => (...args) => {
   const start = Date.now();
   const res = fun(...args);

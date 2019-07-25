@@ -21,3 +21,14 @@ const repeat = (maxLevel: number, colors: any[]) =>
   )(range(0, Math.floor(maxLevel / colors.length)))
 
 export const levelColors = repeat(15, orgHeadersColors)
+
+export const getItemColor = ({type, level}) => {
+  switch (type) {
+    case 'file':
+      return Colors.special
+case 'workspace':
+      return Colors.special
+    default:
+      return levelColors[level-1]
+  }
+}

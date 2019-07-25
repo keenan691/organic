@@ -5,26 +5,34 @@ import styles from './styles'
 import { OrgEntry } from 'core/entries/store/types'
 import { TextInput } from 'react-native-gesture-handler'
 import { Colors } from 'view/themes';
+import { getItemColor } from 'view/themes/org-colors';
 
 type Props = {
   category: string
   now?: string
   baseLevel?: number
-  fontSize:  number
   onSubmit?: (text: string ) => void
 } & OrgEntry &
   typeof defaultProps
 
 const defaultProps = {
   showDetails: false,
-  colorized: true,
   highlighted: false,
-  editable: false
+  editable: false,
+  fontSize:  14,
+  type: 'headline' as 'headline' | 'project' | 'habit' | 'task' | 'file' | 'workspace',
 }
 
+
 function EntryHeadline(props: Props) {
-  const { fontSize, level, headline } = props
-  const textStyles = [styles[`h${level}C`], fontSize && {fontSize}]
+  const { headline, type, level } = props
+  const textStyles = [{ color: getItemColor({level, type})}]
+
+  switch (type) {
+    case 'file':
+      textStyles.push(styles.file)
+      break;
+  }
 
   const [text, setText] = useState(props.headline)
 
@@ -43,7 +51,7 @@ function EntryHeadline(props: Props) {
           value={text}
           selectTextOnFocus
           autoFocus
-        selectionColor={Colors.darkerGray}
+          selectionColor={Colors.darkerGray}
         />
       ) : (
         <Text style={textStyles}>{props.headline}</Text>

@@ -1,4 +1,6 @@
 rootProject.name = 'Organic'
+include ':react-native-reanimated'
+project(':react-native-reanimated').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-reanimated/android')
 include ':react-native-text-size'
 project(':react-native-text-size').projectDir = new File(rootProject.projectDir, '../node_modules/react-native-text-size/android')
 include ':react-native-gesture-handler'

@@ -19,4 +19,10 @@ export default StyleSheet.create({
   commandMenuItemDisabled: {
     color: Colors.separator,
   },
+  scene: {
+    flex: 1,
+  },
+  modeline: {
+    backgroundColor: Colors.violet,
+  },
 })

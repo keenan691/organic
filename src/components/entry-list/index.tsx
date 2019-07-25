@@ -1,201 +1,163 @@
-import React, { useRef, useLayoutEffect, useEffect, useCallback, memo, useMemo } from 'react'
-import { Text, FlatList, View, UIManager, LayoutAnimation } from 'react-native'
+import React, { useRef, useLayoutEffect, useEffect, useCallback } from 'react'
+import { View, LayoutAnimation, Dimensions, Text } from 'react-native'
+import { TabView, TabBar } from 'react-native-tab-view'
 
 import { Separator, Empty } from 'elements'
-import EntryListItem from './item'
 import STRINGS from 'view/constants/strings'
-import { OrgEntry } from 'core/entries/store/types'
-import { Mode, State, EntryDict, Context, Refs } from './types'
+import { Perspective, EntryDict } from './types'
 import styles from './styles'
-import CommandMenu from './elements/command-menu'
-import reducer from './reducers'
-import selectors from './selectors'
-import { useMyReducer } from './hooks'
 import actions from './actions'
-import { safeGet } from 'helpers/functions'
-import { focusItemAnimation, contentAnimation } from './animations'
+import { focusItemAnimation } from './animations'
 import { useMeasure, useStateMonitor } from 'helpers/hooks'
-import initialState from './state'
-import { TapGestureHandler, RectButton } from 'react-native-gesture-handler'
-import ReorderableTreeFlatList from 'components/outliner'
-import { map } from 'ramda'
+import Outliner from 'components/outliner'
+import { useUnifiedLists } from './useUnifiedLists'
+import { UnifiedListsHOC } from './UnifiedListsHOC'
+import { useData } from './useData'
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler'
+import { itemKeyExtractor } from 'helpers/functions'
+import CircularMenu from 'experiments/circular-menu';
+import BatchEditActions from 'experiments/batch-edit-actions';
 
-type Props = {
-  items: EntryDict
-  onItemPress: (id: string) => void
-  onItemLongPress: (id: string) => void
-  visitedEntry?: OrgEntry
+export type Props = {
+  entries: EntryDict
 } & typeof defaultProps
 
 const defaultProps = {
-  mode: 'outline' as Mode,
-  filters: {},
+  mode: 'sdf',
+  perspective: 'outline' as Perspective,
 }
 
-UIManager.setLayoutAnimationEnabledExperimental &&
-  UIManager.setLayoutAnimationEnabledExperimental(true)
-
-const EmptyComponent = () => (
-  <Empty itemName={STRINGS.entry.namePlural} message={STRINGS.entry.emptyDescription} />
-)
-
-export const EntryListContext = React.createContext<Context>({
-  dispatch: () => null,
-})
-
-const keyExtractor = item => item.id
-
 function EntryList(props: Props) {
-  const bench = useMeasure('EntryList')
-  /**
-   * State
-   */
-  // TODO może kopiowanie propsa data spowalnia wybieranie - sprawdzić jak to wpływa na wydajność
-  // jeśli trzeba będzie to użyć immera i sprawdzić, datę można tez prznościć w metadanych akcji
-  // mój dispatcher możeto automatycznie robić
-  const [state, dispatch] = useMyReducer(reducer, initialState, (state: typeof initialState) => {
-    const ordering = Object.keys(props.items).sort(key => props.items[key].position)
-    return {
-      ...state,
-      ordering,
-      levels: ordering.map(id => props.items[id].level),
-      itemsDict: props.items,
-      data: props.items,
-      mode: 'outline',
-    }
-  })
+  const tabsRef = useRef({})
 
-  /**
-   * Selectors
-   */
-  const ordering = state.ordering
-  const levels = state.levels
-  const focusedEntry = selectors.getFocusedEntry(state)
-  const focusedEntryId = safeGet('id', focusedEntry)
-  /* const isEntryFocused = Boolean(focusedEntryId) */
-  const isEntryFocused = false
-  const isContentExpanded = false
+  const { unifiedListsApiRef, activeRoute, navigationState } = useUnifiedLists(tabsRef)
 
-  /* const isGlobalMenuVisible = !isEntryFocused */
-  const isGlobalMenuVisible = false
-
-  /**
-   * Callbacks
-   */
-  const setOrdering = useCallback(ordering => {
-    return dispatch(actions.setEntriesOrdering(ordering))
-  }, [])
-
-  const setLevels = useCallback(levels => {
-    return dispatch(actions.setEntriesLevels(levels))
-  }, [])
-
-  const addItem = useCallback((item) => {
-    return dispatch(actions.addItem(item))
-  }, [])
-
-  const deleteItems = useCallback((positions:  number[]) => {
-    return dispatch(actions.deleteItems(positions))
-  }, [])
-
-  const changeItems = useCallback((itemsChanges) => {
-    return dispatch(actions.changeItems(itemsChanges))
-  }, [])
-
-  /**
-   * Refs
-   */
-  const initialRefs: Refs = {
-    entry: {
-      commandMenuPosition: 'bottom',
-      heights: {},
-    },
-    commands: {
-      get: () => [],
-      commandMenuOffsets: {},
-      setMenuOffset: newOffset => console.tron.debug(newOffset),
-    },
-    dispatch,
+  const [entriesState, useEntriesAction, entryActions, entryDispatch] = useData(
+    props.entries,
+    unifiedListsApiRef
+  )
+  const entriesProps = {
+    itemDict: entriesState.itemsDict,
+    levels: entriesState.levels,
+    ordering: entriesState.ordering,
+    addItem: useEntriesAction(actions.addItem),
+    changeItems: useEntriesAction(actions.changeItems),
+    deleteItems: useEntriesAction(actions.deleteItems),
+    setLevels: useEntriesAction(actions.setEntriesLevels),
+    setOrdering: useEntriesAction(actions.setEntriesOrdering),
   }
 
-  const refs = useRef<Refs>(initialRefs)
+  const [workspacesState, useWorkspacesAction, workspaceActions, workspaceDispatch] = useData(
+    props.workspaces,
+    unifiedListsApiRef
+  )
 
-  /**
-   * Effects
-   */
-  useEffect(() => {
-    // Update refs
-    const lastFocusedEntry = selectors.getLastFocusedEntry(state)
-    const lastFocusedEntryPosition = safeGet('position', lastFocusedEntry)
-    const focusedEntryPosition = safeGet('position', focusedEntry)
-    const commandMenuPosition = lastFocusedEntryPosition < focusedEntryPosition ? 'top' : 'bottom'
+  const workspacesProps = {
+    itemDict: workspacesState.itemsDict,
+    levels: workspacesState.levels,
+    ordering: workspacesState.ordering,
+    addItem: useWorkspacesAction(actions.addItem),
+    changeItems: useWorkspacesAction(actions.changeItems),
+    deleteItems: useWorkspacesAction(actions.deleteItems),
+    setLevels: useWorkspacesAction(actions.setEntriesLevels),
+    setOrdering: useWorkspacesAction(actions.setEntriesOrdering),
+    openHandler: useWorkspacesAction(actions.openItem, (item: Item) => {
+      /* if (item.type === 'workspace')
+       *   unifiedListsApiRef.current.dispatch(actions.activateNextRoute()) */
+    }),
+  }
 
-    refs.current.entry.commandMenuPosition = commandMenuPosition
-  })
-
-  useLayoutEffect(() => {
-    LayoutAnimation.configureNext(focusItemAnimation())
-  }, [focusedEntryId, ordering])
-
-  useLayoutEffect(() => {
-    LayoutAnimation.configureNext(contentAnimation(isContentExpanded))
-  }, [state.contentVisibilityDict])
-
-  /**
-   * Dev
-   */
-  // XXX Dev starup actions and measurenment tools
-  /* useEffect(() => {
-   *   const entryKeys = Object.keys(props.items)
-   *   dispatch(
-   *     actions.onItemPress({
-   *       entryId: props.items[entryKeys[2]].id,
-   *     })
-   *   )
-   * }, [])
-   */
-  const beforeOutlineActivationCallback = useCallback(() => {
-    /* dispatch(actions.blurItem()) */
-  }, [])
-
-  useStateMonitor(state)
-  bench.step('rendering starts')
+  const onIndexChangeCallback = useCallback(
+    index => unifiedListsApiRef.current.dispatch(actions.onIndexChange(index)),
+    []
+  )
 
   return (
-    <EntryListContext.Provider value={refs}>
-      <View style={styles.container}>
-        <ReorderableTreeFlatList
-          itemDict={state.itemsDict}
-          ordering={ordering}
-          levels={levels}
-          setOrdering={setOrdering}
-          setLevels={setLevels}
-          deleteItems={deleteItems}
-          changeItems={changeItems}
-          addItem={addItem}
-          ListHeaderComponent={<CommandMenu type="global" show={isGlobalMenuVisible} />}
-          renderItem={props => (
-            <EntryListItem
-              {...props}
-              showContent={state.contentVisibilityDict[props.item.id]}
-              isFocused={state.isFocused && state.jumpList[0] === props.item.id}
-              isFocused={false}
-            />
-          )}
-          ItemSeparatorComponent={Separator}
-          beforeOutlineActivation={beforeOutlineActivationCallback}
-          keyExtractor={keyExtractor}
-          ListEmptyComponent={EmptyComponent}
-          initialNumToRender={30}
-          maxToRenderPerBatch={30}
-          windowSize={3}
-          updateCellsBatchingPeriod={200}
-        />
-      </View>
-    </EntryListContext.Provider>
+    <View style={styles.container}>
+      <TabView
+        navigationState={navigationState}
+        swipeEnabled={true}
+        lazy={true}
+        renderLazyPlaceholder={() => <Text>preload</Text>}
+        tabBarPosition="top"
+        renderTabBar={props => <TabBar style={styles.modeline} {...props} />}
+        onIndexChange={onIndexChangeCallback}
+        initialLayout={{ width: Dimensions.get('window').width }}
+        renderScene={({ route, position }) => {
+          const controlProps = {
+            isActiveRoute: route.key === activeRoute.key,
+            unifiedListsApiRef,
+            route,
+            position,
+          }
+
+          switch (route.key) {
+            case 'workspace':
+              return (
+                <View style={[styles.scene]}>
+                  <ControlledOutliner
+                    {...workspacesProps}
+                    {...controlProps}
+                    canAddItems={false}
+                    ItemSeparatorComponent={Separator}
+                    keyExtractor={itemKeyExtractor}
+                    ListEmptyComponent={EmptyList}
+                    initialNumToRender={30}
+                    maxToRenderPerBatch={30}
+                    windowSize={3}
+                    updateCellsBatchingPeriod={200}
+                    mode="outliner"
+                  />
+                </View>
+              )
+            case 'outliner':
+              return (
+                <View style={[styles.scene]}>
+                  <ControlledOutliner
+                    {...entriesProps}
+                    {...controlProps}
+                    canAddItems={true}
+                    ItemSeparatorComponent={Separator}
+                    keyExtractor={itemKeyExtractor}
+                    ListEmptyComponent={EmptyList}
+                    initialNumToRender={30}
+                    maxToRenderPerBatch={30}
+                    windowSize={3}
+                    updateCellsBatchingPeriod={200}
+                    mode="outliner"
+                  />
+                </View>
+              )
+            case 'visitor':
+              return (
+                <View style={[styles.scene]}>
+                  <ControlledOutliner
+                    {...entriesProps}
+                    {...controlProps}
+                    ItemSeparatorComponent={Separator}
+                    keyExtractor={itemKeyExtractor}
+                    ListEmptyComponent={EmptyList}
+                    initialNumToRender={30}
+                    maxToRenderPerBatch={30}
+                    windowSize={3}
+                    updateCellsBatchingPeriod={200}
+                    mode="reader"
+                  />
+                </View>
+              )
+          }
+        }}
+      />
+    </View>
   )
 }
 
 EntryList.defaultProps = defaultProps
 
-export default EntryList
+const EmptyList = (
+  <Empty itemName={STRINGS.entry.namePlural} message={STRINGS.entry.emptyDescription} />
+)
+
+const ControlledOutliner = UnifiedListsHOC(Outliner)
+
+export default gestureHandlerRootHOC(EntryList)
