@@ -1,15 +1,13 @@
 import React, { useCallback, memo } from 'react'
 import { View, LayoutChangeEvent, LayoutAnimation } from 'react-native'
 import { TouchableHighlight } from 'react-native-gesture-handler'
-import { BooleanDict } from 'components/entry-list/types'
+import { BooleanDict } from 'components/editor/types'
 import ItemIndicator from './ItemIndicator'
 import styles from './styles'
 import { Colors } from 'view/themes'
 import { ITEM_PADDING_VERTICAL, HEADLINE_FONT_SIZE } from './constants'
 import { EntryHeadline } from 'elements'
 import { hasChildren, hasHiddenChildren } from './useVisibility'
-import { foldAnimation } from './animations'
-import { levelColors } from 'view/themes/org-colors';
 
 type Props = {
   hideDict: BooleanDict
@@ -21,9 +19,6 @@ type Props = {
   onItemPress: (itemPosition: number) => void
   onItemLayoutCallback: (event: LayoutChangeEvent, itemId: string) => void
   position: number
-} & typeof defaultProps
-
-const defaultProps = {
 }
 
 function Item(props: Props) {
@@ -73,7 +68,5 @@ function Item(props: Props) {
     </TouchableHighlight>
   )
 }
-
-Item.defaultProps = defaultProps
 
 export default Item

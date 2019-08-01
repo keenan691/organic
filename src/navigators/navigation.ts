@@ -22,7 +22,7 @@ export const tabbedNavigation = () =>
               children: [
                 {
                   component: {
-                    name: <Screens>'Workspace',
+                    name: <Screens>'Splash',
                     passProps: {
                       text: 'This is Home',
                     },

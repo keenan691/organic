@@ -1,7 +1,7 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react-native'
 
-import FileList from 'components/file-list'
+import FileList from 'experiments/file-list'
 import { createFileListItem } from 'helpers/test-object-generator'
 import moment from 'moment'
 

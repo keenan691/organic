@@ -9,7 +9,7 @@ import { HEADLINE_FONT_SIZE, INDENT_SIZE, ITEM_PADDING_VERTICAL } from './consta
 import { pipe, reduce, reduceWhile, uniq } from 'ramda'
 import { cycleItemVisibility, hasChildren, hasHiddenChildren } from './useVisibility'
 import { createSelector } from 'reselect'
-import { BooleanDict } from '../entry-list/types'
+import { BooleanDict } from '../editor/types'
 
 /**
  * Hook

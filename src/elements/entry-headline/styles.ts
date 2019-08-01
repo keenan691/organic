@@ -51,7 +51,7 @@ export default StyleSheet.create({
     textDecorationLine: 'underline',
   },
   file: {
-    fontSize: Fonts.size.h4,
-    fontWeight: 'bold',
+    color: Colors.fileText,
+    ...Fonts.style.h4,
   },
 })

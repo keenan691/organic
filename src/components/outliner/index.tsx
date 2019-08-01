@@ -1,9 +1,15 @@
-import React, { memo, useLayoutEffect, useRef, forwardRef, useImperativeHandle, useCallback } from 'react'
+import React, {
+  memo,
+  useRef,
+  forwardRef,
+  useImperativeHandle,
+  useCallback,
+} from 'react'
 import { Animated, LayoutAnimation, Text, View } from 'react-native'
 import { FlatList, PanGestureHandler, PinchGestureHandler } from 'react-native-gesture-handler'
 
+import { Separator, Empty, Icon } from 'elements'
 import styles from './styles'
-import { useMeasure } from 'helpers/hooks'
 import { foldAnimation } from './animations'
 import ItemFocused from './ItemFocused'
 import Item from './Item'
@@ -12,25 +18,22 @@ import { usePinchGesture } from './usePinchGesture'
 import { useScroll } from './useScroll'
 import { usePanGesture } from './usePanGesture'
 import { useVisibility } from './useVisibility'
-import ItemReader from './ItemReader'
+import { itemKeyExtractor } from 'helpers/functions'
+import STRINGS from 'view/constants/strings';
 
 type Props = {
   itemDict: object
   ordering: string[]
+  ItemComponent: (props: object) => JSX.Element
   levels: number[]
   addItem: (item: object) => void
   changeItems: any
   deleteItems: any
+  canAddItems: boolean
   setLevels: (levels: number[]) => void
   setOrdering: (ordering: string[]) => void
-  onChangeFocusedItem: ({ position: number, item: object}) => void
-} & typeof defaultProps &
-  React.ComponentProps<typeof FlatList>
-
-const defaultProps = {
-  mode: 'outliner' as 'outliner' | 'skeleton' | 'reader' | 'concept',
-  canAddItems: true,
-}
+  onChangeFocusedItem: ({ position: number, item: object }) => void
+} & React.ComponentProps<typeof FlatList>
 
 const createAnimatedValues = () => ({
   draggable: {
@@ -45,13 +48,27 @@ const createAnimatedValues = () => ({
   scroll: new Animated.Value(0),
 })
 
-function Outliner({ renderItem, ...props }: Props, ref) {
+function Outliner(
+  {
+    renderItem,
+    canAddItems = true,
+    ItemComponent = Item,
+    ItemSeparatorComponent = Separator,
+    keyExtractor = itemKeyExtractor,
+    ListEmptyComponent = EmptyList,
+    initialNumToRender=30,
+    maxToRenderPerBatch=30,
+    windowSize=3,
+    updateCellsBatchingPeriod=200,
+    ...props
+  }: Props,
+  ref
+) {
+
   useImperativeHandle(ref, () => ({
     focusItem,
     scrollToItem,
   }))
-
-  const bench = useMeasure('ReorderableTree')
 
   const {
     ordering,
@@ -61,7 +78,6 @@ function Outliner({ renderItem, ...props }: Props, ref) {
     changeItems,
     deleteItems,
     onChangeFocusedItem,
-    mode,
     openHandler,
   } = props
 
@@ -99,8 +115,8 @@ function Outliner({ renderItem, ...props }: Props, ref) {
   const draggableItemRef = useRef<ItemDraggable>()
   const flatlistRef = useRef<FlatList<{}>>()
 
-  const scrollToItem = (item: number |  string) => {
-    const index = typeof item === 'string' ? ordering.findIndex((id) => id === item) : item
+  const scrollToItem = (item: number | string) => {
+    const index = typeof item === 'string' ? ordering.findIndex(id => id === item) : item
     LayoutAnimation.configureNext(foldAnimation)
     flatlistRef.current.getNode().scrollToIndex({
       index,
@@ -152,9 +168,9 @@ function Outliner({ renderItem, ...props }: Props, ref) {
 
   const onScrollEventCallback = useScroll(refsData, animatedValues)
 
-  const onItemPress = useCallback((item) => {
+  const onItemPress = useCallback(item => {
     activateItem(item.position)
-  },[])
+  }, [])
 
   if (loadingItems) {
     return (
@@ -164,9 +180,6 @@ function Outliner({ renderItem, ...props }: Props, ref) {
     )
   }
 
-  bench.step('reorderable')
-
-  const OutlinerItem = mode === 'outliner' ? Item : ItemReader
   return (
     <ReorderableTreeFlatListContext.Provider value={refs}>
       <PinchGestureHandler
@@ -176,8 +189,7 @@ function Outliner({ renderItem, ...props }: Props, ref) {
         <View>
           <Animated.FlatList
             renderItem={({ item, index }) => (
-              <OutlinerItem
-                mode={props.mode}
+              <ItemComponent
                 item={item}
                 position={index}
                 onItemPress={onItemPress}
@@ -187,13 +199,20 @@ function Outliner({ renderItem, ...props }: Props, ref) {
                 {...itemsData}
               />
             )}
-            ref={flatlistRef}
+            ItemSeparatorComponent={ItemSeparatorComponent}
+            ListEmptyComponent={ListEmptyComponent}
             data={items}
-            getItemLayout={mode !== 'reader' && getItemLayout}
+            getItemLayout={getItemLayout}
+            initialNumToRender={initialNumToRender}
+            keyExtractor={keyExtractor}
+            maxToRenderPerBatch={maxToRenderPerBatch}
+            updateCellsBatchingPeriod={updateCellsBatchingPeriod}
+            windowSize={windowSize}
             onScroll={Animated.event(
               [{ nativeEvent: { contentOffset: { y: animatedValues.scroll } } }],
               { useNativeDriver: true, listener: onScrollEventCallback }
             )}
+            ref={flatlistRef}
             {...props}
           />
 
@@ -239,7 +258,7 @@ function Outliner({ renderItem, ...props }: Props, ref) {
                   ref={draggableItemRef}
                   focus={focusItem}
                   activateItem={activateItem}
-                  canAddItems={props.canAddItems}
+                  canAddItems={canAddItems}
                   deleteItems={deleteItems}
                   changeItems={changeItems}
                   refs={refs}
@@ -262,7 +281,9 @@ function Outliner({ renderItem, ...props }: Props, ref) {
   )
 }
 
-Outliner.defaultProps = defaultProps
+const EmptyList = (
+  <Empty itemName={STRINGS.entry.namePlural} message={STRINGS.entry.emptyDescription} />
+)
 
 export const ReorderableTreeFlatListContext = React.createContext<Context>({})
 

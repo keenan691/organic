@@ -1,7 +1,7 @@
 import Chance from 'chance'
 
-import { OrgFile } from 'core/files/store/types'
-import { OrgEntry } from 'core/entries/store/types'
+import { OrgFile } from 'modules/files/store/types'
+import { OrgEntry } from 'modules/entries/store/types'
 
 const chance = new Chance('seed')
 

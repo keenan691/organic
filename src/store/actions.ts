@@ -1,6 +1,6 @@
-import { startupActions } from 'core/startup'
-import { filesActions } from 'core/files'
-import { entriesActions } from 'core/entries'
+import { startupActions } from 'modules/startup'
+import { filesActions } from 'modules/files'
+import { entriesActions } from 'modules/entries'
 
 export default {
   ...entriesActions,

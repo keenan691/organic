@@ -3,7 +3,7 @@ import { Provider } from 'react-redux'
 import { getStorybookUI, configure } from '@storybook/react-native'
 
 import { appConfig } from 'config/app'
-import { registerScreens } from 'view/screens'
+import { registerScreens } from 'navigators/screens'
 import { showSplash } from './navigation'
 import store from 'store'
 import { UIManager } from 'react-native';
@@ -12,7 +12,7 @@ UIManager.setLayoutAnimationEnabledExperimental &&
 UIManager.setLayoutAnimationEnabledExperimental(true)
 
 const app = () => {
-  Navigation.events().registerAppLaunchedListener(() => {
+  Navigation.events().registerAppLaunchedListener(async () => {
     registerScreens({ store, Provider })
     Navigation.setDefaultOptions({
       topBar: { visible: true },

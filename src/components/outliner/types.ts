@@ -1,4 +1,4 @@
-import { NumberDict } from "components/entry-list/types";
+import { NumberDict } from "components/editor/types";
 
 export type ItemHeightCache = NumberDict
 

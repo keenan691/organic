@@ -22,7 +22,7 @@ export default StyleSheet.create({
   item: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1
+    flex: 1,
   },
   row: {
     flexDirection: 'row',

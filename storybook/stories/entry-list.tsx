@@ -1,7 +1,7 @@
 import React from 'react'
 import { storiesOf } from '@storybook/react-native'
 
-import EntryList from 'components/entry-list'
+import EntryList from 'components/editor'
 import { createEntryListItem } from 'helpers/test-object-generator'
 
 const generateRandomEntries = (num: number) => Array(num).fill(null).map(() => createEntryListItem())

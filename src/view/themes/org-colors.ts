@@ -25,7 +25,7 @@ export const levelColors = repeat(15, orgHeadersColors)
 export const getItemColor = ({type, level}) => {
   switch (type) {
     case 'file':
-      return Colors.special
+      return Colors.fileText
 case 'workspace':
       return Colors.special
     default:

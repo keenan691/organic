@@ -14,7 +14,7 @@ import { useObservable, useEventCallback } from 'rxjs-hooks'
 import { interval } from 'rxjs'
 import { map, tap, debounceTime, auditTime } from 'rxjs/operators'
 import { path, prop, of, reduceWhile } from 'ramda'
-import { OrgEntry } from 'core/entries/store/types'
+import { OrgEntry } from 'modules/entries/store/types'
 import { posix } from 'path'
 import Outliner from 'components/outliner';
 

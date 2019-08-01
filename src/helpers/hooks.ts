@@ -1,7 +1,7 @@
 import {Reducer, useCallback, useEffect, useReducer, useRef} from 'react'
 import {complement, compose, filter, isNil, nth} from 'ramda'
 import {objectDiff} from 'helpers/object';
-import {Action} from "../components/entry-list/types";
+import {Action} from "../components/editor/types";
 import {logAction} from "./debug";
 
 

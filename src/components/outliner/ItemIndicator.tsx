@@ -1,7 +1,7 @@
 import React, { memo, useEffect, useRef } from 'react'
 import { View, Animated, Easing } from 'react-native'
 import styles from './styles'
-import { INDENT_WIDTH } from 'components/entry-list/constants'
+import { INDENT_WIDTH } from 'components/editor/constants'
 import { TouchableOpacity } from 'react-native-gesture-handler'
 import { Icon } from 'elements'
 import { usePrevious } from 'helpers/hooks'
@@ -82,7 +82,7 @@ function ItemIndicator(props: Props) {
 ItemIndicator.defaultProps = defaultProps
 
 const getIconName = ({hasChildren, type}: Props) => {
-  if (type==='workspace') return  'genderless'
+  /* if (type==='workspace') return  'genderless' */
   if (hasChildren) return 'angleRight'
   return
 }
