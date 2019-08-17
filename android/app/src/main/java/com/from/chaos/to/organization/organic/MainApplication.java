@@ -8,7 +8,7 @@ import com.github.amarcruz.rntextsize.RNTextSizePackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
 import io.realm.react.RealmReactPackage;
 import com.rnfs.RNFSPackage;
-import com.reactnativedocumentpicker.ReactNativeDocumentPicker;
+import io.github.elyx0.reactnativedocumentpicker.DocumentPickerPackage; // Import package
 import com.aakashns.reactnativedialogs.ReactNativeDialogsPackage;
 import com.facebook.react.ReactNativeHost;
 import com.facebook.react.ReactPackage;
@@ -50,7 +50,7 @@ public class MainApplication extends NavigationApplication {
           new RNTextSizePackage(),
           new RNGestureHandlerPackage(),
           new ReanimatedPackage(),
-          new ReactNativeDocumentPicker(),
+          new DocumentPickerPackage(),
           new ReactNativeDialogsPackage()
       );
     }
