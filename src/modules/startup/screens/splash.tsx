@@ -16,8 +16,12 @@ function Splash() {
     const handleOpenURL = url => {
       console.tron.debug('handle url')
       console.tron.debug(url)
+      /* console.tron.debug(decodeURIComponent(url.url)) */
       RNFS.readFile(url.url).then(data => {
         console.tron.debug('file is red')
+      }).catch((error) => {
+        console.tron.debug('error')
+        console.tron.debug(error)
       })
     }
     /* console.tron.debug('HUJ')
@@ -36,6 +40,9 @@ function Splash() {
       const res = await DocumentPicker.pick({
         type: [DocumentPicker.types.allFiles],
       })
+      RNFS.readDir(RNFS.DocumentDirectoryPath).then((res) => {
+        console.tron.debug(res)
+      })
       console.log(
         res.uri,
         res.type, // mime type
@@ -43,6 +50,13 @@ function Splash() {
         res.size
       )
       console.tron.debug(res.uri)
+
+      RNFS.stat(res.uri).then(data => {
+        console.tron.debug('file is red')
+      }).catch((error) => {
+        console.tron.debug('error')
+        console.tron.debug(error)
+      })
     } catch (err) {
       if (DocumentPicker.isCancel(err)) {
         // User cancelled the picker, exit any dialogs or menus and move on
