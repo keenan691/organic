@@ -4,7 +4,7 @@ import { getStorybookUI, configure } from '@storybook/react-native'
 
 import { appConfig } from 'config/app'
 import { registerScreens } from 'navigators/screens'
-import { showSplash } from './navigation'
+import tabbedNavigation, { showSplash } from './navigation'
 import store from 'store'
 import { UIManager } from 'react-native';
 
@@ -18,7 +18,7 @@ const app = () => {
       topBar: { visible: true },
     })
 
-    showSplash()
+    tabbedNavigation()
   })
 }
 

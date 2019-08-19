@@ -3,6 +3,7 @@ package com.from.chaos.to.organization.organic;
 import android.app.Application;
 
 import com.facebook.react.ReactApplication;
+import com.RNFetchBlob.RNFetchBlobPackage;
 import com.swmansion.reanimated.ReanimatedPackage;
 import com.github.amarcruz.rntextsize.RNTextSizePackage;
 import com.swmansion.gesturehandler.react.RNGestureHandlerPackage;
@@ -51,7 +52,8 @@ public class MainApplication extends NavigationApplication {
           new RNGestureHandlerPackage(),
           new ReanimatedPackage(),
           new DocumentPickerPackage(),
-          new ReactNativeDialogsPackage()
+          new ReactNativeDialogsPackage(),
+          new RNFetchBlobPackage()
       );
     }
 
