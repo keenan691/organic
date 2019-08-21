@@ -1,7 +1,7 @@
 ---
 inject: true
 to: src/<%= moduleKind %>/<%= moduleName %>/types.ts
-after: export type State
+after: export type InitialState
 ---
 <% fieldName = name.split('-')[0] -%>
 <% fieldType = {

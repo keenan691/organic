@@ -26,19 +26,19 @@ type Props = {
 
 function Item(props: Props) {
   const {
-    headline,
-    onItemIndicatorPress,
-    onItemPress,
-    itemHeight,
-    onItemLayoutCallback,
-    position,
     hasChildren,
     hasContent,
     hasHiddenChildren,
-    level,
-    type,
+    headline,
+    id,
     isHidden,
-    id
+    itemHeight,
+    level,
+    onItemIndicatorPress,
+    onItemLayoutCallback,
+    onItemPress,
+    position,
+    type,
   } = props
 
   if (isHidden) return null
@@ -53,18 +53,18 @@ function Item(props: Props) {
         onLayout={event => onItemLayoutCallback(event, id)}
       >
         <ItemIndicator
-          position={position}
-          level={level}
-          type={type}
-          hasHiddenChildren={hasHiddenChildren}
           hasChildren={hasChildren}
+          hasHiddenChildren={hasHiddenChildren}
+          level={level}
           onPress={onItemIndicatorPress}
+          position={position}
+          type={type}
         />
         <EntryHeadline
-          type={type}
           headline={headline}
           level={level}
           position={position}
+          type={type}
         />
       </View>
     </TouchableHighlight>

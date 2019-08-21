@@ -3,7 +3,7 @@ import storage from 'redux-persist/lib/storage'
 const reduxPersistConfig = {
   key: 'root',
   storage,
-  whitelist: ['startup'],
+  whitelist: ['dev'],
 }
 
 export { reduxPersistConfig }

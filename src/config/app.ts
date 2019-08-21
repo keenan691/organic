@@ -1,11 +1,10 @@
 const appConfig = {
   checkExternalChangesInterval: 500000,
   logging: true,
-  showDevScreen: false,
+  showDevScreen: true,
   useReactotron: true,
-  useReduxPersist: false,
-  useStorybook: true ,
-  persistorPurge: true,
+  useReduxPersist: true,
+  persistorPurge: false,
   privacyPolicyUrl: 'http://195.116.235.220/privacy-polices/organic.html',
   readmeFilePath: 'org/readme.org',
 }

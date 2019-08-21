@@ -29,6 +29,8 @@ target 'organic' do
 
   pod 'RNVectorIcons', :path => '../node_modules/react-native-vector-icons'
 
+  pod 'react-native-randombytes', :path => '../node_modules/react-native-randombytes'
+
   target 'organicTests' do
     inherit! :search_paths
     # Pods for testing

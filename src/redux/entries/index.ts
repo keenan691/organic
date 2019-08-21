@@ -1,6 +1,6 @@
 import { globalizeSelectors } from 'store/helpers'
-import effects from './effects'
 import { REDUX_SLICE_NAME } from './constants';
+import effects from './effects'
 import selectors from './selectors';
 import reducers from './reducers';
 import actions from './actions';

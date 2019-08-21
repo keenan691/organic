@@ -1,0 +1,95 @@
+#+TITLE: structure
+
+* src
+** elements
+*** Headline
+*** Paragraph
+*** BottomSheet
+*** Modal
+*** Sdfd
+** components
+*** Outliner
+*** EntriesReader
+*** SourcesManager
+*** Timeliner
+** redux
+*** sources
+**** actions
+***** addSource
+show bottom sheet with possible sources:
+- webdav server
+- file explorer
+
+wait for user action
+***** removeSource
+- show warning dialog if file is not saved
+
+***** syncAllSources
+async
+cancel - paluse beetween files
+***** syncSource
+*** entries
+**** actions
+***** addSource
+show bottom sheet with possible sources:
+- webdav server
+- file explorer
+
+wait for user action
+***** removeSource
+- show warning dialog if file is not saved
+
+***** syncAllSources
+async
+cancel - paluse beetween files
+***** syncSource
+*** autocomplete
+*** search
+*** timeline
+*** note
+*** editor
+*** settings
+get possible settings for screen
+** screens
+*** sources
+**** AddSource
+props:
+type 'webdav'
+**** EditSource
+**** SourceSyncStatus
+is runned while app is loading
+- [ ] add pause button
+*** main
+spróbować przenieść do native navigation
+**** Workspaces
+**** Editor
+**** Reader
+*** startup
+**** PrivacyPolicy
+**** Splash
+*** search
+**** SearchResults
+**** SearchFilter
+*** settings
+**** Settings
+outliner
+*** timeline
+*** refile
+**** SelectTarget
+*** notetaker
+**** SelectCaptureTarget
+**** EnterNote
+*** reports
+**** StuckProjects
+** layouts
+*** editor
+*** splash
+*** app
+** themes
+*** base
+*** day
+*** night
+* _devscreens
+** components
+*** Outliner
+* _templates

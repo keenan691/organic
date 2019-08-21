@@ -1,5 +1,6 @@
-import React, { useCallback, useEffect } from 'react';
-import { Options, Navigation } from 'react-native-navigation';
+import React, {useCallback, useEffect} from 'react';
+import {Options, Navigation} from 'react-native-navigation';
+import {gestureHandlerRootHOC} from 'react-native-gesture-handler';
 import {
   SafeAreaView,
   StyleSheet,
@@ -15,23 +16,42 @@ import {
   DebugInstructions,
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
-import { tabbedNavigation } from 'layouts';
-import { startupActions } from 'redux/startup';
-import { useDispatch } from 'react-redux';
-
+import {tabbedNavigation} from 'layouts';
+import {startupActions} from 'redux/startup';
+import {useDispatch} from 'react-redux';
+import BottomSheet from 'reanimated-bottom-sheet';
+import Example from './imperative';
 
 export interface HomeProps {
   componentId: string;
 }
 
-export function Home({ componentId }: HomeProps) {
-  const dispatch = useDispatch()
+function Home({componentId}: HomeProps) {
+  function renderInner(props) {
+    return (
+      <View style={styles.container}>
+        <Text>test</Text>
+      </View>
+    );
+  }
+
+  const dispatch = useDispatch();
+  return <Example/>
+  return (
+    <View style={styles.container}>
+      <Text>df</Text>
+      <BottomSheet
+        snapPoints={[450, 300, 0]}
+        renderContent={renderInner}
+        renderHeader={renderInner}
+      />
+    </View>
+  );
   return (
     <SafeAreaView>
       <ScrollView
         contentInsetAdjustmentBehavior="automatic"
-        style={styles.scrollView}
-      >
+        style={styles.scrollView}>
         <Header />
         {global.HermesInternal == null ? null : (
           <View style={styles.engine}>
@@ -104,6 +124,9 @@ const styles = StyleSheet.create({
   highlight: {
     fontWeight: '700',
   },
+  contentainer: {
+    flex: 1
+  },
   footer: {
     color: Colors.dark,
     fontSize: 12,
@@ -113,3 +136,5 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
 });
+
+export default gestureHandlerRootHOC(Home);
