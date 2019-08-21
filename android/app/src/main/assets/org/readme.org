@@ -1,8 +1,0 @@
-#+TITLE: readme.org
-
-* Node 1
-** Subnode 11
-** Subnode 12
-* Node 2
-** Subnode 21
-** Subnode 22

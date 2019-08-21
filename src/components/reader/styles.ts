@@ -1,7 +1,7 @@
 import { StyleSheet } from 'react-native'
-import { Fonts, Colors, Metrics } from 'view/themes'
-import { headlineStyles } from 'view/styles/levels';
-import globalStyles from 'view/styles/global';
+import { Fonts, Colors, Metrics } from 'themes'
+import globalStyles from 'themes/globalStyles';
+import { headlineStyles } from 'themes/levels';
 
 export default StyleSheet.create({
   ...globalStyles,

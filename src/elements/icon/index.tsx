@@ -1,7 +1,8 @@
 import React from 'react'
 import { View, Text } from 'react-native'
 import styles from './styles'
-import FontAwesome, { Icons } from 'react-native-fontawesome'
+import FontAwesome from 'react-native-vector-icons/FontAwesome';
+import { Colors } from 'themes';
 
 type Props = {
   name: keyof typeof Icons
@@ -10,8 +11,8 @@ type Props = {
 
 function Icon (props: Props) {
   return (
-    <View>
-      <FontAwesome style={props.style}>{Icons[props.name]}</FontAwesome>
+    <View  style={props.style}>
+      <FontAwesome size={8} name={props.name} color={Colors.lightGray} containerStyle ={{ flex: 1, justifyContent: 'center', alignSelf:'center'}}/>
     </View>
   )
 }

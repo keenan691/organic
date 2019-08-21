@@ -4,8 +4,8 @@ import { Text, View, TextInputChangeEventData } from 'react-native'
 import styles from './styles'
 import { OrgEntry } from 'modules/entries/store/types'
 import { TextInput } from 'react-native-gesture-handler'
-import { Colors } from 'view/themes';
-import { getItemColor } from 'view/themes/org-colors';
+import { Colors } from 'themes';
+import { getItemColor } from 'themes/org-colors';
 
 type Props = {
   category: string

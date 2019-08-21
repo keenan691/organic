@@ -2,7 +2,7 @@ import React, { forwardRef } from 'react'
 
 import Outliner from 'components/outliner'
 import { Empty } from 'elements'
-import STRINGS from 'view/constants/strings'
+import STRINGS from 'constants/strings'
 
 type Props = {}
 

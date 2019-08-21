@@ -4,36 +4,40 @@ import React, {
   forwardRef,
   useImperativeHandle,
   useCallback,
-} from 'react'
-import { Animated, LayoutAnimation, Text, View } from 'react-native'
-import { FlatList, PanGestureHandler, PinchGestureHandler } from 'react-native-gesture-handler'
+} from 'react';
+import {Animated, LayoutAnimation, Text, View, UIManager} from 'react-native';
+import {
+  FlatList,
+  PanGestureHandler,
+  PinchGestureHandler,
+} from 'react-native-gesture-handler';
 
-import { Separator, Empty, Icon } from 'elements'
-import styles from './styles'
-import { foldAnimation } from './animations'
-import ItemFocused from './ItemFocused'
-import Item from './Item'
-import { useItems } from './useItems'
-import { usePinchGesture } from './usePinchGesture'
-import { useScroll } from './useScroll'
-import { usePanGesture } from './usePanGesture'
-import { useVisibility } from './useVisibility'
-import { itemKeyExtractor } from 'helpers/functions'
-import STRINGS from 'view/constants/strings';
+import {Separator, Empty, Icon} from 'elements';
+import styles from './styles';
+import {foldAnimation} from './animations';
+import ItemFocused from './ItemFocused';
+import Item from './Item';
+import {useItems} from './useItems';
+import {usePinchGesture} from './usePinchGesture';
+import {useScroll} from './useScroll';
+import {usePanGesture} from './usePanGesture';
+import {useVisibility, hasHiddenChildren, hasChildren} from './useVisibility';
+import {itemKeyExtractor} from 'helpers/functions';
+import STRINGS from 'constants/strings';
 
 type Props = {
-  itemDict: object
-  ordering: string[]
-  ItemComponent: (props: object) => JSX.Element
-  levels: number[]
-  addItem: (item: object) => void
-  changeItems: any
-  deleteItems: any
-  canAddItems: boolean
-  setLevels: (levels: number[]) => void
-  setOrdering: (ordering: string[]) => void
-  onChangeFocusedItem: ({ position: number, item: object }) => void
-} & React.ComponentProps<typeof FlatList>
+  itemDict: object;
+  ordering: string[];
+  ItemComponent: (props: object) => JSX.Element;
+  levels: number[];
+  addItem: (item: object) => void;
+  changeItems: any;
+  deleteItems: any;
+  canAddItems: boolean;
+  setLevels: (levels: number[]) => void;
+  setOrdering: (ordering: string[]) => void;
+  onChangeFocusedItem: ({position: number, item: object}) => void;
+} & React.ComponentProps<typeof FlatList>;
 
 const createAnimatedValues = () => ({
   draggable: {
@@ -46,7 +50,7 @@ const createAnimatedValues = () => ({
     translateY: new Animated.Value(0),
   },
   scroll: new Animated.Value(0),
-})
+});
 
 function Outliner(
   {
@@ -56,19 +60,18 @@ function Outliner(
     ItemSeparatorComponent = Separator,
     keyExtractor = itemKeyExtractor,
     ListEmptyComponent = EmptyList,
-    initialNumToRender=30,
-    maxToRenderPerBatch=30,
-    windowSize=3,
-    updateCellsBatchingPeriod=200,
+    initialNumToRender = 30,
+    maxToRenderPerBatch = 30,
+    windowSize = 3,
+    updateCellsBatchingPeriod = 200,
     ...props
   }: Props,
-  ref
+  ref,
 ) {
-
   useImperativeHandle(ref, () => ({
     focusItem,
     scrollToItem,
-  }))
+  }));
 
   const {
     ordering,
@@ -79,7 +82,7 @@ function Outliner(
     deleteItems,
     onChangeFocusedItem,
     openHandler,
-  } = props
+  } = props;
 
   const refs = useRef({
     itemHeights: [] as number[],
@@ -106,32 +109,33 @@ function Outliner(
     actions: {
       open: openHandler,
     },
-  })
+  });
 
-  const animatedValuesRef = useRef(createAnimatedValues())
-  const animatedValues = animatedValuesRef.current
-  const refsData = refs.current
+  const animatedValuesRef = useRef(createAnimatedValues());
+  const animatedValues = animatedValuesRef.current;
+  const refsData = refs.current;
 
-  const draggableItemRef = useRef<ItemDraggable>()
-  const flatlistRef = useRef<FlatList<{}>>()
+  const draggableItemRef = useRef<ItemDraggable>();
+  const flatlistRef = useRef<FlatList<{}>>();
 
   const scrollToItem = (item: number | string) => {
-    const index = typeof item === 'string' ? ordering.findIndex(id => id === item) : item
-    LayoutAnimation.configureNext(foldAnimation)
+    const index =
+      typeof item === 'string' ? ordering.findIndex(id => id === item) : item;
+    LayoutAnimation.configureNext(foldAnimation);
     flatlistRef.current.getNode().scrollToIndex({
       index,
       viewPosition: 0.2,
       animated: true,
-    })
-  }
+    });
+  };
 
   const focusItem = (index: number) => {
-    activateItem(index)
-  }
+    activateItem(index);
+  };
 
-  const [hideDict, setItemVisibility] = useVisibility(ordering)
+  const [hideDict, setItemVisibility] = useVisibility(ordering);
 
-  const itemsData = { hideDict, levels, ordering }
+  const itemsData = {hideDict, levels, ordering};
 
   const {
     items,
@@ -148,55 +152,68 @@ function Outliner(
     props,
     setItemVisibility,
     animatedValues,
-    onChangeFocusedItem
-  )
+    onChangeFocusedItem,
+  );
 
-  const { onPanCallback, onPanHandlerStateCallback } = usePanGesture(
+  const {onPanCallback, onPanHandlerStateCallback} = usePanGesture(
     itemsData,
     refsData,
     draggableItemRef,
     setOrdering,
     setLevels,
-    animatedValues
-  )
+    animatedValues,
+  );
 
-  const { onPinchCallback, onPinchStateCallback } = usePinchGesture(
+  const {onPinchCallback, onPinchStateCallback} = usePinchGesture(
     itemsData,
     refsData,
-    setItemVisibility
-  )
+    setItemVisibility,
+  );
 
-  const onScrollEventCallback = useScroll(refsData, animatedValues)
+  const onScrollEventCallback = useScroll(refsData, animatedValues);
 
-  const onItemPress = useCallback(item => {
-    activateItem(item.position)
-  }, [])
+  const onItemPress = useCallback(
+    itemPosition => {
+      activateItem(itemPosition);
+    },
+    [itemsData.hideDict, itemsData.levels, itemsData.ordering],
+  );
 
   if (loadingItems) {
     return (
       <View>
         <Text>Loading</Text>
       </View>
-    )
+    );
   }
 
   return (
     <ReorderableTreeFlatListContext.Provider value={refs}>
       <PinchGestureHandler
         onGestureEvent={onPinchCallback}
-        onHandlerStateChange={onPinchStateCallback}
-      >
+        onHandlerStateChange={onPinchStateCallback}>
         <View>
           <Animated.FlatList
-            renderItem={({ item, index }) => (
+            renderItem={({item, index}) => (
               <ItemComponent
-                item={item}
+                id={item.id}
+                headline={item.headline}
+                type={item.type}
                 position={index}
                 onItemPress={onItemPress}
                 onItemIndicatorPress={onItemIndicatorPress}
                 onItemLayoutCallback={onItemLayoutCallback}
                 itemHeight={refsData.itemHeights[index]}
-                {...itemsData}
+                hasHiddenChildren={hasHiddenChildren(
+                  index,
+                  hideDict,
+                  ordering,
+                  levels,
+                )}
+                hasChildren={hasChildren(index, levels)}
+                hasContent={Boolean(item.content)}
+                level={levels[index]}
+                isHidden={hideDict[item.id]}
               />
             )}
             ItemSeparatorComponent={ItemSeparatorComponent}
@@ -209,8 +226,8 @@ function Outliner(
             updateCellsBatchingPeriod={updateCellsBatchingPeriod}
             windowSize={windowSize}
             onScroll={Animated.event(
-              [{ nativeEvent: { contentOffset: { y: animatedValues.scroll } } }],
-              { useNativeDriver: true, listener: onScrollEventCallback }
+              [{nativeEvent: {contentOffset: {y: animatedValues.scroll}}}],
+              {useNativeDriver: true, listener: onScrollEventCallback},
             )}
             ref={flatlistRef}
             {...props}
@@ -218,16 +235,21 @@ function Outliner(
 
           <PanGestureHandler
             onGestureEvent={Animated.event(
-              [{ nativeEvent: { translationY: animatedValues.draggable.translateY } }],
+              [
+                {
+                  nativeEvent: {
+                    translationY: animatedValues.draggable.translateY,
+                  },
+                },
+              ],
               {
                 useNativeDriver: true,
                 listener: event => {
-                  onPanCallback(event)
+                  onPanCallback(event);
                 },
-              }
+              },
             )}
-            onHandlerStateChange={onPanHandlerStateCallback}
-          >
+            onHandlerStateChange={onPanHandlerStateCallback}>
             <Animated.View
               style={[
                 styles.draggableWrapper,
@@ -237,19 +259,17 @@ function Outliner(
                     {
                       translateY: Animated.add(
                         animatedValues.draggable.translateY,
-                        Animated.divide(animatedValues.scroll, -1)
+                        Animated.divide(animatedValues.scroll, -1),
                       ),
                     },
                   ],
                 },
-              ]}
-            >
+              ]}>
               <Animated.View
                 style={[
                   styles.row,
-                  { transform: [{ translateX: animatedValues.draggable.level }] },
-                ]}
-              >
+                  {transform: [{translateX: animatedValues.draggable.level}]},
+                ]}>
                 <ItemFocused
                   onAddButtonPress={createNewItem}
                   onItemPress={activateItem}
@@ -271,23 +291,30 @@ function Outliner(
           <Animated.View
             style={[
               styles.targetIndicator,
-              { opacity: animatedValues.targetIndicator.opacity },
-              { transform: [{ translateY: animatedValues.targetIndicator.translateY }] },
+              {opacity: animatedValues.targetIndicator.opacity},
+              {
+                transform: [
+                  {translateY: animatedValues.targetIndicator.translateY},
+                ],
+              },
             ]}
           />
         </View>
       </PinchGestureHandler>
     </ReorderableTreeFlatListContext.Provider>
-  )
+  );
 }
 
 const EmptyList = (
-  <Empty itemName={STRINGS.entry.namePlural} message={STRINGS.entry.emptyDescription} />
-)
+  <Empty
+    itemName={STRINGS.entry.namePlural}
+    message={STRINGS.entry.emptyDescription}
+  />
+);
 
-export const ReorderableTreeFlatListContext = React.createContext<Context>({})
+export const ReorderableTreeFlatListContext = React.createContext<Context>({});
 
-export type Refs = typeof gestureData
-export type AnimatedValues = ReturnType<typeof createAnimatedValues>
+export type Refs = typeof gestureData;
+export type AnimatedValues = ReturnType<typeof createAnimatedValues>;
 
-export default memo(forwardRef(Outliner))
+export default memo(forwardRef(Outliner));

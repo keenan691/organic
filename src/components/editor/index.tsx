@@ -38,7 +38,6 @@ function Editor(props: Props) {
             route,
             position,
           }
-
           return (
             <View style={[styles.scene]}>
               {
@@ -60,7 +59,6 @@ function Editor(props: Props) {
         lazy={true}
         renderLazyPlaceholder={() => <Text>preload</Text>}
         tabBarPosition="top"
-        renderTabBar={props => null}
         initialLayout={{ width: Dimensions.get('window').width }}
       />
     </View>

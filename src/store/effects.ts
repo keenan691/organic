@@ -1,7 +1,7 @@
 import { all } from 'redux-saga/effects'
-import { effects as startupEffects } from 'modules/startup'
-import { effects as filesEffects } from 'modules/files'
-import { effects as entriesEffects } from 'modules/entries'
+import { effects as startupEffects } from 'redux/startup'
+import { effects as filesEffects } from 'redux/files'
+import { effects as entriesEffects } from 'redux/entries'
 
 export default function* root() {
   yield all([...entriesEffects])

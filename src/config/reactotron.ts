@@ -5,6 +5,8 @@ import { appConfig } from './app'
 import { registerReactotronCustomCommands } from 'helpers/debug'
 
 const useReactotron = __DEV__ && appConfig.useReactotron
+// const useReactotron = false
+
 let reactotron: any
 
 if (useReactotron) {
@@ -19,6 +21,13 @@ if (useReactotron) {
   reactotron.clear()
   registerReactotronCustomCommands(reactotron)
   console.tron = reactotron
+} else {
+  console.tron = {
+    log: () => null,
+    debug: () => null,
+    error: () => null,
+    display: () => null
+  }
 }
 
 export { reactotron }

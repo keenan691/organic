@@ -1,17 +1,19 @@
-import { StyleSheet } from 'react-native'
-import { Fonts, Colors, Metrics } from 'view/themes'
-import { headlineStyles } from 'view/styles/levels';
-import globalStyles from 'view/styles/global';
+import {StyleSheet} from 'react-native';
+import { Colors } from 'themes/colors';
+import Fonts from 'themes/Fonts';
+import Metrics from 'themes/Metrics';
+import globalStyles from 'themes/globalStyles';
+import { headlineStyles } from 'themes/levels';
 
 export default StyleSheet.create({
   ...globalStyles,
   ...headlineStyles,
   targetIndicator: {
-      height: 1,
-      width: '100%',
+    height: 1,
+    width: '100%',
     backgroundColor: Colors.blue,
-      position: 'absolute',
-      zIndex: 1,
+    position: 'absolute',
+    zIndex: 1,
   },
   draggableWrapper: {
     width: '100%',
@@ -22,16 +24,15 @@ export default StyleSheet.create({
   item: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1,
   },
   row: {
     flexDirection: 'row',
     alignItems: 'center',
-    flex: 1
+    flex: 1,
   },
   column: {
     flexDirection: 'column',
-    flex: 1
+    flex: 1,
   },
   headlineIndicator: {
     fontSize: Fonts.size.h4,
@@ -48,11 +49,11 @@ export default StyleSheet.create({
   },
   headlineIndicatorIcon: {
     color: Colors.white,
-    marginTop: -4,
+    // marginTop: -4,
   },
   contentPreviewText: {
     ...Fonts.style.label,
     fontSize: Fonts.size.small,
     color: Colors.base01,
   },
-})
+});

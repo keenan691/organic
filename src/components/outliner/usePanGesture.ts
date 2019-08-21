@@ -7,12 +7,13 @@ import {
 } from 'react-native-gesture-handler'
 import { map, filter, bufferCount } from 'rxjs/operators'
 import { LEVEL_SHIFT_TRIGGER } from './constants'
-import { endDragAnimation, startDragAnimation, startShiftLevelAnimation } from './animations'
+import { endDragAnimation, startDragAnimation, startShiftLevelAnimation, foldAnimation } from './animations'
 import { Refs, AnimatedValues } from '.'
 import { applyChanges } from "./applyChanges";
 import { ItemData } from './types'
 import ItemDraggable from './ItemDraggable'
 import { getItemInfo } from './useItems'
+import { LayoutAnimation } from 'react-native';
 
 export function usePanGesture(
   { levels, ordering, hideDict }: ItemData,
@@ -115,6 +116,7 @@ export function usePanGesture(
     const [newOrdering, newLevels] = applyChanges(data, ordering, levels)
     setOrdering(newOrdering)
     setLevels(newLevels)
+    LayoutAnimation.configureNext(foldAnimation)
   })
   return { onPanCallback, onPanHandlerStateCallback }
 }

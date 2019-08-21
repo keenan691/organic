@@ -70,8 +70,7 @@ export function useDebugReducer<R extends Reducer<S, F>, S, F>(red: R, initS: S,
       ...action,
       meta: {dispatch: wrappedDispatch},
     };
-    __DEV__ &&
-    logAction(updatedAction);
+    __DEV__ && logAction(updatedAction);
     return dispatch(updatedAction);
   }, []);
 

@@ -1,6 +1,6 @@
 import { StyleSheet } from 'react-native'
-import { Colors} from 'view/themes'
-import globalStyles from 'view/styles/global'
+import { Colors} from 'themes/colors'
+import globalStyles from 'themes/globalStyles'
 
 export default StyleSheet.create({
   ...globalStyles,

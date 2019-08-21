@@ -6,11 +6,6 @@ module.exports = {
       {
         root: ['./src/'],
         extensions: ['.tsx', '.ts'],
-        alias: {
-          '@components': './src/elements/components',
-          '@core': './src/core',
-          '@modules': './src/modules',
-        },
       },
     ],
     [
@@ -22,4 +17,4 @@ module.exports = {
       },
     ],
   ],
-}
+};

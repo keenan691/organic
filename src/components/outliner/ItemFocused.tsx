@@ -158,7 +158,7 @@ function ItemFocused(props: Props, ref) {
         )}
       </View>
       <TouchableOpacity onPress={() => null}>
-          <Icon name="chevronRight" style={[{ margin: 5 }]} />
+          <Icon name="chevron-right" style={[{ margin: 5 }]} />
       </TouchableOpacity>
     </View>
   )
@@ -186,7 +186,7 @@ function AddButtons({
       ]}
     >
       <TouchableOpacity onPress={() => onAddButtonPress(direction)}>
-        <Icon name="plusCircle" style={[{ margin: 5 }, styles[`h${level}C`]]} />
+        <Icon name="plus-circle" style={[{ margin: 5 }, styles[`h${level}C`]]} />
       </TouchableOpacity>
     </View>
   )

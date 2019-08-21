@@ -1,8 +1,8 @@
 import { OrgApi } from 'org-mode-connection'
-import RNFS from 'react-native-fs'
 import Realm from 'realm'
+import RNFetchBlob from 'rn-fetch-blob';
 
-OrgApi.configureFileAccess(RNFS)
+OrgApi.configureFileAccess(RNFetchBlob)
 OrgApi.configureDb(Realm)
 OrgApi.connectDb()
 

@@ -3,8 +3,8 @@ import { View, LayoutChangeEvent, Text } from 'react-native'
 import { TouchableHighlight } from 'react-native-gesture-handler'
 import { BooleanDict } from 'components/editor/types'
 import styles from './styles'
-import { Colors } from 'view/themes'
 import OrgContent from 'elements/entry-content';
+import { Colors } from 'themes/colors';
 
 type Props = {
   hideDict: BooleanDict

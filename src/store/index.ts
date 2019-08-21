@@ -14,7 +14,7 @@ const configureStore = (rootReducer: Reducer, rootSaga: Saga) => {
   const middleware = []
 
   const sagaMonitor = appConfig.useReactotron ? reactotron.createSagaMonitor() : null
-  const sagaMiddleware = createSagaMiddleware({ sagaMonitor })
+  const sagaMiddleware = createSagaMiddleware(appConfig.useReactotron ? { sagaMonitor } : {})
   middleware.push(sagaMiddleware)
 
   const reducer = appConfig.useReduxPersist

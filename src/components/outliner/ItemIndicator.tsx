@@ -1,18 +1,18 @@
-import React, { memo, useEffect, useRef } from 'react'
-import { View, Animated, Easing } from 'react-native'
-import styles from './styles'
-import { INDENT_WIDTH } from 'components/editor/constants'
-import { TouchableOpacity } from 'react-native-gesture-handler'
-import { Icon } from 'elements'
-import { usePrevious } from 'helpers/hooks'
-import { getItemColor } from 'view/themes/org-colors';
+import React, {memo, useEffect, useRef} from 'react';
+import {View, Animated, Easing} from 'react-native';
+import styles from './styles';
+import {INDENT_WIDTH} from 'components/editor/constants';
+import {TouchableOpacity} from 'react-native-gesture-handler';
+import {Icon} from 'elements';
+import {usePrevious} from 'helpers/hooks';
+import {getItemColor} from 'themes/org-colors';
 
 type Props = {
-  level: number
-  position: number
-  iconName?: keyof typeof Icon
-  onPress: (itemPosition: number) => void
-} & typeof defaultProps
+  level: number;
+  position: number;
+  iconName?: keyof typeof Icon;
+  onPress: (itemPosition: number) => void;
+} & typeof defaultProps;
 
 const defaultProps = {
   baseLevel: 1,
@@ -20,30 +20,37 @@ const defaultProps = {
   hasHiddenChildren: false,
   hasChildren: false,
   hasContent: false,
-}
+};
 
 function ItemIndicator(props: Props) {
-  const { flatDisplay, level, hasHiddenChildren, baseLevel, position, type } = props
-  const width = flatDisplay ? INDENT_WIDTH : INDENT_WIDTH * level
-  const iconName = props.iconName || getIconName(props) || null
+  const {
+    flatDisplay,
+    level,
+    hasHiddenChildren,
+    baseLevel,
+    position,
+    type,
+  } = props;
+  const width = flatDisplay ? INDENT_WIDTH : INDENT_WIDTH * level;
+  const iconName = props.iconName || getIconName(props) || null;
 
-  const color = getItemColor({ level, type})
-  const iconSpinValue = useRef(new Animated.Value(0))
+  const color = getItemColor({level, type});
+  const iconSpinValue = useRef(new Animated.Value(0));
   const iconSpinInterpolated = useRef(
     iconSpinValue.current.interpolate({
       inputRange: [0, 1],
       outputRange: ['0deg', '90deg'],
-    })
-  )
+    }),
+  );
 
-  const prevPosition = usePrevious(position)
+  const prevPosition = usePrevious(position);
 
-  const newIconSpinValue = hasHiddenChildren ? 1 : 0
+  const newIconSpinValue = hasHiddenChildren ? 1 : 0;
 
   // Do not animate when identity of visualized item changes
   // This is special use case for ItemDraggable
   if (position !== prevPosition) {
-    iconSpinValue.current.setValue(newIconSpinValue)
+    iconSpinValue.current.setValue(newIconSpinValue);
   }
 
   useEffect(() => {
@@ -52,39 +59,41 @@ function ItemIndicator(props: Props) {
         toValue: newIconSpinValue,
         duration: 200,
         easing: Easing.linear,
-      }).start()
+      }).start();
     }
-  }, [hasHiddenChildren])
+  }, [hasHiddenChildren]);
 
   return (
     <TouchableOpacity onPress={() => props.onPress(props.position)}>
-      <View style={[styles.headlineIndicatorWrapper, { width }]}>
+      <View style={[styles.headlineIndicatorWrapper, {width}]}>
         <Animated.View
           style={[
             {
               backgroundColor: color,
-              transform: [{ rotate: iconSpinInterpolated.current }] },
+              transform: [{rotate: iconSpinInterpolated.current}],
+            },
             styles.headlineIndicator,
-          ]}
-        >
+          ]}>
           {iconName && (
             <Icon
               name={iconName}
-              style={[styles.headlineIndicatorIcon, styles[`h${props.level}CH`]]}
+              style={[
+                styles.headlineIndicatorIcon,
+              ]}
             />
           )}
         </Animated.View>
       </View>
     </TouchableOpacity>
-  )
+  );
 }
 
-ItemIndicator.defaultProps = defaultProps
+ItemIndicator.defaultProps = defaultProps;
 
 const getIconName = ({hasChildren, type}: Props) => {
   /* if (type==='workspace') return  'genderless' */
-  if (hasChildren) return 'angleRight'
-  return
-}
+  if (hasChildren) return 'chevron-down';
+  return;
+};
 
-export default memo(ItemIndicator)
+export default memo(ItemIndicator);

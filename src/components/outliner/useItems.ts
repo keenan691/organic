@@ -45,21 +45,19 @@ export function useItems(
     return { length, offset, index }
   }
 
-  const activateItem = useCallback((newPosition: number| string, newItem?: any) => {
+  const activateItem = (newPosition: number| string, newItem?: any) => {
     if (!draggableRef.current) return
     let position
     if (typeof newPosition === 'string'){
       const desiredId = newPosition
       position = ordering.findIndex((id) => id === desiredId)
-      console.tron.debug('SDFSDF')
-      console.tron.debug(position)
     } else {
       position = newItem ? newItem.position : newPosition
     }
 
     const level = newItem ? newItem.level : levels[position]
     const item = newItem ? newItem : props.itemDict[ordering[position]]
-    // LayoutAnimation.configureNext(foldAnimation)
+
     const absoluteItemOffset = getAbsoluteItemPositionOffset(
       position,
       ordering,
@@ -100,7 +98,7 @@ export function useItems(
       startActivateAnimation(animatedValues)
       onChangeFocusedItem({ position, item })
     }
-  })
+  }
 
   const createNewItem = useCallback(
     (direction: 'top' | 'bottom') => {

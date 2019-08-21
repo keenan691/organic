@@ -1,66 +1,68 @@
 import React, { useCallback, memo } from 'react'
-import { View, LayoutChangeEvent, LayoutAnimation } from 'react-native'
+import { View, LayoutChangeEvent, Text} from 'react-native'
 import { TouchableHighlight } from 'react-native-gesture-handler'
-import { BooleanDict } from 'components/editor/types'
 import ItemIndicator from './ItemIndicator'
 import styles from './styles'
-import { Colors } from 'view/themes'
+import { Colors } from 'themes'
 import { ITEM_PADDING_VERTICAL, HEADLINE_FONT_SIZE } from './constants'
 import { EntryHeadline } from 'elements'
-import { hasChildren, hasHiddenChildren } from './useVisibility'
 
 type Props = {
-  hideDict: BooleanDict
   item: { id: string; content: string }
-  levels: number[]
-  ordering: string[]
+  type:  string,
+  headline:  string,
   itemHeight?: number
   onItemIndicatorPress: (itemPosition: number) => void
   onItemPress: (itemPosition: number) => void
   onItemLayoutCallback: (event: LayoutChangeEvent, itemId: string) => void
-  position: number
+  position: number,
+  hasChildren: boolean,
+  hasContent: boolean,
+  hasHiddenChildren: boolean,
+  level:  number,
+  isHidden: boolean,
+  id:  string
 }
 
 function Item(props: Props) {
   const {
-    hideDict,
-    item,
+    headline,
     onItemIndicatorPress,
     onItemPress,
-    ordering,
     itemHeight,
     onItemLayoutCallback,
-    levels,
     position,
+    hasChildren,
+    hasContent,
+    hasHiddenChildren,
+    level,
+    type,
+    isHidden,
+    id
   } = props
 
-  if (hideDict[item.id]) return null
-
-  const level = levels[position]
+  if (isHidden) return null
 
   return (
     <TouchableHighlight
       underlayColor={Colors.white}
-      onPress={() => {
-        onItemPress({...item, position})
-      }}
+      onPress={() => {onItemPress(position)}}
     >
       <View
         style={[styles.item, itemHeight && { height: itemHeight }]}
-        onLayout={event => onItemLayoutCallback(event, item.id)}
+        onLayout={event => onItemLayoutCallback(event, id)}
       >
         <ItemIndicator
           position={position}
-          level={levels[position]}
-          type={item.type}
-          hasHiddenChildren={hasHiddenChildren(position, hideDict, ordering, levels)}
-          hasChildren={hasChildren(position, levels)}
-          hasContent={Boolean(item.content)}
+          level={level}
+          type={type}
+          hasHiddenChildren={hasHiddenChildren}
+          hasChildren={hasChildren}
           onPress={onItemIndicatorPress}
         />
         <EntryHeadline
-          type={item.type}
-          headline={item.headline}
+          type={type}
+          headline={headline}
           level={level}
           position={position}
         />
