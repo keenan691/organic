@@ -2,11 +2,8 @@
 
 * src
 ** elements
-*** Headline
-*** Paragraph
 *** BottomSheet
 *** Modal
-*** Sdfd
 ** components
 *** Outliner
 *** EntriesReader
@@ -51,6 +48,12 @@ cancel - paluse beetween files
 *** settings
 get possible settings for screen
 ** screens
+*** main
+spróbować przenieść do native navigation
+**** Editor
+**** Agenda
+**** Notetaker
+**** Screen
 *** sources
 **** AddSource
 props:
@@ -59,11 +62,6 @@ type 'webdav'
 **** SourceSyncStatus
 is runned while app is loading
 - [ ] add pause button
-*** main
-spróbować przenieść do native navigation
-**** Workspaces
-**** Editor
-**** Reader
 *** startup
 **** PrivacyPolicy
 **** Splash
@@ -76,9 +74,6 @@ outliner
 *** timeline
 *** refile
 **** SelectTarget
-*** notetaker
-**** SelectCaptureTarget
-**** EnterNote
 *** reports
 **** StuckProjects
 ** layouts

@@ -16,8 +16,9 @@ const registerComponentWithRedux = (redux: any) => (name, component: any) => {
 };
 
 // prettier-ignore
-export type Screens = 'Dev' |
-                      'DevDrawer'
+export type Screens =
+  'Dev' |
+  'DevDrawer'
 
 export function registerScreens(redux) {
   // TODO register DevScreen only when in dev
