@@ -4,6 +4,9 @@ const globalStyles =  StyleSheet.create({
   container: {
     flex: 1,
   },
+  page: {
+    flex: 1,
+  },
   row: {
     flexDirection: 'row',
     flex: 1,

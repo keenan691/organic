@@ -6,8 +6,10 @@ import {iconsMap} from 'helpers/icons';
 import {Drawer} from 'react-native-paper';
 import {useDispatch, useSelector} from 'react-redux';
 import {devActions, devSelectors} from 'redux/dev';
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 
 export const devScreens = {
+  SourcesManager: require('./components/SourcesManager').default,
   Editor: require('./screens/main/Editor').default,
 };
 
@@ -76,7 +78,7 @@ class DevScreen extends Component {
     });
     return (
       <View style={styles.page}>
-        <Component />
+        <Component componentId={componentId} />
       </View>
     );
   }
@@ -98,4 +100,4 @@ const mapStateToProps = state => ({
   currentDevScreen: devSelectors.getCurrentDevScreen(state),
 });
 
-export const DevComponent = connect(mapStateToProps)(DevScreen);
+export const DevComponent = gestureHandlerRootHOC(connect(mapStateToProps)(DevScreen));

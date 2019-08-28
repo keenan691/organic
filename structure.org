@@ -4,7 +4,6 @@
 ** elements
 *** BottomSheet
 ** components
-*** Outliner
 *** SourcesManager
 ** redux
 *** sources
@@ -26,11 +25,11 @@ cancel - paluse beetween files
 *** main
 **** Editor
 *** sources
-**** AddSource
+**** WebDavSource
 props:
 type 'webdav'
-**** EditSource
-**** SourceSyncStatus
+**** LocalSource
+**** SourceSync
 is runned while app is loading
 - [ ] add pause button
 *** startup

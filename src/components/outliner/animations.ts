@@ -20,7 +20,7 @@ export const foldAnimation = {
 }
 
 export const opacityAnimation = {
-  duration: 1500,
+  duration: 10500,
   update: {
     property: LayoutAnimation.Properties.opacity,
     type: LayoutAnimation.Types.easeOut,
