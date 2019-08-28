@@ -1,5 +1,5 @@
 ---
-to: _devscreen/components/<%= h.changeCase.pascal(name) %>.tsx
+to: _devscreen/screens/<%= moduleName %>/<%= h.changeCase.pascal(name) %>.tsx
 ---
 import React from 'react'
 import <%= h.changeCase.pascal(name) %> from 'screens/<%= moduleName %>/<%= h.changeCase.pascal(name) %>';

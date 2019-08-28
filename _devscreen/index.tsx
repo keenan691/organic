@@ -8,6 +8,7 @@ import {useDispatch, useSelector} from 'react-redux';
 import {devActions, devSelectors} from 'redux/dev';
 
 export const devScreens = {
+  Editor: require('./screens/main/Editor').default,
 };
 
 export function DevComponentChooser({componentId}) {

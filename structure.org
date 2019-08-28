@@ -3,12 +3,9 @@
 * src
 ** elements
 *** BottomSheet
-*** Modal
 ** components
 *** Outliner
-*** EntriesReader
 *** SourcesManager
-*** Timeliner
 ** redux
 *** sources
 **** actions
@@ -25,35 +22,9 @@ wait for user action
 async
 cancel - paluse beetween files
 ***** syncSource
-*** entries
-**** actions
-***** addSource
-show bottom sheet with possible sources:
-- webdav server
-- file explorer
-
-wait for user action
-***** removeSource
-- show warning dialog if file is not saved
-
-***** syncAllSources
-async
-cancel - paluse beetween files
-***** syncSource
-*** autocomplete
-*** search
-*** timeline
-*** note
-*** editor
-*** settings
-get possible settings for screen
 ** screens
 *** main
-spróbować przenieść do native navigation
 **** Editor
-**** Agenda
-**** Notetaker
-**** Screen
 *** sources
 **** AddSource
 props:
@@ -65,26 +36,3 @@ is runned while app is loading
 *** startup
 **** PrivacyPolicy
 **** Splash
-*** search
-**** SearchResults
-**** SearchFilter
-*** settings
-**** Settings
-outliner
-*** timeline
-*** refile
-**** SelectTarget
-*** reports
-**** StuckProjects
-** layouts
-*** editor
-*** splash
-*** app
-** themes
-*** base
-*** day
-*** night
-* _devscreens
-** components
-*** Outliner
-* _templates
