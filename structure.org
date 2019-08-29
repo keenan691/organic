@@ -3,6 +3,8 @@
 * src
 ** elements
 *** BottomSheet
+*** FormFormik
+*** TextInputFormik
 ** components
 *** SourcesManager
 ** redux

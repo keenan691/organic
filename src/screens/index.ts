@@ -1,4 +1,5 @@
 import {Navigation} from 'react-native-navigation';
+import WebDavSource from './sources/WebDavSource'
 import Editor from './main/Editor'
 import {Other} from './Other';
 import Home from './Home';
@@ -18,11 +19,13 @@ const registerComponentWithRedux = (redux: any) => (name, component: any) => {
 
 // prettier-ignore
 export type Screens =
+  'sources/WebDavSource' |
   'main/Editor' |
   'Dev' |
   'DevDrawer'
 
 export function registerScreens(redux) {
+  registerComponentWithRedux(redux)('sources/WebDavSource', WebDavSource);
   registerComponentWithRedux(redux)('main/Editor', Editor);
   // TODO register DevScreen only when in dev
   registerComponentWithRedux(redux)('DevDrawer', DevComponentChooser);

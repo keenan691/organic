@@ -46,7 +46,7 @@ function SourcesManager(
 
   const onPressCallback = useCallback(() => {
     /* setLayoutWihEffects(name.nothing); */
-    bottomSheetRef.current.snapTo(1);
+    bottomSheetRef.current.snapTo(2);
   }, []);
 
   useEffect(() => {
@@ -87,7 +87,7 @@ function SourcesManager(
   );
   const bs = useRef(null);
   const newLocal = {
-    inputRange: [0.95, 1],
+    inputRange: [0.90, 1],
     outputRange: [0, 1],
     extrapolate: 'clamp',
   };
@@ -102,7 +102,8 @@ function SourcesManager(
         renderContent={() => (
           <View style={styles.panel}>
             <Button mode="contained" onPress={() => {
-
+              bottomSheetRef.current.snapTo(3);
+              Navigation.showModal({stack: {children: [{component: {name: 'sources/WebDavSource'}}]}})
             }}>
               WebDAV
             </Button>
@@ -111,7 +112,7 @@ function SourcesManager(
             </Button>
           </View>
         )}
-        initialSnap={2}
+        initialSnap={3}
         enabledGestureInteraction={true}
       />
       <View style={[styles.fabWrapper]}>

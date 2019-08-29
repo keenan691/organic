@@ -35,6 +35,7 @@
     "reactotron-redux-saga": "^4.2.2",
     "realm": "^2.29.2",
     "reanimated-bottom-sheet": "^1.0.0-alpha.13",
+    "recompose": "^0.30.0",
     "redux": "^4.0.4",
     "redux-persist": "^5.10.0",
     "redux-saga": "^1.0.5",

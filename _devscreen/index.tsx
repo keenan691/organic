@@ -9,6 +9,7 @@ import {devActions, devSelectors} from 'redux/dev';
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 
 export const devScreens = {
+  WebDavSource: require('./screens/sources/WebDavSource').default,
   SourcesManager: require('./components/SourcesManager').default,
   Editor: require('./screens/main/Editor').default,
 };
@@ -89,6 +90,7 @@ const styles = StyleSheet.create({
     flex: 1,
     marginTop: 10,
     paddingHorizontal: 3,
+    backgroundColor: 'white'
   },
   sectionContainer: {
     marginTop: 32,
