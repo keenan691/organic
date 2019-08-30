@@ -4,9 +4,11 @@
 ** elements
 *** BottomSheet
 *** FormFormik
+*** GroupFormik
 *** TextInputFormik
 ** components
 *** SourcesManager
+*** Source
 ** redux
 *** sources
 **** actions

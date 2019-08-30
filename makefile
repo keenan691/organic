@@ -22,6 +22,7 @@ yarn-install:
 
 typesync:
 	typesync
+	yarn install
 
 # ** Logs
 

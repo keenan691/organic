@@ -16,4 +16,4 @@ function <%= h.changeCase.pascal(name) %> (props: Props) {
   )
 }
 
-export default <%= h.capitalize(name) %>
+export default <%= h.changeCase.pascal(name) %> %>
