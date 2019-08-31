@@ -25,6 +25,8 @@ wait for user action
 async
 cancel - paluse beetween files
 ***** syncSource
+**** selectors
+***** getWebDavServers
 ** screens
 *** main
 **** Editor

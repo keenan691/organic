@@ -1,6 +1,7 @@
 import {Button} from 'react-native-paper'
 import {Formik} from 'formik'
 import {Options, Navigation} from 'react-native-navigation'
+import {Source} from 'redux/sources/types'
 import {View, StyleSheet, Keyboard} from 'react-native'
 import {createClient} from 'webdav'
 import {prop} from 'ramda'
@@ -34,14 +35,6 @@ const validationSchema = Yup.object().shape({
   username: Yup.string().required(),
   password: Yup.string().required(),
 })
-
-export type Source = {
-  type: 'webdav' | 'resillio-sync' | 'local-file'
-  url: string
-  path: string
-  username: string
-  password: string
-}
 
 const createSourceFromFormValues = values => ({
   ...values,
@@ -115,7 +108,7 @@ export default function WebDavSource({componentId}: Props) {
     }
   }, [source])
 
-  const handleAddFile = useCallback(() => {
+  const handleAddSource = useCallback(() => {
     if (!pingResult) return
     const {content, stat} = pingResult
     const name = {source, stat, content}
@@ -169,7 +162,7 @@ export default function WebDavSource({componentId}: Props) {
               <TextInputFormik label="password" name="password" type="password" />
             </GroupFormik>
             {pingResult && pingResult.stat && pingResult.stat.type === 'file' ? (
-              <Button onPress={handleAddFile} mode="contained">
+              <Button onPress={handleAddSource} mode="contained">
                 Add {pingResult.stat.basename}({pingResult.stat.size})
               </Button>
             ) : (
