@@ -1,8 +1,7 @@
 import {Navigation} from 'react-native-navigation';
+import Home from './main/Home'
 import WebDavSource from './sources/WebDavSource'
-import Editor from './main/Editor'
 import {Other} from './Other';
-import Home from './Home';
 import Splash from './Splash';
 import Search from './Search';
 import Main from './Main';
@@ -12,7 +11,7 @@ import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 const registerComponentWithRedux = (redux: any) => (name, component: any) => {
   Navigation.registerComponentWithRedux(
     name,
-    () => component,
+    () => gestureHandlerRootHOC(component),
     redux.Provider,
     redux.store,
   );
@@ -20,20 +19,17 @@ const registerComponentWithRedux = (redux: any) => (name, component: any) => {
 
 // prettier-ignore
 export type Screens =
+  'main/Home' |
   'sources/WebDavSource' |
-  'main/Editor' |
   'Dev' |
   'DevDrawer'
 
 export function registerScreens(redux) {
+  registerComponentWithRedux(redux)('main/Home', Home);
   registerComponentWithRedux(redux)('sources/WebDavSource', WebDavSource);
-  registerComponentWithRedux(redux)('main/Editor', Editor);
   // TODO register DevScreen only when in dev
   registerComponentWithRedux(redux)('DevDrawer', DevComponentChooser);
   registerComponentWithRedux(redux)('Dev', DevComponent);
-  registerComponentWithRedux(redux)('Other', Other);
-  registerComponentWithRedux(redux)('Home', Home);
   registerComponentWithRedux(redux)('Splash', Splash);
   registerComponentWithRedux(redux)('Search', Search);
-  registerComponentWithRedux(redux)('Main', Main);
 }

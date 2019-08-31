@@ -1,43 +1,36 @@
-import React, {
-  memo,
-  useRef,
-  forwardRef,
-  useImperativeHandle,
-  useCallback,
-} from 'react';
-import {Animated, LayoutAnimation, Text, View, UIManager} from 'react-native';
-import {
-  FlatList,
-  PanGestureHandler,
-  PinchGestureHandler,
-} from 'react-native-gesture-handler';
+import {Animated, LayoutAnimation, Text, View} from 'react-native'
+import {FlatList, PanGestureHandler, PinchGestureHandler} from 'react-native-gesture-handler'
+import {number, object} from 'yup'
+import React, {memo, useRef, forwardRef, useImperativeHandle, useCallback} from 'react'
 
-import {Separator, Empty, Icon} from 'elements';
-import styles from './styles';
-import {foldAnimation} from './animations';
-import ItemFocused from './ItemFocused';
-import Item from './Item';
-import {useItems} from './useItems';
-import {usePinchGesture} from './usePinchGesture';
-import {useScroll} from './useScroll';
-import {usePanGesture} from './usePanGesture';
-import {useVisibility, hasHiddenChildren, hasChildren} from './useVisibility';
-import {itemKeyExtractor} from 'helpers/functions';
-import STRINGS from 'constants/strings';
+import {Separator, Empty} from 'elements'
+import {itemKeyExtractor} from 'helpers/functions'
+import STRINGS from 'constants/strings'
+
+import {foldAnimation} from './animations'
+import {useItems} from './useItems'
+import {usePanGesture} from './usePanGesture'
+import {usePinchGesture} from './usePinchGesture'
+import {useScroll} from './useScroll'
+import {useVisibility, hasHiddenChildren, hasChildren} from './useVisibility'
+import Item from './Item'
+import ItemFocused from './ItemFocused'
+import styles from './styles'
 
 type Props = {
-  itemDict: object;
-  ordering: string[];
-  ItemComponent: (props: object) => JSX.Element;
-  levels: number[];
-  addItem: (item: object) => void;
-  changeItems: any;
-  deleteItems: any;
-  canAddItems: boolean;
-  setLevels: (levels: number[]) => void;
-  setOrdering: (ordering: string[]) => void;
-  onChangeFocusedItem: ({position: number, item: object}) => void;
-} & React.ComponentProps<typeof FlatList>;
+  itemDict: object
+  ordering: string[]
+  ItemComponent: (props: object) => JSX.Element
+  levels: number[]
+  addItem: (item: object) => void
+  changeItems: any
+  deleteItems: any
+  canAddItems: boolean
+  openHandler: object
+  setLevels: (levels: number[]) => void
+  setOrdering: (ordering: string[]) => void
+  onChangeFocusedItem: ({position: number, item: object}) => void
+} & React.ComponentProps<typeof FlatList>
 
 const createAnimatedValues = () => ({
   draggable: {
@@ -50,7 +43,7 @@ const createAnimatedValues = () => ({
     translateY: new Animated.Value(0),
   },
   scroll: new Animated.Value(0),
-});
+})
 
 function Outliner(
   {
@@ -71,7 +64,7 @@ function Outliner(
   useImperativeHandle(ref, () => ({
     focusItem,
     scrollToItem,
-  }));
+  }))
 
   const {
     ordering,
@@ -82,7 +75,7 @@ function Outliner(
     deleteItems,
     onChangeFocusedItem,
     openHandler,
-  } = props;
+  } = props
 
   const refs = useRef({
     itemHeights: [] as number[],
@@ -109,33 +102,32 @@ function Outliner(
     actions: {
       open: openHandler,
     },
-  });
+  })
 
-  const animatedValuesRef = useRef(createAnimatedValues());
-  const animatedValues = animatedValuesRef.current;
-  const refsData = refs.current;
+  const animatedValuesRef = useRef(createAnimatedValues())
+  const animatedValues = animatedValuesRef.current
+  const refsData = refs.current
 
-  const draggableItemRef = useRef<ItemDraggable>();
-  const flatlistRef = useRef<FlatList<{}>>();
+  const draggableItemRef = useRef<ItemDraggable>()
+  const flatlistRef = useRef<FlatList<{}>>()
 
   const scrollToItem = (item: number | string) => {
-    const index =
-      typeof item === 'string' ? ordering.findIndex(id => id === item) : item;
-    LayoutAnimation.configureNext(foldAnimation);
+    const index = typeof item === 'string' ? ordering.findIndex(id => id === item) : item
+    LayoutAnimation.configureNext(foldAnimation)
     flatlistRef.current.getNode().scrollToIndex({
       index,
       viewPosition: 0.2,
       animated: true,
-    });
-  };
+    })
+  }
 
   const focusItem = (index: number) => {
-    activateItem(index);
-  };
+    activateItem(index)
+  }
 
-  const [hideDict, setItemVisibility] = useVisibility(ordering);
+  const [hideDict, setItemVisibility] = useVisibility(ordering)
 
-  const itemsData = {hideDict, levels, ordering};
+  const itemsData = {hideDict, levels, ordering}
 
   const {
     items,
@@ -153,7 +145,7 @@ function Outliner(
     setItemVisibility,
     animatedValues,
     onChangeFocusedItem,
-  );
+  )
 
   const {onPanCallback, onPanHandlerStateCallback} = usePanGesture(
     itemsData,
@@ -162,29 +154,29 @@ function Outliner(
     setOrdering,
     setLevels,
     animatedValues,
-  );
+  )
 
   const {onPinchCallback, onPinchStateCallback} = usePinchGesture(
     itemsData,
     refsData,
     setItemVisibility,
-  );
+  )
 
-  const onScrollEventCallback = useScroll(refsData, animatedValues);
+  const onScrollEventCallback = useScroll(refsData, animatedValues)
 
   const onItemPress = useCallback(
     itemPosition => {
-      activateItem(itemPosition);
+      activateItem(itemPosition)
     },
     [itemsData.hideDict, itemsData.levels, itemsData.ordering],
-  );
+  )
 
   if (loadingItems) {
     return (
       <View>
         <Text>Loading</Text>
       </View>
-    );
+    )
   }
 
   return (
@@ -204,12 +196,7 @@ function Outliner(
                 onItemIndicatorPress={onItemIndicatorPress}
                 onItemLayoutCallback={onItemLayoutCallback}
                 itemHeight={refsData.itemHeights[index]}
-                hasHiddenChildren={hasHiddenChildren(
-                  index,
-                  hideDict,
-                  ordering,
-                  levels,
-                )}
+                hasHiddenChildren={hasHiddenChildren(index, hideDict, ordering, levels)}
                 hasChildren={hasChildren(index, levels)}
                 hasContent={Boolean(item.content)}
                 level={levels[index]}
@@ -225,10 +212,10 @@ function Outliner(
             maxToRenderPerBatch={maxToRenderPerBatch}
             updateCellsBatchingPeriod={updateCellsBatchingPeriod}
             windowSize={windowSize}
-            onScroll={Animated.event(
-              [{nativeEvent: {contentOffset: {y: animatedValues.scroll}}}],
-              {useNativeDriver: true, listener: onScrollEventCallback},
-            )}
+            onScroll={Animated.event([{nativeEvent: {contentOffset: {y: animatedValues.scroll}}}], {
+              useNativeDriver: true,
+              listener: onScrollEventCallback,
+            })}
             ref={flatlistRef}
             {...props}
           />
@@ -245,7 +232,7 @@ function Outliner(
               {
                 useNativeDriver: true,
                 listener: event => {
-                  onPanCallback(event);
+                  onPanCallback(event)
                 },
               },
             )}
@@ -266,10 +253,7 @@ function Outliner(
                 },
               ]}>
               <Animated.View
-                style={[
-                  styles.row,
-                  {transform: [{translateX: animatedValues.draggable.level}]},
-                ]}>
+                style={[styles.row, {transform: [{translateX: animatedValues.draggable.level}]}]}>
                 <ItemFocused
                   onAddButtonPress={createNewItem}
                   onItemPress={activateItem}
@@ -293,28 +277,23 @@ function Outliner(
               styles.targetIndicator,
               {opacity: animatedValues.targetIndicator.opacity},
               {
-                transform: [
-                  {translateY: animatedValues.targetIndicator.translateY},
-                ],
+                transform: [{translateY: animatedValues.targetIndicator.translateY}],
               },
             ]}
           />
         </View>
       </PinchGestureHandler>
     </ReorderableTreeFlatListContext.Provider>
-  );
+  )
 }
 
 const EmptyList = (
-  <Empty
-    itemName={STRINGS.entry.namePlural}
-    message={STRINGS.entry.emptyDescription}
-  />
-);
+  <Empty itemName={STRINGS.entry.namePlural} message={STRINGS.entry.emptyDescription} />
+)
 
-export const ReorderableTreeFlatListContext = React.createContext<Context>({});
+export const ReorderableTreeFlatListContext = React.createContext<Context>({})
 
-export type Refs = typeof gestureData;
-export type AnimatedValues = ReturnType<typeof createAnimatedValues>;
+export type Refs = typeof gestureData
+export type AnimatedValues = ReturnType<typeof createAnimatedValues>
 
-export default memo(forwardRef(Outliner));
+export default memo(forwardRef(Outliner))

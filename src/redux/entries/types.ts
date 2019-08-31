@@ -1,5 +1,3 @@
-import { ActionType } from 'typesafe-actions'
-import Creators from './actions'
 import { PlainOrgNode } from 'org-mode-connection';
 
 export type InitialState = {

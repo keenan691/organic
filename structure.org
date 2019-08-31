@@ -27,10 +27,16 @@ cancel - paluse beetween files
 ***** syncSource
 **** selectors
 ***** getWebDavServers
+***** getStatus
+***** getData
 **** state
+***** sources
 ** screens
 *** main
-**** Editor
+**** Home
+**** Search
+**** Timeline
+**** Notetaker
 *** sources
 **** WebDavSource
 props:

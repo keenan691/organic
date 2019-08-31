@@ -1,9 +1,10 @@
-import { ActionType } from 'typesafe-actions'
-import Creators from './actions'
-
 // prettier-ignore
 export type InitialState = {
+  status: 'importing' | 'syncing' | 'ready'
+  data: SavedSource[]
 }
+
+export type SavedSource = Source & Stat & { id: string, metadata: string, description: string }
 
 export type Stat = {
   filename: string

@@ -9,9 +9,9 @@ import {devActions, devSelectors} from 'redux/dev';
 import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 
 export const devScreens = {
+  Home: require('./screens/main/Home').default,
   WebDavSource: require('./screens/sources/WebDavSource').default,
   SourcesManager: require('./components/SourcesManager').default,
-  Editor: require('./screens/main/Editor').default,
 };
 
 export function DevComponentChooser({componentId}) {
@@ -46,6 +46,7 @@ class DevScreen extends Component {
           text: 'select',
           icon: iconsMap['add-circle'],
         },
+        visible: false
       },
     };
   }
@@ -102,4 +103,4 @@ const mapStateToProps = state => ({
   currentDevScreen: devSelectors.getCurrentDevScreen(state),
 });
 
-export const DevComponent = gestureHandlerRootHOC(connect(mapStateToProps)(DevScreen));
+export const DevComponent = connect(mapStateToProps)(DevScreen);

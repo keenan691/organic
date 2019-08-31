@@ -137,4 +137,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default gestureHandlerRootHOC(Home);
+export default Home;

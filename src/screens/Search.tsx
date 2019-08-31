@@ -44,4 +44,4 @@ const styles = StyleSheet.create({
   },
 });
 
-export default gestureHandlerRootHOC(Search);
+export default Search;

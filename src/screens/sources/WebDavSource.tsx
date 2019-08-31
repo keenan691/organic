@@ -107,7 +107,7 @@ export default function WebDavSource({componentId}: Props) {
   const handleAddSource = useCallback(() => {
     if (!pingResult) return
     const {content, stat} = pingResult
-    dispatch(sourcesActions.addSource({
+    dispatch(sourcesActions.addSource.request({
       source,
       stat,
       content

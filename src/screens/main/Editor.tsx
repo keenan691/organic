@@ -8,12 +8,7 @@ type Props = {
 };
 
 export default function Editor({componentId}: Props) {
-  return (
-    <View style={styles.page}>
-      <Text>dfdfdfEddfitor</Text>
-      <FAB style={styles.fab} icon="person-add" onPress={() => null} />
-    </View>
-  );
+  return null
 }
 
 Editor.options = (): Options => ({

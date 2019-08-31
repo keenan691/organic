@@ -1,72 +1,62 @@
-import React, {
-  forwardRef,
-  useEffect,
-  useCallback,
-  useState,
-  useRef,
-} from 'react';
+import {FAB, Button} from 'react-native-paper'
+import {Navigation} from 'react-native-navigation'
+import {View, Text, LayoutAnimation} from 'react-native'
+import {sourcesSelectors} from 'redux/sources'
+import {useSelector} from 'react-redux'
+import Animated from 'react-native-reanimated'
+import BottomSheet from 'reanimated-bottom-sheet'
+import React, {useEffect, useCallback, useState, useRef, Fragment, memo} from 'react'
 
-import BottomSheet from 'reanimated-bottom-sheet';
-import Outliner from 'components/outliner';
-import Item from './Item';
-import {Empty} from 'elements';
-import STRINGS from 'constants/strings';
-import {View, Text, LayoutAnimation} from 'react-native';
-import styles from './styles';
-import {Navigation} from 'react-native-navigation';
-import {iconsMap} from 'helpers/icons';
-import {FAB, Button} from 'react-native-paper';
-import {foldAnimation, opacityAnimation} from 'components/outliner/animations';
-import Animated from 'react-native-reanimated';
+import {Empty} from 'elements'
+import {foldAnimation} from 'components/outliner/animations'
+import STRINGS from 'constants/strings'
 
-type Props = {};
+import styles from './styles'
 
-export type Layouts = 'one' | 'two';
+type Props = {}
+
+export type Layouts = 'one' | 'two'
 
 const name = {
   mount: 0,
   nothing: 1,
   addButtonVisible: 2,
-};
+}
 
-function SourcesManager(
-  props: Props,
-  ref:
-    | ((instance: unknown) => void)
-    | React.RefObject<unknown>
-    | null
-    | undefined,
-) {
-  const [layout, setLayout] = useState<Layouts>(name.mount);
+function SourcesManager(props: Props) {
+  const [layout, setLayout] = useState<Layouts>(name.mount)
+
+  const status = useSelector(sourcesSelectors.getStatus)
+  const data = useSelector(sourcesSelectors.getData)
 
   const setLayoutWihEffects = val => {
-    setLayout(val);
-    if (val > name.mount) LayoutAnimation.configureNext(foldAnimation);
-  };
+    setLayout(val)
+    if (val > name.mount) LayoutAnimation.configureNext(foldAnimation)
+  }
 
   const onPressCallback = useCallback(() => {
     /* setLayoutWihEffects(name.nothing); */
-    bottomSheetRef.current.snapTo(2);
-  }, []);
+    bottomSheetRef.current.snapTo(2)
+  }, [])
 
   useEffect(() => {
     if (layout === name.mount) {
       setTimeout(() => {
-        setLayoutWihEffects(name.nothing);
-      }, 0);
+        setLayoutWihEffects(name.nothing)
+      }, 0)
       setTimeout(() => {
-        setLayoutWihEffects(name.addButtonVisible);
-      }, 100);
+        setLayoutWihEffects(name.addButtonVisible)
+      }, 100)
     } else {
     }
-  }, [layout]);
+  }, [layout])
 
   const onClose = useRef(() => {
-    console.tron.debug('close');
-  });
-  const bottomSheetRef = useRef<BottomSheet | null>(null);
-  const callbackNode = useRef(new Animated.Value(1));
-  const callbackNode1 = useRef(new Animated.Value(1));
+    console.tron.debug('close')
+  })
+  const bottomSheetRef = useRef<BottomSheet | null>(null)
+  const callbackNode = useRef(new Animated.Value(1))
+  const callbackNode1 = useRef(new Animated.Value(1))
   Animated.useCode(
     Animated.onChange(
       callbackNode.current,
@@ -84,27 +74,29 @@ function SourcesManager(
       ]),
     ),
     [onClose],
-  );
-  const bs = useRef(null);
+  )
+  const bs = useRef(null)
   const newLocal = {
-    inputRange: [0.90, 1],
+    inputRange: [0.9, 1],
     outputRange: [0, 1],
     extrapolate: 'clamp',
-  };
+  }
   return (
-    <View style={styles.page}>
-      <Text>dfSourcesManager</Text>
-
+    <Fragment >
       <BottomSheet
         ref={bottomSheetRef}
         callbackNode={callbackNode.current}
         snapPoints={[500, 200, 100, 20]}
         renderContent={() => (
           <View style={styles.panel}>
-            <Button mode="contained" onPress={() => {
-              bottomSheetRef.current.snapTo(3);
-              Navigation.showModal({stack: {children: [{component: {name: 'sources/WebDavSource'}}]}})
-            }}>
+            <Button
+              mode="contained"
+              onPress={() => {
+                bottomSheetRef.current.snapTo(3)
+                Navigation.showModal({
+                  stack: {children: [{component: {name: 'sources/WebDavSource'}}]},
+                })
+              }}>
               WebDAV
             </Button>
             <Button mode="contained" onPress={() => null}>
@@ -132,27 +124,8 @@ function SourcesManager(
           </Animated.View>
         ) : null}
       </View>
-    </View>
-  );
-  return (
-    <Outliner
-      ItemComponent={Item}
-      ListEmptyComponent={EmptyList}
-      initialNumToRender={30}
-      maxToRenderPerBatch={30}
-      windowSize={3}
-      updateCellsBatchingPeriod={200}
-      ref={ref}
-      {...props}
-    />
-  );
+    </Fragment>
+  )
 }
 
-const EmptyList = (
-  <Empty
-    itemName={STRINGS.entry.namePlural}
-    message={STRINGS.entry.emptyDescription}
-  />
-);
-
-export default forwardRef(SourcesManager);
+export default memo(SourcesManager)

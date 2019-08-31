@@ -9,7 +9,8 @@ export function useVisibility(ordering: string[]): [any, any] {
   const [hideDict, setItemVisibility] = useState(() => ordering.reduce((acc, id) => ({ ...acc, [id]: false }), {}))
 
   useLayoutEffect(() => {
-    LayoutAnimation.configureNext(foldAnimation)
+    // TODO prevent effect trigger on initial render
+    // LayoutAnimation.configureNext(foldAnimation)
   }, [hideDict])
 
   return [hideDict, setItemVisibility]
