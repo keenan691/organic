@@ -1,20 +1,16 @@
-import {Button, TextInput, Headline} from 'react-native-paper'
+import {Button, TextInput} from 'react-native-paper'
 import {Formik} from 'formik'
-import {Options} from 'react-native-navigation'
-import {View, StyleSheet} from 'react-native'
-import {compose} from 'recompose'
-import {handleTextInput, withNextInputAutoFocusInput} from 'react-native-formik'
-import {inc, pipe, ifElse} from 'ramda'
-import React, {useState, useCallback} from 'react'
+import {Options, Navigation} from 'react-native-navigation'
+import {View, StyleSheet, Keyboard} from 'react-native'
+import React, {useState, useEffect, useCallback, useRef} from 'react'
 import * as Yup from 'yup'
-
-import {FormFormik, TextInputFormik, GroupFormik} from 'elements'
+import {createClient} from 'webdav'
+import {FormFormik, TextInputFormik, GroupFormik, AutocompleteTextInputFormik} from 'elements'
+import { prop } from 'ramda';
 
 type Props = {
   componentId: string
 }
-
-const {createClient} = require('webdav')
 
 const createSourceClient = ({type, password, url, username}: Source) => {
   let client
@@ -29,7 +25,6 @@ const createSourceClient = ({type, password, url, username}: Source) => {
   return client
 }
 
-
 const validationSchema = Yup.object().shape({
   url: Yup.string()
     .required()
@@ -38,13 +33,6 @@ const validationSchema = Yup.object().shape({
   username: Yup.string().required(),
   password: Yup.string().required(),
 })
-
-/* value="http://195.116.235.151:5000/Documents/" */
-
-/* <TextInputFormik value="keenan" label="username" name="username" type="name" />
- * <TextInputFormik value="koyote69." label="password" name="password" type="password" />
- *
- * <TextInputFormik value="/someday.org" label="path" name="path" type="name" /> */
 
 export type Source = {
   type: 'webdav' | 'resillio-sync' | 'local-file'
@@ -56,94 +44,134 @@ export type Source = {
 
 const createSourceFromFormValues = values => ({
   ...values,
-  type: 'webdav'
+  type: 'webdav',
 })
 
 export type Stat = {
-  filename:  string
-  basename:  string
+  filename: string
+  basename: string
   lastmod: string // "Sun, 13 Mar 2016 04:23:32 GMT",
   size: number
   type: 'file' | 'directory'
-  mime:  string
-  etag:  string//"33a728c7f288ede1fecc90ac6a10e062"
+  mime: string
+  etag: string //"33a728c7f288ede1fecc90ac6a10e062"
 }
 
-export type PingSourceResult = Promise<{
+export type PingSourceResult = {
   status: boolean
-  error?:  string
+  error?: string
   stat?: Stat
   content?: string
-}>
+}
 
-const pingSource = async (source: Source): PingSourceResult => {
+const pingSource = async (source: Source): Promise<PingSourceResult> => {
   const client = createSourceClient(source)
   let result
   try {
     const stat: Stat = await client.stat('/someday.org')
     let content: string
-    if (stat.type === 'file'){
+    if (stat.type === 'file') {
       // fetch file content
-      content = await client.getFileContents('/someday.org', { format: 'text'})
+      content = await client.getFileContents('/someday.org', {format: 'text'})
       // check if have write rights
-      await client.putFileContents("/someday.org", content);
+      await client.putFileContents('/someday.org', content)
     } else {
       content = ''
     }
     result = {
       status: true,
       stat,
-      content
+      content,
     }
   } catch (err) {
     console.tron.error(err)
-    result = { status: false }
+    result = {status: false}
   }
-  return new Promise(result)
+  return result
+}
+
+const tryToFetchFileCandidates = async (source: Source): string[] => {
+  try
+  {
+    const client = createSourceClient(source)
+    const result = await client.getDirectoryContents('/', { glob: "/**/*.org"})
+    return result.map(prop('basename'))
+  } catch(err){
+    return []
+  }
 }
 
 export default function WebDavSource({componentId}: Props) {
-  const [buttonState, setButtonState] = useState(1)
-  const nextStage = () => setButtonState(inc(1))
+  const [source, setSource] = useState<null | Source>(null)
+  const [pingResult, setPingResult] = useState<null | PingSourceResult>(null)
+  const [connecting, setConnecting] = useState(false)
+  const [serverFiles, setServerFiles] = useState<string[]>([])
+
+  useEffect(() => {
+    if (source) {
+      pingSource(source)
+        .then(setPingResult)
+        .finally(() => setConnecting(false))
+    }
+  }, [source])
+
+  const handleAddFile = useCallback(() => {
+    if (!pingResult) return
+    const {content, stat} = pingResult
+    const name = {source, stat, content}
+    Keyboard.dismiss()
+    Navigation.dismissAllModals()
+  }, [pingResult])
+
+  const urlCandidates = ['http://195.116.235.151:5000/Documents']
+
+  const pingUrlCallback = useCallback(async (values) => {
+    const source = createSourceFromFormValues(values)
+    const candidates = await tryToFetchFileCandidates(source)
+    setServerFiles(candidates)
+  } ,[])
 
   return (
     <View style={styles.page}>
       <Formik
         onSubmit={async values => {
-          nextStage()
-          const newSource = createSourceFromFormValues(values)
-          console.tron.debug('D!')
-          const pingResults = await pingSource(newSource)
-          console.tron.debug('D4')
-          console.tron.debug(pingResults)
+          setConnecting(true)
+          setSource(createSourceFromFormValues(values))
+          setPingResult(null)
         }}
         initialValues={{
-          url: 'http://195.116.235.151:5000/Documents/',
-          path: '/someday.org',
+          url: 'http://195.116.235.151:5000/Documents',
+          path: '',
           username: 'admin',
           password: 'koyote69.',
         }}
         validationSchema={validationSchema}
-        render={({handleSubmit}) => (
+        render={({handleSubmit, values}) => (
           <FormFormik>
             <GroupFormik title="Server Settings">
-              <TextInputFormik autoFocus label="url" name="url" type="url" />
-              <TextInputFormik label="path" name="path" type="name" />
+              <AutocompleteTextInputFormik
+                autoFocus
+                label="url"
+                name="url"
+                type="url"
+                onSubmitEditing={() => pingUrlCallback(values)}
+                candidates={urlCandidates}
+              />
+              <AutocompleteTextInputFormik label="path" name="path" type="name" candidates={serverFiles} />
             </GroupFormik>
             <GroupFormik title="Creditials">
               <TextInputFormik label="username" name="username" type="name" />
               <TextInputFormik label="password" name="password" type="password" />
             </GroupFormik>
-            <Button
-              onPress={handleSubmit}
-              mode="contained"
-              {...[
-                {disabled: true, children: 'connect'},
-                {disabled: false, children: 'connect'},
-                {loading: true, children: 'connecting'},
-                {children: 'add source'},
-              ][buttonState]}
-            />
+            {pingResult && pingResult.stat && pingResult.stat.type === 'file' ? (
+              <Button onPress={handleAddFile} mode="contained">
+                Add {pingResult.stat.basename}({pingResult.stat.size})
+              </Button>
+            ) : (
+              <Button onPress={handleSubmit} mode="contained" loading={connecting}>
+                {connecting ? 'connecting' : 'connect'}
+              </Button>
+            )}
           </FormFormik>
         )}
       />

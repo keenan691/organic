@@ -7,6 +7,7 @@ import Splash from './Splash';
 import Search from './Search';
 import Main from './Main';
 import {DevComponent, DevComponentChooser} from '../../_devscreen';
+import { gestureHandlerRootHOC } from 'react-native-gesture-handler';
 
 const registerComponentWithRedux = (redux: any) => (name, component: any) => {
   Navigation.registerComponentWithRedux(

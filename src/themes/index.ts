@@ -9,8 +9,10 @@ const Theme = {
     ...DefaultTheme.colors,
   },
 };
+const colors = DefaultTheme.colors
 
 export {
+  colors,
     Colors,
     Fonts,
     Metrics,
