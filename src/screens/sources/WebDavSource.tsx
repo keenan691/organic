@@ -1,7 +1,7 @@
 import {Button} from 'react-native-paper'
 import {Formik} from 'formik'
 import {Options, Navigation} from 'react-native-navigation'
-import {Source} from 'redux/sources/types'
+import {Source, Stat} from 'redux/sources/types'
 import {View, StyleSheet, Keyboard} from 'react-native'
 import {createClient} from 'webdav'
 import {prop} from 'ramda'
@@ -9,6 +9,8 @@ import React, {useState, useEffect, useCallback} from 'react'
 import * as Yup from 'yup'
 
 import {FormFormik, TextInputFormik, GroupFormik, AutocompleteTextInputFormik} from 'elements'
+import { useSelector, useDispatch } from 'react-redux';
+import { sourcesSelectors, sourcesActions } from 'redux/sources';
 
 type Props = {
   componentId: string
@@ -41,15 +43,6 @@ const createSourceFromFormValues = values => ({
   type: 'webdav',
 })
 
-export type Stat = {
-  filename: string
-  basename: string
-  lastmod: string // "Sun, 13 Mar 2016 04:23:32 GMT",
-  size: number
-  type: 'file' | 'directory'
-  mime: string
-  etag: string //"33a728c7f288ede1fecc90ac6a10e062"
-}
 
 export type PingSourceResult = {
   status: boolean
@@ -100,6 +93,9 @@ export default function WebDavSource({componentId}: Props) {
   const [connecting, setConnecting] = useState(false)
   const [serverFiles, setServerFiles] = useState<string[]>([])
 
+  const urlCandidates = useSelector(sourcesSelectors.getWebDavServers)
+  const dispatch = useDispatch()
+
   useEffect(() => {
     if (source) {
       pingSource(source)
@@ -111,12 +107,14 @@ export default function WebDavSource({componentId}: Props) {
   const handleAddSource = useCallback(() => {
     if (!pingResult) return
     const {content, stat} = pingResult
-    const name = {source, stat, content}
+    dispatch(sourcesActions.addSource({
+      source,
+      stat,
+      content
+    }))
     Keyboard.dismiss()
     Navigation.dismissAllModals()
   }, [pingResult])
-
-  const urlCandidates = ['http://195.116.235.151:5000/Documents']
 
   const pingUrlCallback = useCallback(async values => {
     const source = createSourceFromFormValues(values)
@@ -133,8 +131,6 @@ export default function WebDavSource({componentId}: Props) {
           setPingResult(null)
         }}
         initialValues={{
-          url: 'http://195.116.235.151:5000/Documents',
-          path: '',
           username: 'admin',
           password: 'koyote69.',
         }}

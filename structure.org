@@ -27,6 +27,7 @@ cancel - paluse beetween files
 ***** syncSource
 **** selectors
 ***** getWebDavServers
+**** state
 ** screens
 *** main
 **** Editor
