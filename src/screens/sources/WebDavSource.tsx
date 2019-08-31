@@ -1,12 +1,13 @@
-import {Button, TextInput} from 'react-native-paper'
+import {Button} from 'react-native-paper'
 import {Formik} from 'formik'
 import {Options, Navigation} from 'react-native-navigation'
 import {View, StyleSheet, Keyboard} from 'react-native'
-import React, {useState, useEffect, useCallback, useRef} from 'react'
-import * as Yup from 'yup'
 import {createClient} from 'webdav'
+import {prop} from 'ramda'
+import React, {useState, useEffect, useCallback} from 'react'
+import * as Yup from 'yup'
+
 import {FormFormik, TextInputFormik, GroupFormik, AutocompleteTextInputFormik} from 'elements'
-import { prop } from 'ramda';
 
 type Props = {
   componentId: string
@@ -91,12 +92,11 @@ const pingSource = async (source: Source): Promise<PingSourceResult> => {
 }
 
 const tryToFetchFileCandidates = async (source: Source): string[] => {
-  try
-  {
+  try {
     const client = createSourceClient(source)
-    const result = await client.getDirectoryContents('/', { glob: "/**/*.org"})
+    const result = await client.getDirectoryContents('/', {glob: '/**/*.org'})
     return result.map(prop('basename'))
-  } catch(err){
+  } catch (err) {
     return []
   }
 }
@@ -125,11 +125,11 @@ export default function WebDavSource({componentId}: Props) {
 
   const urlCandidates = ['http://195.116.235.151:5000/Documents']
 
-  const pingUrlCallback = useCallback(async (values) => {
+  const pingUrlCallback = useCallback(async values => {
     const source = createSourceFromFormValues(values)
     const candidates = await tryToFetchFileCandidates(source)
     setServerFiles(candidates)
-  } ,[])
+  }, [])
 
   return (
     <View style={styles.page}>
@@ -157,7 +157,12 @@ export default function WebDavSource({componentId}: Props) {
                 onSubmitEditing={() => pingUrlCallback(values)}
                 candidates={urlCandidates}
               />
-              <AutocompleteTextInputFormik label="path" name="path" type="name" candidates={serverFiles} />
+              <AutocompleteTextInputFormik
+                label="path"
+                name="path"
+                type="name"
+                candidates={serverFiles}
+              />
             </GroupFormik>
             <GroupFormik title="Creditials">
               <TextInputFormik label="username" name="username" type="name" />
