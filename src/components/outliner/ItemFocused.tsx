@@ -147,13 +147,13 @@ function ItemFocused(props: Props, ref) {
             position={position}
             onSubmit={onSubmitCallback}
           />
-          {item.content && itemState === 'active' && (
+          {item.content && itemState === 'active' ? (
             <View>
               <Text style={styles.contentPreviewText} numberOfLines={1} ellipsizeMode={'tail'}>
                 {item.content}
               </Text>
             </View>
-          )}
+          ): null}
         </TouchableOpacity>
         {props.canAddItems && itemState === 'active' && (
           <Fragment>

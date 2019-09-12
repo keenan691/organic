@@ -1,25 +1,42 @@
 import product from 'immer'
-import { createReducer } from 'typesafe-actions'
-import { InitialState } from './types'
+import {createReducer} from 'typesafe-actions'
+import {InitialState} from './types'
 import actions from './actions'
+import {indexBy, prop, omit} from 'ramda'
 
-// prettier-ignore
 const initialState: InitialState = {
-  objects: {},
-  orderingByFile: {}
+  status: 'ready',
+  editorEntryPoint: null,
+  agendaIds: [],
+  editorIds: [],
+  searchIds: [],
+  data: {},
 }
 
 const reducers = createReducer(initialState)
-  .handleAction(actions.loadEntries.request, state => state)
-  .handleAction(actions.loadEntries.cancel, state => state)
-  .handleAction(actions.loadEntries.failure, state => state)
-  .handleAction(actions.loadEntries.success, (state, { payload }) => {
-      return state;
+  .handleAction(actions.loadEntriesForEntryPoint.request, (state, {payload}) => {
+      return ({
+          ...state,
+          status: 'loading',
+          editorEntryPoint: payload,
+        data: omit(state.editorIds, state.data),
+        editorIds: []
+      });
   })
-
-  .handleAction(actions.preloadEntries.request, state => state)
-  .handleAction(actions.preloadEntries.cancel, state => state)
-  .handleAction(actions.preloadEntries.failure, state => state)
-  .handleAction(actions.preloadEntries.success, (state, { payload }) => payload)
+  .handleAction(actions.loadEntriesForEntryPoint.failure, state => state)
+  .handleAction(actions.loadEntriesForEntryPoint.success, state => {
+    return {...state, status: 'loading'}
+  })
+  .handleAction(actions.mergeAgendaEntries, (state, {payload}) => state)
+  .handleAction(actions.mergeEditorEntries, (state, {payload}) => {
+    const entriesDict = indexBy(prop('id'), payload)
+    const editorIds = payload.map(prop('id'))
+    return {
+      ...state,
+      data: {...state.data, ...entriesDict},
+      editorIds,
+    }
+  })
+  .handleAction(actions.mergeSearchEntries, (state, {payload}) => state)
 
 export default reducers

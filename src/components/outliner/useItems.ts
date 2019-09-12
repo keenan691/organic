@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState, useLayoutEffect } from 'react'
+import React, { useCallback, useEffect, useState, useLayoutEffect, useRef } from 'react'
 import { Dimensions, LayoutChangeEvent, LayoutAnimation } from 'react-native'
 import { startActivateAnimation, foldAnimation } from './animations'
 import { AnimatedValues, Refs } from '.'
@@ -22,16 +22,23 @@ export function useItems(
   props,
   setVisibility: React.Dispatch<React.SetStateAction<{}>>,
   animatedValues: AnimatedValues,
-  onChangeFocusedItem: ({ position: number, item: object }) => void
+  onChangeFocusedItem: ({ position: number, item: object }) => void,
 ) {
   const [loading, setLoading] = useState(true)
 
-  useEffect(() => {
+  const offsets = useRef([])
+  if (loading) {
     measureItems(ordering.map(id => props.itemDict[id].headline), levels).then(heights => {
       data.itemHeights = heights
-      setLoading(false)
+      if (heights.length > 0) {
+
+        for (let i = 1; i < ordering.length; i++) {
+          offsets.current[i] = offsets.current[i - 1] + heights[i]
+        }
+        setLoading(false)
+      }
     })
-  }, [])
+  }
 
   const onItemLayoutCallback = useCallback((event: LayoutChangeEvent, itemId: string) => {
     // TODO
@@ -239,7 +246,7 @@ export const getAbsoluteItemPositionOffset = (
 ) =>
   ordering
     .slice(0, position)
-    .reduce((acc, id) => (!hideDict[id] ? acc + itemHeights[position] : acc), 0)
+    .reduce((acc, id, idx) => (!hideDict[id] ? acc + itemHeights[idx] : acc), 0)
 
 export const getItems = createSelector(
   props => props.itemDict,
